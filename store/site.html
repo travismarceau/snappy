@@ -1,0 +1,264 @@
+<title>Snappy</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --ground:#f4f6f6;
+    --grid:#e6e9e9;
+    --surface:#ffffff;
+    --ink:#16181b;
+    --mid:#63696f;
+    --faint:#8b9198;
+    --hair:#dcdfdf;
+    --accent:#2a55cf;
+    --accent-ink:#ffffff;
+    --kcap-face:#ffffff;
+    --kcap-edge:#c9cdcd;
+    --kcap-shadow:rgba(20,24,28,.18);
+    --radius:10px;
+    --measure:39rem;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#121316;
+      --grid:#1e2024;
+      --surface:#191b1f;
+      --ink:#e8e9eb;
+      --mid:#9aa0a6;
+      --faint:#767c83;
+      --hair:#2a2d32;
+      --accent:#7aa4ff;
+      --accent-ink:#0f1114;
+      --kcap-face:#23262b;
+      --kcap-edge:#3a3e44;
+      --kcap-shadow:rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#121316;
+    --grid:#1e2024;
+    --surface:#191b1f;
+    --ink:#e8e9eb;
+    --mid:#9aa0a6;
+    --faint:#767c83;
+    --hair:#2a2d32;
+    --accent:#7aa4ff;
+    --accent-ink:#0f1114;
+    --kcap-face:#23262b;
+    --kcap-edge:#3a3e44;
+    --kcap-shadow:rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--ink);
+    background-color:var(--ground);
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:30px 30px;
+    background-position:-1px -1px;
+    line-height:1.6;
+    font-size:16px;
+    letter-spacing:-0.005em;
+  }
+  .wrap{max-width:var(--measure);margin:0 auto;padding:clamp(2rem,6vw,4.5rem) 1.4rem 5rem}
+
+  a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+  a:hover{text-decoration-thickness:2px}
+  a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+  h1,h2,h3{font-weight:700;line-height:1.2;text-wrap:balance;letter-spacing:-0.02em;margin:0}
+  h1{font-size:clamp(2.1rem,7vw,2.9rem)}
+  h2{font-size:1.35rem;margin:0 0 .9rem}
+  h3{font-size:1rem;font-weight:600;margin:0 0 .3rem}
+  p{margin:0 0 1rem;max-width:var(--measure)}
+  strong{font-weight:600}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 .8rem
+  }
+
+  /* ---- header ---- */
+  header{
+    display:flex;flex-direction:column;gap:1.4rem;
+    padding-bottom:2.2rem;margin-bottom:2.6rem;border-bottom:1px solid var(--hair)
+  }
+  .mark{display:flex;align-items:center;gap:.85rem}
+  .mark svg{width:44px;height:44px;flex:none;display:block}
+  .tile{fill:var(--surface);stroke:var(--hair)}
+  .win{fill:var(--ink)}
+  .quad{fill:var(--faint);opacity:.5}
+  .cell-line{stroke:var(--hair);stroke-width:1}
+  .mark .name{font-size:1.5rem;font-weight:700;letter-spacing:-0.03em}
+  .lede{font-size:1.12rem;color:var(--ink);max-width:34rem}
+  .shortcut{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;color:var(--mid);font-size:.95rem}
+
+  kbd{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:.82rem;font-weight:500;
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:1.9rem;height:1.9rem;padding:0 .55rem;
+    color:var(--ink);
+    background:var(--kcap-face);
+    border:1px solid var(--kcap-edge);
+    border-radius:7px;
+    box-shadow:0 2px 0 var(--kcap-shadow), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .then{color:var(--faint);font-size:.85rem}
+
+  /* ---- diagram ---- */
+  figure{margin:0;padding:0}
+  .diagram{
+    width:100%;max-width:420px;display:block;
+    border:1px solid var(--hair);border-radius:var(--radius);
+    background:var(--surface)
+  }
+  .diagram .cell-line{stroke:var(--hair);stroke-width:1}
+  .diagram .win{fill:var(--ink)}
+  .diagram .quad{fill:var(--faint);opacity:.5}
+  figcaption{font-size:.82rem;color:var(--faint);margin-top:.6rem}
+
+  /* ---- sections ---- */
+  section{padding:2.4rem 0;border-top:1px solid var(--hair)}
+  section:first-of-type{border-top:none;padding-top:0}
+
+  ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:1.15rem}
+  ol.steps li{counter-increment:s;display:grid;grid-template-columns:1.9rem 1fr;gap:.9rem;align-items:start}
+  ol.steps li::before{
+    content:counter(s);
+    font-family:"IBM Plex Mono",monospace;font-size:.8rem;font-weight:500;
+    width:1.9rem;height:1.9rem;display:flex;align-items:center;justify-content:center;
+    color:var(--mid);border:1px solid var(--hair);border-radius:50%;
+  }
+  ol.steps li p{margin:0}
+
+  dl{margin:0;display:grid;grid-template-columns:1fr;gap:1.1rem}
+  dl>div{display:grid;gap:.15rem}
+  dt{font-weight:600;font-size:.95rem}
+  dd{margin:0;color:var(--mid);font-size:.95rem}
+
+  .rule{color:var(--mid);font-size:.95rem}
+  .rule + .rule{margin-top:.7rem}
+
+  address{font-style:normal}
+  .updated{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--faint);letter-spacing:.04em}
+
+  footer{margin-top:3rem;padding-top:1.6rem;border-top:1px solid var(--hair);color:var(--faint);font-size:.82rem;display:flex;flex-wrap:wrap;gap:.4rem 1rem}
+
+  :target{scroll-margin-top:1.5rem}
+  @media (prefers-reduced-motion:no-preference){
+    kbd{transition:transform .06s ease, box-shadow .06s ease}
+    kbd:hover{transform:translateY(1px);box-shadow:0 1px 0 var(--kcap-shadow), inset 0 1px 0 rgba(255,255,255,.06)}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="mark">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <rect class="tile" x="1.5" y="1.5" width="37" height="37" rx="8"/>
+        <rect class="win" x="7" y="7" width="12.5" height="26" rx="2.5"/>
+        <rect class="quad" x="20.5" y="7" width="12.5" height="12.5" rx="2.5"/>
+        <line class="cell-line" x1="20.5" y1="7" x2="20.5" y2="33"/>
+        <line class="cell-line" x1="7" y1="20" x2="33" y2="20"/>
+      </svg>
+      <span class="name">Snappy</span>
+    </div>
+    <p class="lede">A menu-bar app that moves macOS windows with the keyboard. One shortcut opens a grid over your screen; one more key snaps the window to a region you drew.</p>
+    <div class="shortcut">
+      <kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd>
+      <span class="then">then</span>
+      <kbd>F</kbd>
+      <span class="then">— front window fills the screen</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="use-h">
+    <p class="eyebrow">Using Snappy</p>
+    <h2 id="use-h">One shortcut, then one key</h2>
+    <ol class="steps">
+      <li><p>Grant Accessibility permission the first time (see Requirements) so Snappy can move windows.</p></li>
+      <li><p>Press <kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd>. A grid appears over the active display.</p></li>
+      <li><p>Press the key you bound to a region — the front window jumps there and the grid closes. Pause instead and the full key map fades in.</p></li>
+      <li><p>Bind your own regions in <strong>Settings ▸ Placement</strong>: drag a rectangle on the grid, press a key. Under <strong>Layouts</strong>, bind one key to several apps at once.</p></li>
+    </ol>
+    <figure style="margin-top:1.8rem">
+      <svg class="diagram" viewBox="0 0 260 168" role="img" aria-label="A screen divided into a grid: the left half is one window region, the top-right quarter is another.">
+        <rect class="tile" x="1" y="1" width="258" height="166" rx="10"/>
+        <g class="cell-line">
+          <line x1="65"  y1="14" x2="65"  y2="154"/>
+          <line x1="130" y1="14" x2="130" y2="154"/>
+          <line x1="195" y1="14" x2="195" y2="154"/>
+          <line x1="14"  y1="49"  x2="246" y2="49"/>
+          <line x1="14"  y1="84"  x2="246" y2="84"/>
+          <line x1="14"  y1="119" x2="246" y2="119"/>
+        </g>
+        <rect class="win"  x="16"  y="16" width="112" height="136" rx="4"/>
+        <rect class="quad" x="132" y="16" width="112" height="66"  rx="4"/>
+      </svg>
+      <figcaption>Two regions on a 4×4 grid — a key for the left half, a key for the top-right quarter.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="req-h">
+    <p class="eyebrow">Requirements</p>
+    <h2 id="req-h">What Snappy needs</h2>
+    <dl>
+      <div>
+        <dt>macOS 10.15 or later</dt>
+        <dd>Apple silicon and Intel.</dd>
+      </div>
+      <div>
+        <dt>Accessibility permission</dt>
+        <dd>System Settings ▸ Privacy &amp; Security ▸ Accessibility ▸ turn on <strong>Snappy</strong>. This is the macOS API for resizing and moving windows; Snappy uses it for nothing else.</dd>
+      </div>
+      <div>
+        <dt>Nothing else</dt>
+        <dd>No account, no internet connection, no background services.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section id="support" aria-labelledby="sup-h">
+    <p class="eyebrow">Support</p>
+    <h2 id="sup-h">Getting help</h2>
+    <p>Questions, bugs, or a placement that won't stick — email and include your macOS version and what you expected to happen.</p>
+    <address><a href="mailto:t@travismarceau.com">t@travismarceau.com</a></address>
+    <p class="rule" style="margin-top:1.2rem"><strong>Windows won't move?</strong> Re-check the Accessibility toggle. After an app update macOS sometimes drops it — remove Snappy from the list with <kbd>–</kbd> and add it back.</p>
+    <p class="rule"><strong>The grid key does nothing?</strong> That key isn't bound yet. Open Settings ▸ Placement and assign it, or press <kbd>Esc</kbd> to close the grid.</p>
+  </section>
+
+  <section id="privacy" aria-labelledby="priv-h">
+    <p class="eyebrow">Privacy Policy</p>
+    <h2 id="priv-h">Snappy collects nothing</h2>
+    <p>Snappy does not collect, transmit, or sell any personal data. It has no analytics, no crash reporting, no accounts, and makes no network connections of any kind.</p>
+
+    <h3>Information handled on your Mac</h3>
+    <p class="rule"><strong>Window and screen geometry.</strong> To place a window, Snappy reads the position and size of the frontmost window and the dimensions of your displays through the macOS Accessibility API, then writes a new frame. This happens locally, in the moment, and is never stored or sent anywhere.</p>
+    <p class="rule"><strong>App identifiers in layouts.</strong> If you build a multi-window layout, the bundle identifiers of the apps you choose (for example <span class="updated">com.apple.Terminal</span>) are saved in your configuration so the layout can find those windows again. They stay on your Mac.</p>
+    <p class="rule"><strong>Your preferences.</strong> Grid size, margins, key bindings, and layouts are stored locally in your user Library (<span class="updated">~/Library/Application&nbsp;Support/Snappy</span> and the app's preferences), and in the app's sandbox container for the Mac App Store build. You can export them to a JSON file yourself; Snappy never uploads them.</p>
+
+    <h3>Permissions</h3>
+    <p class="rule"><strong>Accessibility</strong> — required, and used solely to move and resize windows on your own Mac.</p>
+    <p class="rule"><strong>Launch at login</strong> — optional, off by default.</p>
+
+    <h3>Children</h3>
+    <p class="rule">Snappy is a utility with no user content and no data collection, and is rated 4+. It is not directed at children specifically, and collects nothing from anyone.</p>
+
+    <h3>Changes &amp; contact</h3>
+    <p class="rule">If this policy ever changes, the updated version will be posted here. Questions: <a href="mailto:t@travismarceau.com">t@travismarceau.com</a>.</p>
+    <p class="updated">Last updated 2 September 2026</p>
+  </section>
+
+  <footer>
+    <span>Snappy</span>
+    <span>© 2026 Travis Marceau</span>
+    <span>Window-move engine derived from <a href="https://github.com/rxhanson/Rectangle">Rectangle</a> (MIT)</span>
+  </footer>
+</div>
