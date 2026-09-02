@@ -41,6 +41,11 @@ final class PlacementConfigViewController: NSViewController {
     private let revealAlwaysTag = 0, revealDelayTag = 1, revealNeverTag = 2
     private let displayCurrentTag = -100, displayNextTag = -1
 
+    // The two columns of the Placements pane, aligned to the General / Grid
+    // cards above so the layout reads as two consistent columns top to bottom.
+    private var placementsLeftColumn = NSView()
+    private var placementsRightColumn = NSView()
+
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
@@ -70,9 +75,10 @@ final class PlacementConfigViewController: NSViewController {
     // MARK: Layout
 
     private func buildLayout() {
+        let placementsPane = buildPlacementsPane() // populates placementsLeftColumn / placementsRightColumn
         let general = titledCard(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""), buildGeneralGrid())
         let gridCard = titledCard(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""), buildGridGrid())
-        let placements = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), buildPlacementsPane(), fillsHeight: true)
+        let placements = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), placementsPane, fillsHeight: true)
 
         for v in [general, gridCard, placements] {
             v.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +101,11 @@ final class PlacementConfigViewController: NSViewController {
             placements.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             placements.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             placements.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -18),
+
+            // Keep the Placements columns aligned to the cards above: the table
+            // ends where General ends, the region editor starts where Grid starts.
+            placementsLeftColumn.trailingAnchor.constraint(equalTo: general.trailingAnchor),
+            placementsRightColumn.leadingAnchor.constraint(equalTo: gridCard.leadingAnchor),
         ])
     }
 
@@ -230,14 +241,13 @@ final class PlacementConfigViewController: NSViewController {
         let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), #selector(exportKeymap))
 
         // Left column: table filling the height, add/remove + import/export below.
-        let left = NSView()
+        let left = placementsLeftColumn
         left.translatesAutoresizingMaskIntoConstraints = false
         for v in [scroll, addRemoveControl, importButton, exportButton] {
             v.translatesAutoresizingMaskIntoConstraints = false
             left.addSubview(v)
         }
         NSLayoutConstraint.activate([
-            left.widthAnchor.constraint(equalToConstant: 244),
             scroll.topAnchor.constraint(equalTo: left.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: left.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: left.trailingAnchor),
@@ -285,7 +295,7 @@ final class PlacementConfigViewController: NSViewController {
         regionCaption.textColor = .secondaryLabelColor
         regionCaption.translatesAutoresizingMaskIntoConstraints = false
 
-        let right = NSView()
+        let right = placementsRightColumn
         right.translatesAutoresizingMaskIntoConstraints = false
         for v in [regionCaption, picker, detailGrid, conflictLabel] {
             v.translatesAutoresizingMaskIntoConstraints = false
@@ -316,8 +326,10 @@ final class PlacementConfigViewController: NSViewController {
             left.topAnchor.constraint(equalTo: pane.topAnchor),
             left.leadingAnchor.constraint(equalTo: pane.leadingAnchor),
             left.bottomAnchor.constraint(equalTo: pane.bottomAnchor),
+            // left.trailing and right.leading are pinned to the General / Grid
+            // cards in buildLayout so the two columns line up top to bottom.
             right.topAnchor.constraint(equalTo: pane.topAnchor),
-            right.leadingAnchor.constraint(equalTo: left.trailingAnchor, constant: 20),
+            right.leadingAnchor.constraint(greaterThanOrEqualTo: left.trailingAnchor, constant: 16),
             right.trailingAnchor.constraint(equalTo: pane.trailingAnchor),
             right.bottomAnchor.constraint(lessThanOrEqualTo: pane.bottomAnchor),
             pane.heightAnchor.constraint(greaterThanOrEqualToConstant: 260),
