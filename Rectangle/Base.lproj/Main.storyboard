@@ -2661,6 +2661,7 @@
                     <tabViewItems>
                         <tabViewItem label="Shortcuts" image="keyboardToolbarTemplate" id="uw2-9W-2jq"/>
                         <tabViewItem label="Snap Areas" image="snapAreaTemplate" id="Fap-R2-Aj6"/>
+                        <tabViewItem label="Placement" image="keyboardToolbarTemplate" id="Plc-Cf-tb1"/>
                         <tabViewItem label="General" image="toolbarSettingsTemplate" id="gtf-PD-IHm"/>
                     </tabViewItems>
                     <viewControllerTransitionOptions key="transitionOptions" allowUserInteraction="YES"/>
@@ -2676,12 +2677,26 @@
                         <outlet property="tabView" destination="Tya-24-HNL" id="TDu-Z5-7uP"/>
                         <segue destination="zlF-FD-XEr" kind="relationship" relationship="tabItems" id="Q5z-Um-3xn"/>
                         <segue destination="t2d-Q7-RLy" kind="relationship" relationship="tabItems" id="Tnv-BY-sch"/>
+                        <segue destination="Plc-Cf-vc1" kind="relationship" relationship="tabItems" id="Plc-Cf-sg1"/>
                         <segue destination="yhc-gS-h02" kind="relationship" relationship="tabItems" id="LMQ-qb-ja6"/>
                     </connections>
                 </tabViewController>
                 <customObject id="CxR-5G-Y25" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-204" y="664"/>
+        </scene>
+        <!--Placement Config View Controller-->
+        <scene sceneID="Plc-Cf-sc1">
+            <objects>
+                <viewController storyboardIdentifier="PlacementConfigViewController" id="Plc-Cf-vc1" customClass="PlacementConfigViewController" customModule="Rectangle" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Plc-Cf-vw1">
+                        <rect key="frame" x="0.0" y="0.0" width="850" height="720"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                </viewController>
+                <customObject id="Plc-Cf-fr1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-204" y="1120"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="tRx-9g-sUa">

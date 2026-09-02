@@ -1,36 +1,12 @@
 /// PlacementConfigWindow.swift
 ///
 /// The Divvy-style configuration UI: pick a grid size, then for each key draw a
-/// rectangular region on the grid and assign a single keystroke to it. Opened
-/// from the status menu ("Configure Window Placements…"). Standalone,
-/// programmatic AppKit laid out to feel like a macOS System Settings pane.
+/// rectangular region on the grid and assign a single keystroke to it. Hosted as
+/// the "Placement" tab of Rectangle Settings (Main.storyboard). Programmatic
+/// AppKit laid out to feel like a macOS System Settings pane.
 
 import Cocoa
 import MASShortcut
-
-// MARK: - Window controller
-
-final class PlacementConfigWindowController: NSWindowController {
-
-    static let shared = PlacementConfigWindowController()
-
-    private convenience init() {
-        let vc = PlacementConfigViewController()
-        let window = NSWindow(contentViewController: vc)
-        window.title = NSLocalizedString("Window Placement", tableName: "Main", value: "Window Placement", comment: "")
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.setContentSize(NSSize(width: 680, height: 780))
-        window.minSize = NSSize(width: 640, height: 720)
-        window.center()
-        self.init(window: window)
-    }
-
-    func show() {
-        NSApp.activate(ignoringOtherApps: true)
-        showWindow(self)
-        window?.makeKeyAndOrderFront(self)
-    }
-}
 
 // MARK: - View controller
 
@@ -68,7 +44,7 @@ final class PlacementConfigViewController: NSViewController {
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 680, height: 780))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 850, height: 720))
         view.wantsLayer = true
         buildLayout()
     }
@@ -78,6 +54,17 @@ final class PlacementConfigViewController: NSViewController {
         syncControlsFromModel()
         reloadTable()
         selectRow(keymap.bindings.isEmpty ? nil : 0)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        // Pick up any changes made outside this tab (e.g. imported config).
+        if keymap != (Defaults.placementKeymap.typedValue ?? .empty) {
+            keymap = Defaults.placementKeymap.typedValue ?? .empty
+            syncControlsFromModel()
+            reloadTable()
+            selectRow(keymap.bindings.isEmpty ? nil : 0)
+        }
     }
 
     // MARK: Layout

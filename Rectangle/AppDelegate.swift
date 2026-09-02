@@ -265,7 +265,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     private func insertPlacementMenuItem() {
         let item = NSMenuItem(
-            title: NSLocalizedString("Configure Window Placements…", tableName: "Main", value: "Configure Window Placements…", comment: ""),
+            title: NSLocalizedString("Window Placement…", tableName: "Main", value: "Window Placement…", comment: ""),
             action: #selector(openPlacementConfig(_:)),
             keyEquivalent: "")
         item.target = self
@@ -279,8 +279,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Opens Rectangle Settings and selects the Placement tab.
     @objc func openPlacementConfig(_ sender: Any) {
-        PlacementConfigWindowController.shared.show()
+        openPreferences(sender)
+        if let tabVC = prefsWindowController?.window?.contentViewController as? NSTabViewController {
+            if let index = tabVC.tabViewItems.firstIndex(where: { ($0.viewController as? PlacementConfigViewController) != nil }) {
+                tabVC.selectedTabViewItemIndex = index
+            }
+        }
     }
 
     @IBAction func openPreferences(_ sender: Any) {
