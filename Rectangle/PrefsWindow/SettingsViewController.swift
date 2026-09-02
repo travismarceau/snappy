@@ -2,7 +2,6 @@
 
 import Cocoa
 import ServiceManagement
-import Sparkle
 import MASShortcut
 
 class SettingsViewController: NSViewController {
@@ -145,7 +144,7 @@ class SettingsViewController: NSViewController {
     }
     
     @IBAction func checkForUpdates(_ sender: Any) {
-        AppDelegate.instance.updaterController?.checkForUpdates(sender)
+        // Updates are handled by the App Store.
     }
     
     @IBAction func toggleDoubleClickTitleBar(_ sender: NSButton) {
@@ -162,7 +161,7 @@ class SettingsViewController: NSViewController {
             let conflictTitleText = NSLocalizedString(
                 "Conflict with system setting", tableName: "Main", value: "", comment: "")
             let conflictDescriptionText = NSLocalizedString(
-                "To let Rectangle manage the title bar double click functionality, you need to disable the corresponding macOS setting.", tableName: "Main", value: "", comment: "")
+                "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting.", tableName: "Main", value: "", comment: "")
 
             
             let closeText = NSLocalizedString("DVo-aG-piG.title", tableName: "Main", value: "Close", comment: "")
@@ -250,12 +249,12 @@ class SettingsViewController: NSViewController {
     }
     
     @IBAction func restoreDefaults(_ sender: Any) {
-        // Ask user if they want to restore to Rectangle or Spectacle defaults
-        let currentDefaults = Defaults.alternateDefaultShortcuts.enabled ? "Rectangle" : "Spectacle"
+        // Ask user if they want to restore to Divvtangle or Spectacle defaults
+        let currentDefaults = Defaults.alternateDefaultShortcuts.enabled ? "Divvtangle" : "Spectacle"
         let defaultShortcutsTitle = NSLocalizedString("Default Shortcuts", tableName: "Main", value: "", comment: "")
         let currentlyUsingText = NSLocalizedString("Currently using: ", tableName: "Main", value: "", comment: "")
         let cancelText = NSLocalizedString("Cancel", tableName: "Main", value: "", comment: "")
-        let response = AlertUtil.threeButtonAlert(question: defaultShortcutsTitle, text: currentlyUsingText + currentDefaults, buttonOneText: "Rectangle", buttonTwoText: "Spectacle", buttonThreeText: cancelText)
+        let response = AlertUtil.threeButtonAlert(question: defaultShortcutsTitle, text: currentlyUsingText + currentDefaults, buttonOneText: "Divvtangle", buttonTwoText: "Spectacle", buttonThreeText: cancelText)
         if response == .alertThirdButtonReturn { return }
 
         //  Restore default shortcuts
@@ -274,7 +273,7 @@ class SettingsViewController: NSViewController {
         Notification.Name.windowSnapping.post(object: false)
         let savePanel = NSSavePanel()
         savePanel.allowedFileTypes = ["json"]
-        savePanel.nameFieldStringValue = "RectangleConfig"
+        savePanel.nameFieldStringValue = "DivvtangleConfig"
         let response = savePanel.runModal()
         if response == .OK, let url = savePanel.url {
             do {
@@ -1082,15 +1081,15 @@ class SettingsViewController: NSViewController {
                                                name: .stackBadgeChanged,
                                                object: nil)
 
-        checkForUpdatesAutomaticallyCheckbox.bind(.value, to: AppDelegate.instance.updaterController.updater, withKeyPath: "automaticallyChecksForUpdates", options: nil)
-        
+        // Sparkle-based updating is removed for the App Store build.
+        checkForUpdatesAutomaticallyCheckbox.isHidden = true
+        checkForUpdatesButton.isHidden = true
+
         let appVersionString: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
         let buildString: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
-        
+
         versionLabel.stringValue = "v" + appVersionString + " (" + buildString + ")"
 
-        updateCheckForUpdatesTitle()
-        
         initializeTodoModeSettings()
         shortcutRecordingObserver.observe([toggleTodoShortcutView, reflowTodoShortcutView])
         
@@ -1134,15 +1133,8 @@ class SettingsViewController: NSViewController {
             self.hideMenuBarIconCheckbox.state = .on
         })
         
-        Notification.Name.updateAvailability.onPost { _ in
-            self.updateCheckForUpdatesTitle()
-        }
     }
-    
-    func updateCheckForUpdatesTitle() {
-        checkForUpdatesButton.title = AppDelegate.instance.hasPendingUpdate ? "Update Available…".localized : "Check for Updates…".localized(key: "74m-kw-w1f.title")
-    }
-    
+
     func initializeTodoModeSettings() {
         todoCheckbox.state = Defaults.todo.userEnabled ? .on : .off
         todoAppWidthField.stringValue = String(Defaults.todoSidebarWidth.value)

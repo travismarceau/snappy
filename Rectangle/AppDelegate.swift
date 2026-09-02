@@ -1,24 +1,17 @@
 /// AppDelegate.swift
 
 import Cocoa
-import Sparkle
 import ServiceManagement
 import os.log
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static let launcherAppId = "com.knollsoft.RectangleLauncher"
+    static let launcherAppId = "com.travismarceau.divvtangle.Launcher"
 
     private let accessibilityAuthorization = AccessibilityAuthorization()
     private let statusItem = RectangleStatusItem.instance
     static let windowHistory = WindowHistory()
-    var updaterController: SPUStandardUpdaterController!
-    var hasPendingUpdate = false {
-        didSet {
-            Notification.Name.updateAvailability.post()
-        }
-    }
 
     private var shortcutManager: ShortcutManager!
     private var windowManager: WindowManager!
@@ -41,7 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var unauthorizedMenu: NSMenu!
     @IBOutlet weak var ignoreMenuItem: NSMenuItem!
     @IBOutlet weak var viewLoggingMenuItem: NSMenuItem!
-    @IBOutlet weak var updatesMenuItem: NSMenuItem!
     @IBOutlet weak var quitMenuItem: NSMenuItem!
     
     static var instance: AppDelegate {
@@ -58,7 +50,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         checkLaunchOnLogin()
         
         let alreadyTrusted = accessibilityAuthorization.checkAccessibility {
-            self.showWelcomeWindow()
             self.checkForConflictingApps()
             self.openPreferences(self)
             self.statusItem.statusMenu = self.mainStatusMenu
@@ -80,12 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(rebuildMenu), name: .showAdditionalSizesInMenuChanged, object: nil)
 
-        updaterController = SPUStandardUpdaterController(updaterDelegate: nil, userDriverDelegate: self)
-        
-        checkAutoCheckForUpdates()
-        
         Notification.Name.configImported.onPost(using: { _ in
-            self.checkAutoCheckForUpdates()
             self.statusItem.refreshVisibility()
             self.applicationToggle.reloadFromDefaults()
             self.shortcutManager.reloadFromDefaults()
@@ -119,8 +105,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         } else {
+            // First run: apply the recommended defaults directly (no welcome prompt).
             Defaults.installVersion.value = currentVersion
             Defaults.allowAnyShortcut.enabled = true
+            Defaults.alternateDefaultShortcuts.enabled = true
+            Defaults.subsequentExecutionMode.value = .acrossMonitor
         }
         MASShortcutMigration.syncRenamedSideShortcutAliases()
         
@@ -139,18 +128,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 item.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
             case #selector(viewLogging):
                 item.image = NSImage(systemSymbolName: "doc.text", accessibilityDescription: nil)
-            case #selector(checkForUpdates):
-                item.image = NSImage(systemSymbolName: "arrow.down.circle", accessibilityDescription: nil)
             default:
                 break
             }
         }
     }
 
-    func checkAutoCheckForUpdates() {
-        updaterController.updater.automaticallyChecksForUpdates = Defaults.SUEnableAutomaticChecks.enabled
-    }
-    
     func accessibilityTrusted() {
         self.windowCalculationFactory = WindowCalculationFactory()
         self.windowManager = WindowManager()
@@ -178,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for app in runningApps {
             guard let bundleId = app.bundleIdentifier else { continue }
             if let conflictingAppName = conflictingAppsIds[bundleId] {
-                AlertUtil.oneButtonAlert(question: "Potential window manager conflict: \(conflictingAppName)", text: "Since \(conflictingAppName) might have some overlapping behavior with Rectangle, it's recommended that you either disable or quit \(conflictingAppName).")
+                AlertUtil.oneButtonAlert(question: "Potential window manager conflict: \(conflictingAppName)", text: "Since \(conflictingAppName) might have some overlapping behavior with Divvtangle, it's recommended that you either disable or quit \(conflictingAppName).")
                 break
             }
         }
@@ -230,30 +213,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let displayNameString = displayNames.joined(separator: "\n")
         
         if !problemBundles.isEmpty {
-            AlertUtil.oneButtonAlert(question: "Known issues with installed applications", text: "\(displayNameString)\n\nThese applications have issues with the drag to screen edge to snap functionality in Rectangle.\n\nYou can either ignore the applications using the menu item in Rectangle, or disable drag to screen edge snapping in Rectangle preferences.")
+            AlertUtil.oneButtonAlert(question: "Known issues with installed applications", text: "\(displayNameString)\n\nThese applications have issues with the drag to screen edge to snap functionality in Divvtangle.\n\nYou can either ignore the applications using the menu item in Divvtangle, or disable drag to screen edge snapping in Divvtangle preferences.")
             Defaults.notifiedOfProblemApps.enabled = true
         }
     }
         
-    private func showWelcomeWindow() {
-        let welcomeWindowController = NSStoryboard(name: "Main", bundle: nil)
-            .instantiateController(withIdentifier: "WelcomeWindowController") as? NSWindowController
-        guard let welcomeWindow = welcomeWindowController?.window else { return }
-        welcomeWindow.delegate = self
-        
-        NSApp.activate(ignoringOtherApps: true)
-        
-        let response = NSApp.runModal(for: welcomeWindow)
-        
-        let usingRecommended = response == .alertFirstButtonReturn || response == .abort
-        
-        Defaults.alternateDefaultShortcuts.enabled = usingRecommended
-        
-        Defaults.subsequentExecutionMode.value = usingRecommended ? .acrossMonitor : .resize
-        
-        welcomeWindowController?.close()
-    }
-    
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if Defaults.relaunchOpensMenu.enabled {
             statusItem.openMenu()
@@ -279,7 +243,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Opens Rectangle Settings and selects the Placement tab.
+    /// Opens Settings and selects the Placement tab.
     @objc func openPlacementConfig(_ sender: Any) {
         openPreferences(sender)
         if let tabVC = prefsWindowController?.window?.contentViewController as? NSTabViewController {
@@ -299,7 +263,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBAction func showAbout(_ sender: Any) {
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.orderFrontStandardAboutPanel(sender)
+        let credits = NSAttributedString(
+            string: "Divvy-style window placement built on Rectangle by Ryan Hanson (MIT License), which is itself based on Spectacle by Eric Czarny.",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 11),
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .paragraphStyle: { let p = NSMutableParagraphStyle(); p.alignment = .center; return p }(),
+            ])
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
     
     @IBAction func viewLogging(_ sender: Any) {
@@ -312,10 +283,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             applicationToggle.disableApp()
         }
-    }
-    
-    @IBAction func checkForUpdates(_ sender: Any) {
-        updaterController.checkForUpdates(sender)
     }
     
     @IBAction func authorizeAccessibility(_ sender: Any) {
@@ -684,8 +651,8 @@ extension AppDelegate {
                 }
                 let alert = NSAlert()
                 alert.alertStyle = .warning
-                alert.messageText = "Allow Rectangle URL action?".localized
-                alert.informativeText = String(format: "An external source asked Rectangle to perform \"%@\" on app bundle id \"%@\". Allow?".localized, action, bundleId)
+                alert.messageText = "Allow Divvtangle URL action?".localized
+                alert.informativeText = String(format: "An external source asked Divvtangle to perform \"%@\" on app bundle id \"%@\". Allow?".localized, action, bundleId)
                 alert.addButton(withTitle: "Allow".localized)
                 alert.addButton(withTitle: "Cancel".localized)
                 NSApp.activate(ignoringOtherApps: true)
@@ -728,24 +695,3 @@ extension AppDelegate {
     }
 }
 
-extension AppDelegate: SPUStandardUserDriverDelegate {
-    
-    var supportsGentleScheduledUpdateReminders: Bool {
-        true
-    }
-
-    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
-        if immediateFocus {
-            return true
-        }
-        
-        self.hasPendingUpdate = true
-        updatesMenuItem.title = "Update Available…".localized
-        return false
-    }
-    
-    func standardUserDriverWillFinishUpdateSession() {
-        self.hasPendingUpdate = false
-        updatesMenuItem.title = "Check for Updates…".localized(key: "HIK-3r-i7E.title")
-    }
-}
