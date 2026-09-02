@@ -122,10 +122,19 @@ class WindowManager {
         let currentNormalizedRect = currentWindowRect.screenFlipped
         let currentWindow = Window(id: windowId, rect: currentNormalizedRect)
         
-        let windowCalculation = WindowCalculationFactory.calculationsByAction[action]
-        
         let calculationParams = WindowCalculationParameters(window: currentWindow, usableScreens: usableScreens, action: action, lastAction: lastRectangleAction, ignoreTodo: ignoreTodo)
-        guard var calcResult = windowCalculation?.calculate(calculationParams) else {
+
+        let precalculatedResult: WindowCalculationResult?
+        if let precomputedRect = parameters.precomputedRect {
+            // Divvy-style grid placement: the caller has already resolved the
+            // exact destination rect against the (possibly explicit) screen.
+            precalculatedResult = WindowCalculationResult(rect: precomputedRect,
+                                                          screen: usableScreens.currentScreen,
+                                                          resultingAction: action)
+        } else {
+            precalculatedResult = WindowCalculationFactory.calculationsByAction[action]?.calculate(calculationParams)
+        }
+        guard var calcResult = precalculatedResult else {
             NSSound.beep()
             Logger.log("Nil calculation result")
             return
@@ -321,14 +330,19 @@ struct ExecutionParameters {
     let windowElement: AccessibilityElement?
     let windowId: CGWindowID?
     let source: ExecutionSource
+    /// When set, `WindowManager.execute` skips `WindowCalculationFactory` and
+    /// moves the window straight to this rect (Cocoa, bottom-left origin, in the
+    /// coordinate space of the target screen). Used by Divvy-style grid placement.
+    let precomputedRect: CGRect?
 
-    init(_ action: WindowAction, updateRestoreRect: Bool = true, screen: NSScreen? = nil, windowElement: AccessibilityElement? = nil, windowId: CGWindowID? = nil, source: ExecutionSource = .keyboardShortcut) {
+    init(_ action: WindowAction, updateRestoreRect: Bool = true, screen: NSScreen? = nil, windowElement: AccessibilityElement? = nil, windowId: CGWindowID? = nil, source: ExecutionSource = .keyboardShortcut, precomputedRect: CGRect? = nil) {
         self.action = action
         self.updateRestoreRect = updateRestoreRect
         self.screen = screen
         self.windowElement = windowElement
         self.windowId = windowId
         self.source = source
+        self.precomputedRect = precomputedRect
     }
 }
 

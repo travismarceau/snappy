@@ -182,6 +182,15 @@ enum WindowAction: Int, Codable {
     func postSnap(windowElement: AccessibilityElement?, windowId: CGWindowID?, screen: NSScreen) {
         NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, updateRestoreRect: false, screen: screen, windowElement: windowElement, windowId: windowId, source: .dragToSnap))
     }
+
+    /// Divvy-style grid placement: move the window straight to `rect` (Cocoa,
+    /// bottom-left origin, in `screen`'s coordinate space), bypassing the
+    /// calculation factory. Routes through the normal execution pipeline so
+    /// restore rects, fixed-size handling, cross-display moves and cursor-follow
+    /// all still apply.
+    func postPlacement(rect: CGRect, screen: NSScreen, windowElement: AccessibilityElement?, windowId: CGWindowID?) {
+        NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, updateRestoreRect: true, screen: screen, windowElement: windowElement, windowId: windowId, source: .keyboardShortcut, precomputedRect: rect))
+    }
     
     func postUrl() {
         NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, source: .url))

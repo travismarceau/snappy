@@ -110,6 +110,10 @@ class Defaults {
     static let screensOrderedByX = IntEnumDefault<ScreenOrdering>(key: "screensOrderedByX", defaultValue: .yThenMinX)
     static let combinedDisplayMode = OptionalBoolDefault(key: "combinedDisplayMode")
     static let greenButtonOverride = BoolDefault(key: "greenButtonOverride")
+    static let placementModeEnabled = OptionalBoolDefault(key: "placementModeEnabled")
+    static let placementPaneSticky = BoolDefault(key: "placementPaneSticky")
+    static let placementPaneTimeout = FloatDefault(key: "placementPaneTimeout", defaultValue: 4)
+    static let placementKeymap = JSONDefault<PlacementKeymap>(key: "placementKeymap")
     static var array: [Default] = [
         launchOnLogin,
         disabledApps,
@@ -206,7 +210,11 @@ class Defaults {
         cyclingOverlapMaxCascade,
         stackBadge,
         moveFixedSizeToEdge,
-        greenButtonOverride
+        greenButtonOverride,
+        placementModeEnabled,
+        placementPaneSticky,
+        placementPaneTimeout,
+        placementKeymap
     ]
 }
 

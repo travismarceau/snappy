@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F1AC0DE00000000000000201 /* PlacementModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000101 /* PlacementModel.swift */; };
+		F1AC0DE00000000000000202 /* PlacementMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000102 /* PlacementMode.swift */; };
+		F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000103 /* PlacementOverlay.swift */; };
+		F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */; };
+		F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000105 /* PlacementConfigViews.swift */; };
+		F1AC0DE00000000000000206 /* PlacementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000106 /* PlacementTests.swift */; };
 		01f52cab9bce43359775bdd7 /* JSONDefaultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = de0950b8b00f40308934a523 /* JSONDefaultTests.swift */; };
 		05DBEA44B55E6F8C5FC3D6E0 /* MiddleLeftTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEABF10E66D648DDB37DABBA /* MiddleLeftTwelfthCalculation.swift */; };
 		0F29956694B5BB31EBDAE445 /* UpperMiddleRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B5B09465C38F8B766B3C3C /* UpperMiddleRightSixteenthCalculation.swift */; };
@@ -228,6 +234,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F1AC0DE00000000000000101 /* PlacementModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementModel.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000102 /* PlacementMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementMode.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000103 /* PlacementOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementOverlay.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigWindow.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000105 /* PlacementConfigViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigViews.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000106 /* PlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementTests.swift; sourceTree = "<group>"; };
 		16B4044DB4809116039F96EB /* SixteenthsRepeated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SixteenthsRepeated.swift; sourceTree = "<group>"; };
 		246168B345ECE6C375ACEEB7 /* BottomLeftTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomLeftTwelfthCalculation.swift; sourceTree = "<group>"; };
 		30166BCF24F27D6A00A38608 /* SpecifiedCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecifiedCalculation.swift; sourceTree = "<group>"; };
@@ -720,6 +732,7 @@
 				982470422EFA00010037B409 /* WindowManager+CooperativeCornerResize.swift */,
 				AA49DD1029B8C1B100690E13 /* TitleBarManager.swift */,
 				AA49DD2029B8C1B100690E13 /* GreenButtonManager.swift */,
+				F1AC0DE00000000000000100 /* Placement */,
 				98987AA62391890C00BE72C4 /* Logging */,
 				98910B3C2311304D0066EC23 /* PrefsWindow */,
 				989DA30C243FC0C3008C7AA4 /* WelcomeWindow */,
@@ -742,6 +755,7 @@
 				9824701F22AF9B7E0037B409 /* RectangleTests.swift */,
 				944F25D02CE5A144004B2FD2 /* ShortcutRecordingObserverTests.swift */,
 				de0950b8b00f40308934a523 /* JSONDefaultTests.swift */,
+				F1AC0DE00000000000000106 /* PlacementTests.swift */,
 				9824702122AF9B7E0037B409 /* Info.plist */,
 			);
 			path = RectangleTests;
@@ -756,6 +770,16 @@
 			path = Popover;
 			sourceTree = "<group>";
 		};
+		F1AC0DE00000000000000100 /* Placement */ = {
+			isa = PBXGroup;
+			children = (
+				F1AC0DE00000000000000101 /* PlacementModel.swift */,
+				F1AC0DE00000000000000102 /* PlacementMode.swift */,
+				F1AC0DE00000000000000103 /* PlacementOverlay.swift */,
+			);
+			path = Placement;
+			sourceTree = "<group>";
+		};
 		98910B3C2311304D0066EC23 /* PrefsWindow */ = {
 			isa = PBXGroup;
 			children = (
@@ -764,6 +788,8 @@
 				98910B3D231130AF0066EC23 /* SettingsViewController.swift */,
 				983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */,
 				98C97FFC25893B040061F01F /* Config.swift */,
+				F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */,
+				F1AC0DE00000000000000105 /* PlacementConfigViews.swift */,
 			);
 			path = PrefsWindow;
 			sourceTree = "<group>";
@@ -1014,6 +1040,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1AC0DE00000000000000201 /* PlacementModel.swift in Sources */,
+				F1AC0DE00000000000000202 /* PlacementMode.swift in Sources */,
+				F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */,
+				F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */,
+				F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */,
 				98A009B32512536900CFBF0C /* LastFourthCalculation.swift in Sources */,
 				98A009BB2512539900CFBF0C /* BottomLeftSixthCalculation.swift in Sources */,
 				9821402322B3886100ABFB3F /* CenterCalculation.swift in Sources */,
@@ -1202,6 +1233,7 @@
 				9824702022AF9B7E0037B409 /* RectangleTests.swift in Sources */,
 				944F25D12CE5A144004B2FD2 /* ShortcutRecordingObserverTests.swift in Sources */,
 				01f52cab9bce43359775bdd7 /* JSONDefaultTests.swift in Sources */,
+				F1AC0DE00000000000000206 /* PlacementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

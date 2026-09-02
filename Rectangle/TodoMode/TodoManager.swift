@@ -316,7 +316,7 @@ struct AppShortcutConflict {
             return AppShortcutConflict(shortcutName: action.displayName ?? action.name)
         }
 
-        let appShortcutDefaultsKeys = TodoManager.defaultsKeys + StackBadgeManager.defaultsKeys
+        let appShortcutDefaultsKeys = TodoManager.defaultsKeys + StackBadgeManager.defaultsKeys + PlacementModeManager.defaultsKeys
         for defaultsKey in appShortcutDefaultsKeys where defaultsKey != ignoredDefaultsKey {
             guard let appShortcut = ShortcutCycle.shortcut(forDefaultsKey: defaultsKey, userDefaults: userDefaults),
                   ShortcutCycle.ShortcutIdentity(appShortcut) == identity
@@ -336,6 +336,8 @@ struct AppShortcutConflict {
             return NSLocalizedString("Reflow Todo", tableName: "Main", value: "Reflow Todo", comment: "")
         case StackBadgeManager.toggleDefaultsKey:
             return NSLocalizedString("Toggle stacked window badge", tableName: "Main", value: "Toggle stacked window badge", comment: "")
+        case PlacementModeManager.defaultsKey:
+            return NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")
         default:
             return defaultsKey
         }

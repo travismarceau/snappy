@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var windowCalculationFactory: WindowCalculationFactory!
     private var snappingManager: SnappingManager!
     private var stackBadgeManager: StackBadgeManager!
+    private var placementModeManager: PlacementModeManager!
     private var titleBarManager: TitleBarManager!
     private var greenButtonManager: GreenButtonManager!
     
@@ -75,6 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
         addWindowActionMenuItems()
+        insertPlacementMenuItem()
 
         NotificationCenter.default.addObserver(self, selector: #selector(rebuildMenu), name: .showAdditionalSizesInMenuChanged, object: nil)
 
@@ -88,6 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.applicationToggle.reloadFromDefaults()
             self.shortcutManager.reloadFromDefaults()
             self.snappingManager.reloadFromDefaults()
+            self.placementModeManager?.reloadFromDefaults()
             self.initializeTodo(false)
         })
         
@@ -157,6 +160,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.stackBadgeManager = StackBadgeManager()
         self.titleBarManager = TitleBarManager()
         self.greenButtonManager = GreenButtonManager()
+        self.placementModeManager = PlacementModeManager()
         self.initializeTodo()
         checkForProblematicApps()
         MacTilingDefaults.checkForBuiltInTiling(skipIfAlreadyNotified: true)
@@ -259,6 +263,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
     
+    private func insertPlacementMenuItem() {
+        let item = NSMenuItem(
+            title: NSLocalizedString("Configure Window Placements…", tableName: "Main", value: "Configure Window Placements…", comment: ""),
+            action: #selector(openPlacementConfig(_:)),
+            keyEquivalent: "")
+        item.target = self
+        if #available(macOS 11, *) {
+            item.image = NSImage(systemSymbolName: "square.grid.3x3.square", accessibilityDescription: nil)
+        }
+        if let prefsIndex = mainStatusMenu.items.firstIndex(where: { $0.action == #selector(openPreferences) }) {
+            mainStatusMenu.insertItem(item, at: prefsIndex)
+        } else {
+            mainStatusMenu.addItem(item)
+        }
+    }
+
+    @objc func openPlacementConfig(_ sender: Any) {
+        PlacementConfigWindowController.shared.show()
+    }
+
     @IBAction func openPreferences(_ sender: Any) {
         if prefsWindowController == nil {
             prefsWindowController = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "PrefsWindowController") as? NSWindowController
