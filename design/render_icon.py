@@ -55,6 +55,12 @@ block = vgradient(px(bw), px(bh), (0x2C, 0x2C, 0x2E), (0x16, 0x16, 0x17))
 block.putalpha(rounded_mask(px(bw), px(bh), px(br)))
 icon.alpha_composite(block, (px(bx), px(by)))
 
+# 3b. a second, smaller region top-right — mid grey
+cx, cy, cw, ch, cr = 699, 156, 169, 169, 16
+cell = vgradient(px(cw), px(ch), (0xAC, 0xAC, 0xAC), (0x8E, 0x8E, 0x8E))
+cell.putalpha(rounded_mask(px(cw), px(ch), px(cr)))
+icon.alpha_composite(cell, (px(cx), px(cy)))
+
 # 4. keep the grid visible across the dark region (light lines)
 over = Image.new("RGBA", (S, S), (0, 0, 0, 0))
 od = ImageDraw.Draw(over)
