@@ -85,30 +85,37 @@ final class PlacementConfigViewController: NSViewController {
     private func buildLayout() {
         let general = titledCard(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""), buildGeneralGrid())
         let gridCard = titledCard(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""), buildGridGrid())
-        let placements = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), buildPlacementsPane())
+        let placements = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), buildPlacementsPane(), fillsHeight: true)
 
         for v in [general, gridCard, placements] {
             v.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(v)
-            NSLayoutConstraint.activate([
-                v.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                v.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ])
         }
-        general.setContentHuggingPriority(.required, for: .vertical)
-        gridCard.setContentHuggingPriority(.required, for: .vertical)
 
         NSLayoutConstraint.activate([
+            // General and Grid share the top row, equal widths.
             general.topAnchor.constraint(equalTo: view.topAnchor, constant: 18),
-            gridCard.topAnchor.constraint(equalTo: general.bottomAnchor, constant: 16),
-            placements.topAnchor.constraint(equalTo: gridCard.bottomAnchor, constant: 16),
+            general.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+
+            gridCard.topAnchor.constraint(equalTo: general.topAnchor),
+            gridCard.leadingAnchor.constraint(equalTo: general.trailingAnchor, constant: 16),
+            gridCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            gridCard.widthAnchor.constraint(equalTo: general.widthAnchor),
+            gridCard.bottomAnchor.constraint(equalTo: general.bottomAnchor),
+
+            // Placements fills the rest, full width.
+            placements.topAnchor.constraint(equalTo: general.bottomAnchor, constant: 16),
+            placements.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            placements.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             placements.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -18),
         ])
     }
 
     /// A section header above a rounded, bordered card that wraps `content` with
-    /// interior padding. Everything pinned with explicit constraints.
-    private func titledCard(_ title: String, _ content: NSView) -> NSView {
+    /// interior padding. Everything pinned with explicit constraints. When
+    /// `fillsHeight` is false the card hugs its content (but can be stretched by
+    /// an outside constraint); when true the content is pinned to fill the card.
+    private func titledCard(_ title: String, _ content: NSView, fillsHeight: Bool = false) -> NSView {
         let container = NSView()
 
         let header = NSTextField(labelWithString: title)
@@ -126,11 +133,14 @@ final class PlacementConfigViewController: NSViewController {
 
         content.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(content)
+        let contentBottom = content.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -14)
+        contentBottom.priority = fillsHeight ? .required : .defaultHigh
         NSLayoutConstraint.activate([
             content.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
             content.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
             content.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
-            content.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -14),
+            contentBottom,
+            card.bottomAnchor.constraint(greaterThanOrEqualTo: content.bottomAnchor, constant: 14),
         ])
 
         container.addSubview(header)
@@ -167,9 +177,9 @@ final class PlacementConfigViewController: NSViewController {
 
         let grid = formGrid([
             [label(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leading(enableSwitch)],
-            [label(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
             [label(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
-             captioned(stickySwitch, NSLocalizedString("Stay open until Esc to place several windows", tableName: "Main", value: "until Esc", comment: ""))],
+             captioned(stickySwitch, NSLocalizedString("until Esc", tableName: "Main", value: "until Esc", comment: ""))],
+            [label(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
             [label(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leading(revealPopup)],
             [label(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
         ])

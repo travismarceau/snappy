@@ -140,7 +140,8 @@ final class PlacementModeController {
     }
 
     private func beginSession() {
-        if isActive { rearmTimeout(); return }
+        // Pressing the leader shortcut again is a toggle: dismiss, don't re-arm.
+        if isActive || finishing { endSession(); return }
         guard Defaults.placementModeEnabled.userEnabled else { return }
 
         let map = Defaults.placementKeymap.typedValue ?? .empty
