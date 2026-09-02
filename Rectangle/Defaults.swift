@@ -113,6 +113,8 @@ class Defaults {
     static let placementModeEnabled = OptionalBoolDefault(key: "placementModeEnabled")
     static let placementPaneSticky = BoolDefault(key: "placementPaneSticky")
     static let placementPaneTimeout = FloatDefault(key: "placementPaneTimeout", defaultValue: 4)
+    static let placementMapReveal = IntEnumDefault<PlacementMapReveal>(key: "placementMapReveal", defaultValue: .afterDelay)
+    static let placementMapRevealDelay = FloatDefault(key: "placementMapRevealDelay", defaultValue: 0.4)
     static let placementKeymap = JSONDefault<PlacementKeymap>(key: "placementKeymap")
     static var array: [Default] = [
         launchOnLogin,
@@ -214,6 +216,8 @@ class Defaults {
         placementModeEnabled,
         placementPaneSticky,
         placementPaneTimeout,
+        placementMapReveal,
+        placementMapRevealDelay,
         placementKeymap
     ]
 }

@@ -14,6 +14,18 @@ import Foundation
 /// `NSEvent.ModifierFlags.rawValue`, without importing AppKit into the model.
 let placementModifierMask: UInt = (1 << 17) | (1 << 18) | (1 << 19) | (1 << 20)
 
+// MARK: - Overlay reveal behaviour
+
+/// How much the on-screen pane shows when placement mode activates.
+enum PlacementMapReveal: Int {
+    /// Draw the full key→region map right away.
+    case always = 0
+    /// Show only a small hint; fade the full map in if the user hesitates.
+    case afterDelay = 1
+    /// Never draw the map; the hint is all you get.
+    case never = 2
+}
+
 // MARK: - Grid
 
 struct PlacementGrid: Codable, Equatable {

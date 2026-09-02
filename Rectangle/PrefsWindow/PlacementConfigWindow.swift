@@ -3,7 +3,7 @@
 /// The Divvy-style configuration UI: pick a grid size, then for each key draw a
 /// rectangular region on the grid and assign a single keystroke to it. Opened
 /// from the status menu ("Configure Window Placements…"). Standalone,
-/// programmatic AppKit — no storyboard scene.
+/// programmatic AppKit laid out to feel like a macOS System Settings pane.
 
 import Cocoa
 import MASShortcut
@@ -19,8 +19,8 @@ final class PlacementConfigWindowController: NSWindowController {
         let window = NSWindow(contentViewController: vc)
         window.title = NSLocalizedString("Window Placement", tableName: "Main", value: "Window Placement", comment: "")
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.setContentSize(NSSize(width: 760, height: 580))
-        window.minSize = NSSize(width: 680, height: 480)
+        window.setContentSize(NSSize(width: 620, height: 640))
+        window.minSize = NSSize(width: 560, height: 560)
         window.center()
         self.init(window: window)
     }
@@ -42,25 +42,34 @@ final class PlacementConfigViewController: NSViewController {
 
     private let recordingObserver = ShortcutRecordingObserver()
 
+    private let enableSwitch = NSSwitch()
+    private let stickySwitch = NSSwitch()
+    private let revealPopup = NSPopUpButton()
+    private let revealDelayField = NSTextField()
+    private let colsStepper = NSStepper()
+    private let rowsStepper = NSStepper()
+    private let colsField = NSTextField()
+    private let rowsField = NSTextField()
+    private let outerMarginField = NSTextField()
+    private let innerGapField = NSTextField()
+
     private let tableView = NSTableView()
+    private let addRemoveControl = NSSegmentedControl()
     private let picker = PlacementGridPickerView()
     private let keyCaptureButton = KeyCaptureButton()
+    private let clearKeyButton = NSButton()
     private let labelField = NSTextField()
     private let displayPopup = NSPopUpButton()
     private let conflictLabel = NSTextField(labelWithString: "")
-    private let rowsField = NSTextField()
-    private let colsField = NSTextField()
-    private let outerMarginField = NSTextField()
-    private let innerGapField = NSTextField()
-    private let stickyCheckbox = NSButton(checkboxWithTitle: "", target: nil, action: nil)
-    private let enableCheckbox = NSButton(checkboxWithTitle: "", target: nil, action: nil)
 
-    private var selectedIndex: Int? {
-        tableView.selectedRow >= 0 ? tableView.selectedRow : nil
-    }
+    private let revealAlwaysTag = 0, revealDelayTag = 1, revealNeverTag = 2
+    private let displayCurrentTag = -100, displayNextTag = -1
+
+    private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 760, height: 580))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 620, height: 640))
+        view.wantsLayer = true
         buildLayout()
     }
 
@@ -74,136 +83,11 @@ final class PlacementConfigViewController: NSViewController {
     // MARK: Layout
 
     private func buildLayout() {
-        // Top: enable + leader shortcut
-        enableCheckbox.title = NSLocalizedString("Enable Window Placement Mode", tableName: "Main", value: "Enable Window Placement Mode", comment: "")
-        enableCheckbox.target = self
-        enableCheckbox.action = #selector(toggleEnabled)
-
-        let leaderLabel = NSTextField(labelWithString: NSLocalizedString("Placement Mode shortcut:", tableName: "Main", value: "Placement Mode shortcut:", comment: ""))
-        let leaderShortcutView = MASShortcutView(frame: NSRect(x: 0, y: 0, width: 140, height: 22))
-        leaderShortcutView.shortcutValidator = AppShortcutValidator(defaultsKey: PlacementModeManager.defaultsKey)
-        leaderShortcutView.setAssociatedUserDefaultsKey(PlacementModeManager.defaultsKey, withTransformerName: MASDictionaryTransformerName)
-        recordingObserver.observe([leaderShortcutView])
-        PlacementModeManager.initShortcut()
-
-        let topRow = row([enableCheckbox, spacer(), leaderLabel, leaderShortcutView])
-
-        // Grid + margins row
-        configureNumberField(rowsField, action: #selector(gridChanged))
-        configureNumberField(colsField, action: #selector(gridChanged))
-        configureNumberField(outerMarginField, action: #selector(marginsChanged))
-        configureNumberField(innerGapField, action: #selector(marginsChanged))
-        stickyCheckbox.title = NSLocalizedString("Keep pane open until Esc", tableName: "Main", value: "Keep pane open until Esc", comment: "")
-        stickyCheckbox.target = self
-        stickyCheckbox.action = #selector(toggleSticky)
-
-        let gridRow = row([
-            NSTextField(labelWithString: NSLocalizedString("Grid rows", tableName: "Main", value: "Grid rows", comment: "")), rowsField,
-            NSTextField(labelWithString: NSLocalizedString("cols", tableName: "Main", value: "cols", comment: "")), colsField,
-            NSTextField(labelWithString: NSLocalizedString("Outer margin", tableName: "Main", value: "Outer margin", comment: "")), outerMarginField,
-            NSTextField(labelWithString: NSLocalizedString("Inner gap", tableName: "Main", value: "Inner gap", comment: "")), innerGapField,
-            spacer(), stickyCheckbox
-        ])
-
-        // Table (left)
-        let keyColumn = NSTableColumn(identifier: .init("key"))
-        keyColumn.title = NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")
-        keyColumn.width = 70
-        let labelColumn = NSTableColumn(identifier: .init("label"))
-        labelColumn.title = NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")
-        labelColumn.width = 90
-        let regionColumn = NSTableColumn(identifier: .init("region"))
-        regionColumn.title = NSLocalizedString("Region", tableName: "Main", value: "Region", comment: "")
-        regionColumn.width = 130
-        for c in [keyColumn, labelColumn, regionColumn] { tableView.addTableColumn(c) }
-        tableView.usesAlternatingRowBackgroundColors = true
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.rowHeight = 22
-        tableView.doubleAction = #selector(focusPicker)
-
-        let scroll = NSScrollView()
-        scroll.documentView = tableView
-        scroll.hasVerticalScroller = true
-        scroll.borderType = .bezelBorder
-        scroll.translatesAutoresizingMaskIntoConstraints = false
-        scroll.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-        let addButton = smallButton("+", #selector(addBinding))
-        let removeButton = smallButton("–", #selector(removeBinding))
-        let importButton = NSButton(title: NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), target: self, action: #selector(importKeymap))
-        let exportButton = NSButton(title: NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), target: self, action: #selector(exportKeymap))
-        let tableButtons = row([addButton, removeButton, spacer(), importButton, exportButton])
-
-        let leftStack = NSStackView(views: [scroll, tableButtons])
-        leftStack.orientation = .vertical
-        leftStack.spacing = 6
-        leftStack.translatesAutoresizingMaskIntoConstraints = false
-        leftStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        NSLayoutConstraint.activate([leftStack.widthAnchor.constraint(equalToConstant: 300)])
-
-        // Right editor
-        picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.onChange = { [weak self] placement in self?.pickerChanged(placement) }
-        NSLayoutConstraint.activate([
-            picker.heightAnchor.constraint(greaterThanOrEqualToConstant: 220),
-        ])
-
-        keyCaptureButton.onCapture = { [weak self] keyCode, mods in self?.keyCaptured(keyCode: keyCode, modifierFlags: mods) }
-        let clearKeyButton = NSButton(title: NSLocalizedString("Clear", tableName: "Main", value: "Clear", comment: ""), target: self, action: #selector(clearKey))
-
-        labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
-        labelField.target = self
-        labelField.action = #selector(labelChanged)
-        labelField.translatesAutoresizingMaskIntoConstraints = false
-
-        displayPopup.target = self
-        displayPopup.action = #selector(displayChanged)
-        rebuildDisplayPopup()
-
-        let keyRow = row([
-            NSTextField(labelWithString: NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")),
-            keyCaptureButton, clearKeyButton, spacer(),
-            NSTextField(labelWithString: NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")),
-            displayPopup
-        ])
-        let labelRow = row([
-            NSTextField(labelWithString: NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")),
-            labelField
-        ])
-        NSLayoutConstraint.activate([labelField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)])
-
-        conflictLabel.textColor = .systemRed
-        conflictLabel.font = .systemFont(ofSize: 11)
-
-        let rightStack = NSStackView(views: [
-            NSTextField(labelWithString: NSLocalizedString("Region (drag on the grid)", tableName: "Main", value: "Region (drag on the grid)", comment: "")),
-            picker, keyRow, labelRow, conflictLabel
-        ])
-        rightStack.orientation = .vertical
-        rightStack.alignment = .leading
-        rightStack.spacing = 8
-        rightStack.translatesAutoresizingMaskIntoConstraints = false
-
-        let split = NSStackView(views: [leftStack, rightStack])
-        split.orientation = .horizontal
-        split.alignment = .top
-        split.spacing = 16
-        split.translatesAutoresizingMaskIntoConstraints = false
-
-        let hint = NSTextField(wrappingLabelWithString: NSLocalizedString(
-            "Press the Placement Mode shortcut, then a single key to move the frontmost window. Map different keys to different regions so keyboard geography matches screen geography.",
-            tableName: "Main",
-            value: "Press the Placement Mode shortcut, then a single key to move the frontmost window. Map different keys to different regions so keyboard geography matches screen geography.",
-            comment: ""))
-        hint.font = .systemFont(ofSize: 11)
-        hint.textColor = .secondaryLabelColor
-
-        let root = NSStackView(views: [topRow, gridRow, separator(), split, hint])
+        let root = NSStackView()
         root.orientation = .vertical
         root.alignment = .leading
-        root.spacing = 12
-        root.edgeInsets = NSEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+        root.spacing = 20
+        root.edgeInsets = NSEdgeInsets(top: 20, left: 20, bottom: 16, right: 20)
         root.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(root)
         NSLayoutConstraint.activate([
@@ -211,18 +95,293 @@ final class PlacementConfigViewController: NSViewController {
             root.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             root.topAnchor.constraint(equalTo: view.topAnchor),
             root.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            split.trailingAnchor.constraint(equalTo: root.trailingAnchor, constant: -20),
-            rightStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 340),
         ])
+
+        root.addArrangedSubview(section(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""),
+                                        buildGeneralGrid()))
+        root.addArrangedSubview(section(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""),
+                                        buildGridGrid()))
+        let placements = section(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""),
+                                 buildPlacementsPane())
+        placements.setContentHuggingPriority(.defaultLow, for: .vertical)
+        root.addArrangedSubview(placements)
+
+        for sub in root.arrangedSubviews {
+            sub.widthAnchor.constraint(equalTo: root.widthAnchor,
+                                       constant: -(root.edgeInsets.left + root.edgeInsets.right)).isActive = true
+        }
+    }
+
+    private func buildGeneralGrid() -> NSView {
+        enableSwitch.target = self; enableSwitch.action = #selector(toggleEnabled)
+        stickySwitch.target = self; stickySwitch.action = #selector(toggleSticky)
+
+        let shortcutView = MASShortcutView(frame: NSRect(x: 0, y: 0, width: 150, height: 24))
+        shortcutView.shortcutValidator = AppShortcutValidator(defaultsKey: PlacementModeManager.defaultsKey)
+        shortcutView.setAssociatedUserDefaultsKey(PlacementModeManager.defaultsKey, withTransformerName: MASDictionaryTransformerName)
+        recordingObserver.observe([shortcutView])
+        PlacementModeManager.initShortcut()
+
+        revealPopup.target = self; revealPopup.action = #selector(revealChanged)
+        addPopupItem(revealPopup, NSLocalizedString("Always", tableName: "Main", value: "Always", comment: ""), tag: revealAlwaysTag)
+        addPopupItem(revealPopup, NSLocalizedString("After a short pause", tableName: "Main", value: "After a short pause", comment: ""), tag: revealDelayTag)
+        addPopupItem(revealPopup, NSLocalizedString("Never", tableName: "Main", value: "Never", comment: ""), tag: revealNeverTag)
+
+        configureNumberField(revealDelayField, width: 46, action: #selector(revealDelayChanged))
+        let delayRow = pair(revealDelayField, caption: NSLocalizedString("seconds", tableName: "Main", value: "seconds", comment: ""))
+
+        let grid = formGrid([
+            [label(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leading(enableSwitch)],
+            [label(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
+            [label(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
+             captioned(stickySwitch, NSLocalizedString("Stay open until Esc to place several windows", tableName: "Main", value: "Stay open until Esc to place several windows", comment: ""))],
+            [label(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leading(revealPopup)],
+            [label(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
+        ])
+        return grid
+    }
+
+    private func buildGridGrid() -> NSView {
+        configureStepper(colsStepper, action: #selector(gridChanged))
+        configureStepper(rowsStepper, action: #selector(gridChanged))
+        configureNumberField(colsField, width: 46, action: #selector(gridFieldChanged))
+        configureNumberField(rowsField, width: 46, action: #selector(gridFieldChanged))
+        configureNumberField(outerMarginField, width: 56, action: #selector(marginsChanged))
+        configureNumberField(innerGapField, width: 56, action: #selector(marginsChanged))
+
+        return formGrid([
+            [label(NSLocalizedString("Columns", tableName: "Main", value: "Columns", comment: "")), stepperRow(colsField, colsStepper)],
+            [label(NSLocalizedString("Rows", tableName: "Main", value: "Rows", comment: "")), stepperRow(rowsField, rowsStepper)],
+            [label(NSLocalizedString("Outer margin", tableName: "Main", value: "Outer margin", comment: "")), pair(outerMarginField, caption: "px")],
+            [label(NSLocalizedString("Inner gap", tableName: "Main", value: "Inner gap", comment: "")), pair(innerGapField, caption: "px")],
+        ])
+    }
+
+    private func buildPlacementsPane() -> NSView {
+        // Left: table + add/remove
+        let keyCol = NSTableColumn(identifier: .init("key"))
+        keyCol.title = NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")
+        keyCol.width = 56
+        let labelCol = NSTableColumn(identifier: .init("label"))
+        labelCol.title = NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")
+        labelCol.width = 80
+        let regionCol = NSTableColumn(identifier: .init("region"))
+        regionCol.title = NSLocalizedString("Region", tableName: "Main", value: "Region", comment: "")
+        regionCol.width = 120
+        for c in [keyCol, labelCol, regionCol] { tableView.addTableColumn(c) }
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.rowHeight = 24
+        tableView.usesAlternatingRowBackgroundColors = false
+        tableView.doubleAction = #selector(focusPicker)
+        if #available(macOS 11, *) { tableView.style = .inset }
+
+        let scroll = NSScrollView()
+        scroll.documentView = tableView
+        scroll.hasVerticalScroller = true
+        scroll.borderType = .lineBorder
+        scroll.drawsBackground = true
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.layer?.cornerRadius = 6
+
+        addRemoveControl.segmentStyle = .separated
+        addRemoveControl.trackingMode = .momentary
+        addRemoveControl.segmentCount = 2
+        addRemoveControl.setImage(NSImage(named: NSImage.addTemplateName), forSegment: 0)
+        addRemoveControl.setImage(NSImage(named: NSImage.removeTemplateName), forSegment: 1)
+        addRemoveControl.setWidth(28, forSegment: 0)
+        addRemoveControl.setWidth(28, forSegment: 1)
+        addRemoveControl.target = self
+        addRemoveControl.action = #selector(addRemoveChanged)
+        addRemoveControl.translatesAutoresizingMaskIntoConstraints = false
+
+        let importButton = smallButton(NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), #selector(importKeymap))
+        let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), #selector(exportKeymap))
+        let leftFooter = NSStackView(views: [addRemoveControl, spacer(), importButton, exportButton])
+        leftFooter.orientation = .horizontal
+        leftFooter.spacing = 6
+
+        let left = NSStackView(views: [scroll, leftFooter])
+        left.orientation = .vertical
+        left.spacing = 6
+        left.translatesAutoresizingMaskIntoConstraints = false
+        left.widthAnchor.constraint(equalToConstant: 260).isActive = true
+        scroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 150).isActive = true
+
+        // Right: region editor
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.onChange = { [weak self] p in self?.pickerChanged(p) }
+        picker.widthAnchor.constraint(greaterThanOrEqualToConstant: 240).isActive = true
+        picker.heightAnchor.constraint(equalToConstant: 168).isActive = true
+
+        keyCaptureButton.onCapture = { [weak self] keyCode, mods in self?.keyCaptured(keyCode: keyCode, modifierFlags: mods) }
+        clearKeyButton.title = NSLocalizedString("Clear", tableName: "Main", value: "Clear", comment: "")
+        clearKeyButton.bezelStyle = .rounded
+        clearKeyButton.target = self
+        clearKeyButton.action = #selector(clearKey)
+        clearKeyButton.controlSize = .small
+
+        labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
+        labelField.target = self
+        labelField.action = #selector(labelChanged)
+        labelField.translatesAutoresizingMaskIntoConstraints = false
+        labelField.widthAnchor.constraint(greaterThanOrEqualToConstant: 180).isActive = true
+
+        displayPopup.target = self
+        displayPopup.action = #selector(displayChanged)
+        rebuildDisplayPopup()
+
+        conflictLabel.font = .systemFont(ofSize: 11)
+        conflictLabel.textColor = .systemRed
+
+        let keyRow = NSStackView(views: [keyCaptureButton, clearKeyButton])
+        keyRow.orientation = .horizontal
+        keyRow.spacing = 6
+
+        let detailGrid = formGrid([
+            [label(NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")), keyRow],
+            [label(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), labelField],
+            [label(NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")), leading(displayPopup)],
+        ])
+
+        let regionCaption = label(NSLocalizedString("Region — drag on the grid", tableName: "Main", value: "Region — drag on the grid", comment: ""))
+        regionCaption.alignment = .left
+
+        let right = NSStackView(views: [regionCaption, picker, detailGrid, conflictLabel])
+        right.orientation = .vertical
+        right.alignment = .leading
+        right.spacing = 10
+        right.translatesAutoresizingMaskIntoConstraints = false
+
+        let split = NSStackView(views: [left, right])
+        split.orientation = .horizontal
+        split.alignment = .top
+        split.spacing = 18
+        split.translatesAutoresizingMaskIntoConstraints = false
+        return split
+    }
+
+    // MARK: Section / form helpers
+
+    private func section(_ title: String, _ content: NSView) -> NSStackView {
+        let header = NSTextField(labelWithString: title)
+        header.font = .systemFont(ofSize: 13, weight: .semibold)
+        header.textColor = .secondaryLabelColor
+
+        let box = NSBox()
+        box.boxType = .custom
+        box.borderWidth = 1
+        box.borderColor = .separatorColor
+        box.cornerRadius = 8
+        box.fillColor = .controlBackgroundColor
+        box.contentViewMargins = NSSize(width: 16, height: 14)
+        box.translatesAutoresizingMaskIntoConstraints = false
+        content.translatesAutoresizingMaskIntoConstraints = false
+        box.contentView = content
+
+        let stack = NSStackView(views: [header, box])
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 6
+        box.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        return stack
+    }
+
+    private func formGrid(_ rows: [[NSView]]) -> NSGridView {
+        let grid = NSGridView(views: rows)
+        grid.rowSpacing = 10
+        grid.columnSpacing = 10
+        grid.translatesAutoresizingMaskIntoConstraints = false
+        if grid.numberOfColumns > 0 { grid.column(at: 0).xPlacement = .trailing }
+        for i in 0..<grid.numberOfRows { grid.row(at: i).yPlacement = .center }
+        return grid
+    }
+
+    private func label(_ s: String) -> NSTextField {
+        let tf = NSTextField(labelWithString: s)
+        tf.alignment = .right
+        tf.textColor = .labelColor
+        return tf
+    }
+    private func leading(_ v: NSView) -> NSView {
+        let wrap = NSStackView(views: [v, spacer()])
+        wrap.orientation = .horizontal
+        wrap.spacing = 0
+        return wrap
+    }
+    private func pair(_ field: NSView, caption: String) -> NSView {
+        let cap = NSTextField(labelWithString: caption)
+        cap.textColor = .secondaryLabelColor
+        cap.font = .systemFont(ofSize: 11)
+        let s = NSStackView(views: [field, cap, spacer()])
+        s.orientation = .horizontal
+        s.spacing = 6
+        return s
+    }
+    private func captioned(_ control: NSView, _ caption: String) -> NSView {
+        let cap = NSTextField(wrappingLabelWithString: caption)
+        cap.textColor = .secondaryLabelColor
+        cap.font = .systemFont(ofSize: 11)
+        cap.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        let s = NSStackView(views: [control, cap])
+        s.orientation = .horizontal
+        s.alignment = .centerY
+        s.spacing = 8
+        return s
+    }
+    private func stepperRow(_ field: NSTextField, _ stepper: NSStepper) -> NSView {
+        let s = NSStackView(views: [field, stepper, spacer()])
+        s.orientation = .horizontal
+        s.spacing = 4
+        return s
+    }
+    private func spacer() -> NSView {
+        let v = NSView()
+        v.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }
+    private func smallButton(_ title: String, _ action: Selector) -> NSButton {
+        let b = NSButton(title: title, target: self, action: action)
+        b.bezelStyle = .rounded
+        b.controlSize = .small
+        b.font = .systemFont(ofSize: 11)
+        return b
+    }
+    private func configureNumberField(_ field: NSTextField, width: CGFloat, action: Selector) {
+        field.translatesAutoresizingMaskIntoConstraints = false
+        field.alignment = .right
+        field.controlSize = .regular
+        field.target = self
+        field.action = action
+        field.widthAnchor.constraint(equalToConstant: width).isActive = true
+    }
+    private func configureStepper(_ stepper: NSStepper, action: Selector) {
+        stepper.minValue = 1
+        stepper.maxValue = Double(PlacementGrid.maxDimension)
+        stepper.increment = 1
+        stepper.valueWraps = false
+        stepper.target = self
+        stepper.action = action
+    }
+    private func addPopupItem(_ popup: NSPopUpButton, _ title: String, tag: Int) {
+        popup.addItem(withTitle: title)
+        popup.lastItem?.tag = tag
     }
 
     // MARK: Model <-> controls
 
     private func syncControlsFromModel() {
-        enableCheckbox.state = Defaults.placementModeEnabled.userEnabled ? .on : .off
-        stickyCheckbox.state = Defaults.placementPaneSticky.enabled ? .on : .off
-        rowsField.stringValue = String(keymap.grid.rows)
+        enableSwitch.state = Defaults.placementModeEnabled.userEnabled ? .on : .off
+        stickySwitch.state = Defaults.placementPaneSticky.enabled ? .on : .off
+        revealPopup.selectItem(withTag: Defaults.placementMapReveal.value.rawValue)
+        revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
+        revealDelayField.isEnabled = Defaults.placementMapReveal.value == .afterDelay
+
         colsField.stringValue = String(keymap.grid.cols)
+        rowsField.stringValue = String(keymap.grid.rows)
+        colsStepper.integerValue = keymap.grid.cols
+        rowsStepper.integerValue = keymap.grid.rows
         outerMarginField.stringValue = String(format: "%g", Double(keymap.outerMargin))
         innerGapField.stringValue = String(format: "%g", Double(keymap.innerGap))
         picker.grid = keymap.grid
@@ -230,7 +389,6 @@ final class PlacementConfigViewController: NSViewController {
 
     private func reloadTable() {
         picker.grid = keymap.grid
-        picker.otherPlacements = keymap.bindings.map { $0.placement }
         tableView.reloadData()
         refreshEditorForSelection()
     }
@@ -247,137 +405,114 @@ final class PlacementConfigViewController: NSViewController {
     private func refreshEditorForSelection() {
         let binding = selectedIndex.flatMap { keymap.bindings[safe: $0] }
         let enabled = binding != nil
-        for control in [keyCaptureButton, labelField, displayPopup] as [NSControl] {
+        for control in [keyCaptureButton, labelField, displayPopup, clearKeyButton] as [NSControl] {
             control.isEnabled = enabled
         }
+        addRemoveControl.setEnabled(enabled, forSegment: 1)
         picker.isEditable = enabled
         picker.placement = binding?.placement
-        picker.otherPlacements = keymap.bindings
-            .filter { $0.id != binding?.id }
-            .map { $0.placement }
+        picker.otherPlacements = keymap.bindings.filter { $0.id != binding?.id }.map { $0.placement }
         picker.needsDisplay = true
 
         labelField.stringValue = binding?.label ?? ""
         keyCaptureButton.setKey(keyCode: binding?.keyCode ?? PlacementBinding.unassignedKeyCode,
                                 modifierFlags: binding?.modifierFlags ?? 0)
-        if let raw = binding?.placement.displayIndexRaw {
-            displayPopup.selectItem(withTag: raw)
-        } else {
-            displayPopup.selectItem(withTag: displayCurrentTag)
-        }
+        displayPopup.selectItem(withTag: binding?.placement.displayIndexRaw ?? displayCurrentTag)
         updateConflictLabel()
     }
 
     private func updateConflictLabel() {
-        guard let index = selectedIndex, let binding = keymap.bindings[safe: index] else {
+        guard let i = selectedIndex, let b = keymap.bindings[safe: i], b.isAssigned,
+              keymap.hasConflict(keyCode: b.keyCode, modifierFlags: b.modifierFlags, excluding: b.id) else {
             conflictLabel.stringValue = ""
             return
         }
-        if binding.isAssigned,
-           keymap.hasConflict(keyCode: binding.keyCode, modifierFlags: binding.modifierFlags, excluding: binding.id) {
-            conflictLabel.stringValue = NSLocalizedString("That key is already used by another placement.", tableName: "Main", value: "That key is already used by another placement.", comment: "")
-        } else {
-            conflictLabel.stringValue = ""
-        }
+        conflictLabel.stringValue = NSLocalizedString("That key is already used by another placement.", tableName: "Main", value: "That key is already used by another placement.", comment: "")
     }
 
     private func mutateSelected(_ transform: (inout PlacementBinding) -> Void) {
         guard let index = selectedIndex, index < keymap.bindings.count else { return }
-        var binding = keymap.bindings[index]
-        transform(&binding)
-        keymap.bindings[index] = binding
-        reloadRow(index)
-        picker.otherPlacements = keymap.bindings.filter { $0.id != binding.id }.map { $0.placement }
-        picker.needsDisplay = true
-        updateConflictLabel()
-    }
-
-    private func reloadRow(_ index: Int) {
+        var b = keymap.bindings[index]
+        transform(&b)
+        keymap.bindings[index] = b
         tableView.reloadData(forRowIndexes: IndexSet(integer: index),
                              columnIndexes: IndexSet(integersIn: 0..<tableView.numberOfColumns))
+        picker.otherPlacements = keymap.bindings.filter { $0.id != b.id }.map { $0.placement }
+        picker.needsDisplay = true
+        updateConflictLabel()
     }
 
     // MARK: Actions
 
     @objc private func toggleEnabled() {
-        Defaults.placementModeEnabled.enabled = enableCheckbox.state == .on
+        Defaults.placementModeEnabled.enabled = enableSwitch.state == .on
         PlacementModeManager.registerUnregisterShortcut()
     }
-
     @objc private func toggleSticky() {
-        Defaults.placementPaneSticky.enabled = stickyCheckbox.state == .on
+        Defaults.placementPaneSticky.enabled = stickySwitch.state == .on
     }
-
+    @objc private func revealChanged() {
+        let tag = revealPopup.selectedTag()
+        Defaults.placementMapReveal.value = PlacementMapReveal(rawValue: tag) ?? .afterDelay
+        revealDelayField.isEnabled = Defaults.placementMapReveal.value == .afterDelay
+    }
+    @objc private func revealDelayChanged() {
+        Defaults.placementMapRevealDelay.value = max(0.05, min(revealDelayField.floatValue, 5))
+        revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
+    }
     @objc private func gridChanged() {
-        let rows = clampDimension(rowsField.integerValue)
-        let cols = clampDimension(colsField.integerValue)
-        keymap.grid = PlacementGrid(rows: rows, cols: cols)
-        keymap.bindings = keymap.bindings.map {
-            var b = $0
-            b.placement = b.placement.normalized(in: keymap.grid)
-            return b
-        }
-        rowsField.stringValue = String(keymap.grid.rows)
-        colsField.stringValue = String(keymap.grid.cols)
+        applyGrid(cols: colsStepper.integerValue, rows: rowsStepper.integerValue)
+    }
+    @objc private func gridFieldChanged() {
+        applyGrid(cols: colsField.integerValue, rows: rowsField.integerValue)
+    }
+    private func applyGrid(cols: Int, rows: Int) {
+        keymap.grid = PlacementGrid(rows: rows == 0 ? 6 : rows, cols: cols == 0 ? 6 : cols)
+        keymap.bindings = keymap.bindings.map { var b = $0; b.placement = b.placement.normalized(in: keymap.grid); return b }
+        colsField.stringValue = String(keymap.grid.cols); rowsField.stringValue = String(keymap.grid.rows)
+        colsStepper.integerValue = keymap.grid.cols; rowsStepper.integerValue = keymap.grid.rows
         reloadTable()
     }
-
     @objc private func marginsChanged() {
         keymap.outerMargin = CGFloat(max(0, outerMarginField.doubleValue))
         keymap.innerGap = CGFloat(max(0, innerGapField.doubleValue))
         picker.needsDisplay = true
     }
-
-    @objc private func addBinding() {
-        let placement = GridPlacement(col: 0, row: 0, colSpan: keymap.grid.cols, rowSpan: keymap.grid.rows)
-        keymap.bindings.append(PlacementBinding(label: "", placement: placement))
+    @objc private func addRemoveChanged() {
+        if addRemoveControl.selectedSegment == 0 { addBinding() } else { removeBinding() }
+    }
+    private func addBinding() {
+        let p = GridPlacement(col: 0, row: 0, colSpan: keymap.grid.cols, rowSpan: keymap.grid.rows)
+        keymap.bindings.append(PlacementBinding(label: "", placement: p))
         reloadTable()
         selectRow(keymap.bindings.count - 1)
         view.window?.makeFirstResponder(keyCaptureButton)
     }
-
-    @objc private func removeBinding() {
+    private func removeBinding() {
         guard let index = selectedIndex else { return }
         keymap.bindings.remove(at: index)
         reloadTable()
         selectRow(keymap.bindings.isEmpty ? nil : min(index, keymap.bindings.count - 1))
     }
-
-    @objc private func focusPicker() {
-        view.window?.makeFirstResponder(picker)
-    }
-
+    @objc private func focusPicker() { view.window?.makeFirstResponder(picker) }
     @objc private func clearKey() {
         mutateSelected { $0.keyCode = PlacementBinding.unassignedKeyCode; $0.modifierFlags = 0 }
         refreshEditorForSelection()
     }
-
-    @objc private func labelChanged() {
-        mutateSelected { $0.label = labelField.stringValue }
-    }
-
+    @objc private func labelChanged() { mutateSelected { $0.label = labelField.stringValue } }
     @objc private func displayChanged() {
         let tag = displayPopup.selectedTag()
-        mutateSelected {
-            $0.placement.displayIndexRaw = (tag == displayCurrentTag) ? nil : tag
-        }
+        mutateSelected { $0.placement.displayIndexRaw = (tag == displayCurrentTag) ? nil : tag }
     }
-
     private func keyCaptured(keyCode: Int, modifierFlags: UInt) {
-        mutateSelected {
-            $0.keyCode = keyCode
-            $0.modifierFlags = modifierFlags & placementModifierMask
-        }
+        mutateSelected { $0.keyCode = keyCode; $0.modifierFlags = modifierFlags & placementModifierMask }
         keyCaptureButton.setKey(keyCode: keyCode, modifierFlags: modifierFlags)
         updateConflictLabel()
     }
-
-    private func pickerChanged(_ placement: GridPlacement) {
+    private func pickerChanged(_ p: GridPlacement) {
         mutateSelected {
-            $0.placement.col = placement.col
-            $0.placement.row = placement.row
-            $0.placement.colSpan = placement.colSpan
-            $0.placement.rowSpan = placement.rowSpan
+            $0.placement.col = p.col; $0.placement.row = p.row
+            $0.placement.colSpan = p.colSpan; $0.placement.rowSpan = p.rowSpan
         }
     }
 
@@ -391,12 +526,9 @@ final class PlacementConfigViewController: NSViewController {
             guard response == .OK, let url = panel.url, let self else { return }
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            if let data = try? encoder.encode(self.keymap) {
-                try? data.write(to: url)
-            }
+            if let data = try? encoder.encode(self.keymap) { try? data.write(to: url) }
         }
     }
-
     @objc private func importKeymap() {
         let panel = NSOpenPanel()
         panel.allowedFileTypes = ["json"]
@@ -404,8 +536,7 @@ final class PlacementConfigViewController: NSViewController {
         panel.beginSheetModal(for: view.window!) { [weak self] response in
             guard response == .OK, let url = panel.url, let self,
                   let data = try? Data(contentsOf: url),
-                  let imported = try? JSONDecoder().decode(PlacementKeymap.self, from: data)
-            else { return }
+                  let imported = try? JSONDecoder().decode(PlacementKeymap.self, from: data) else { return }
             self.keymap = imported
             self.syncControlsFromModel()
             self.reloadTable()
@@ -413,64 +544,13 @@ final class PlacementConfigViewController: NSViewController {
         }
     }
 
-    // MARK: Display popup
-
-    private let displayCurrentTag = -100
-    private let displayNextTag = -1
-
     private func rebuildDisplayPopup() {
         displayPopup.removeAllItems()
-        addPopupItem(NSLocalizedString("Current display", tableName: "Main", value: "Current display", comment: ""), tag: displayCurrentTag)
-        addPopupItem(NSLocalizedString("Next display", tableName: "Main", value: "Next display", comment: ""), tag: displayNextTag)
-        let count = max(NSScreen.screens.count, 1)
-        for i in 0..<count {
-            addPopupItem(String(format: NSLocalizedString("Display %d", tableName: "Main", value: "Display %d", comment: ""), i + 1), tag: i)
+        addPopupItem(displayPopup, NSLocalizedString("Current display", tableName: "Main", value: "Current display", comment: ""), tag: displayCurrentTag)
+        addPopupItem(displayPopup, NSLocalizedString("Next display", tableName: "Main", value: "Next display", comment: ""), tag: displayNextTag)
+        for i in 0..<max(NSScreen.screens.count, 1) {
+            addPopupItem(displayPopup, String(format: NSLocalizedString("Display %d", tableName: "Main", value: "Display %d", comment: ""), i + 1), tag: i)
         }
-    }
-
-    private func addPopupItem(_ title: String, tag: Int) {
-        displayPopup.addItem(withTitle: title)
-        displayPopup.lastItem?.tag = tag
-    }
-
-    // MARK: Small view helpers
-
-    private func row(_ views: [NSView]) -> NSStackView {
-        let stack = NSStackView(views: views)
-        stack.orientation = .horizontal
-        stack.alignment = .centerY
-        stack.spacing = 8
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }
-    private func spacer() -> NSView {
-        let v = NSView()
-        v.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        v.translatesAutoresizingMaskIntoConstraints = false
-        return v
-    }
-    private func separator() -> NSView {
-        let box = NSBox()
-        box.boxType = .separator
-        box.translatesAutoresizingMaskIntoConstraints = false
-        return box
-    }
-    private func smallButton(_ title: String, _ action: Selector) -> NSButton {
-        let b = NSButton(title: title, target: self, action: action)
-        b.bezelStyle = .rounded
-        b.setButtonType(.momentaryPushIn)
-        NSLayoutConstraint.activate([b.widthAnchor.constraint(equalToConstant: 30)])
-        return b
-    }
-    private func configureNumberField(_ field: NSTextField, action: Selector) {
-        field.translatesAutoresizingMaskIntoConstraints = false
-        field.alignment = .right
-        field.target = self
-        field.action = action
-        NSLayoutConstraint.activate([field.widthAnchor.constraint(equalToConstant: 52)])
-    }
-    private func clampDimension(_ value: Int) -> Int {
-        max(1, min(value == 0 ? 6 : value, PlacementGrid.maxDimension))
     }
 }
 
@@ -481,23 +561,17 @@ extension PlacementConfigViewController: NSTableViewDataSource, NSTableViewDeleg
     func numberOfRows(in tableView: NSTableView) -> Int { keymap.bindings.count }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let binding = keymap.bindings[safe: row], let id = tableColumn?.identifier.rawValue else { return nil }
+        guard let b = keymap.bindings[safe: row], let id = tableColumn?.identifier.rawValue else { return nil }
         let text: String
         switch id {
         case "key":
-            if binding.isAssigned {
-                let s = MASShortcut(keyCode: binding.keyCode,
-                                    modifierFlags: NSEvent.ModifierFlags(rawValue: binding.modifierFlags))
+            if b.isAssigned {
+                let s = MASShortcut(keyCode: b.keyCode, modifierFlags: NSEvent.ModifierFlags(rawValue: b.modifierFlags))
                 text = [s.modifierFlagsString, s.keyCodeString].compactMap { $0 }.joined()
-            } else {
-                text = "—"
-            }
-        case "label":
-            text = binding.label
-        case "region":
-            text = binding.placement.regionDescription(in: keymap.grid)
-        default:
-            text = ""
+            } else { text = "—" }
+        case "label": text = b.label
+        case "region": text = b.placement.regionDescription(in: keymap.grid)
+        default: text = ""
         }
 
         let identifier = NSUserInterfaceItemIdentifier("cell_\(id)")
@@ -506,6 +580,7 @@ extension PlacementConfigViewController: NSTableViewDataSource, NSTableViewDeleg
             let tf = NSTextField(labelWithString: "")
             tf.translatesAutoresizingMaskIntoConstraints = false
             tf.lineBreakMode = .byTruncatingTail
+            tf.font = id == "key" ? .monospacedSystemFont(ofSize: 12, weight: .medium) : .systemFont(ofSize: 12)
             c.addSubview(tf)
             c.textField = tf
             c.identifier = identifier
@@ -517,6 +592,7 @@ extension PlacementConfigViewController: NSTableViewDataSource, NSTableViewDeleg
             return c
         }()
         cell.textField?.stringValue = text
+        cell.textField?.textColor = (id == "region") ? .secondaryLabelColor : .labelColor
         return cell
     }
 
@@ -528,7 +604,5 @@ extension PlacementConfigViewController: NSTableViewDataSource, NSTableViewDeleg
 // MARK: - Array safe subscript
 
 private extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
-    }
+    subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
 }

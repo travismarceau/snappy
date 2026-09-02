@@ -93,8 +93,8 @@ final class PlacementModeController {
     static let shared = PlacementModeController()
     private init() {}
 
-    /// Guards `active` and `keymap`, both of which the event-tap thread reads
-    /// from `shouldSwallow` while the main thread mutates them.
+    /// Guards `active`, `finishing` and `keymap`: the event-tap thread reads
+    /// them from `shouldSwallow` while the main thread mutates them.
     private let stateLock = NSLock()
     private var active = false
     private var keymap = PlacementKeymap.empty
@@ -102,6 +102,10 @@ final class PlacementModeController {
     private var monitor: ActiveEventMonitor?
     private var overlay: PlacementOverlayPanel?
     private var timeoutWorkItem: DispatchWorkItem?
+    private var revealWorkItem: DispatchWorkItem?
+    /// True during the brief flash between a placement and teardown, so the
+    /// event tap keeps swallowing keys even though `active` is already false.
+    private var _finishing = false
 
     private var targetElement: AccessibilityElement?
     private var targetWindowId: CGWindowID?
@@ -120,6 +124,13 @@ final class PlacementModeController {
     }
     private func setKeymap(_ value: PlacementKeymap) {
         stateLock.lock(); keymap = value; stateLock.unlock()
+    }
+    private var finishing: Bool {
+        stateLock.lock(); defer { stateLock.unlock() }
+        return _finishing
+    }
+    private func setFinishing(_ value: Bool) {
+        stateLock.lock(); _finishing = value; stateLock.unlock()
     }
 
     // MARK: Activation
@@ -151,8 +162,9 @@ final class PlacementModeController {
         }
         baseScreen = screen
 
-        let panel = PlacementOverlayPanel(screen: screen, keymap: map)
-        panel.orderFrontRegardless()
+        let leader = PlacementModeManager.shortcut(for: PlacementModeManager.defaultsKey)
+        let panel = PlacementOverlayPanel(screen: screen, keymap: map, leaderShortcut: leader)
+        panel.present()
         overlay = panel
 
         let monitor = ActiveEventMonitor(
@@ -164,7 +176,24 @@ final class PlacementModeController {
         self.monitor = monitor
 
         setActive(true)
+        scheduleMapReveal()
         rearmTimeout()
+    }
+
+    private func scheduleMapReveal() {
+        revealWorkItem?.cancel()
+        revealWorkItem = nil
+        switch Defaults.placementMapReveal.value {
+        case .always:
+            overlay?.revealMap(animated: false)
+        case .never:
+            break
+        case .afterDelay:
+            let delay = max(0.05, Double(Defaults.placementMapRevealDelay.value))
+            let item = DispatchWorkItem { [weak self] in self?.overlay?.revealMap(animated: true) }
+            revealWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+        }
     }
 
     // MARK: Event handling
@@ -172,7 +201,8 @@ final class PlacementModeController {
     /// Runs on the event-tap thread. Returning true consumes the event so it
     /// never reaches the focused app.
     private func shouldSwallow(_ event: NSEvent) -> Bool {
-        guard isActive, event.type == .keyDown else { return false }
+        guard isActive || finishing, event.type == .keyDown else { return false }
+        guard isActive else { return true } // in the flash tail: swallow everything, act on nothing
         if Int(event.keyCode) == kVK_Escape { return true }
         let mods = event.modifierFlags.rawValue & placementModifierMask
         if currentKeymap.binding(forKeyCode: Int(event.keyCode), modifierFlags: mods) != nil { return true }
@@ -193,20 +223,29 @@ final class PlacementModeController {
         let mods = event.modifierFlags.rawValue & placementModifierMask
         guard let binding = currentKeymap.binding(forKeyCode: keyCode, modifierFlags: mods) else {
             NSSound.beep()
+            // An unrecognised key almost always means "I forget my map" — show it.
+            revealWorkItem?.cancel()
+            overlay?.revealMap(animated: true)
             rearmTimeout()
             return
         }
 
+        revealWorkItem?.cancel()
+        overlay?.flash(binding)
         place(binding)
 
         if Defaults.placementPaneSticky.enabled {
             // The user will focus a different window before the next key.
             targetElement = AccessibilityElement.getFrontWindowElement()
             targetWindowId = targetElement?.getWindowId()
-            overlay?.flash(binding)
             rearmTimeout()
         } else {
-            deactivate()
+            // Let the flash play, then tear down.
+            setActive(false)
+            setFinishing(true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) { [weak self] in
+                self?.endSession()
+            }
         }
     }
 
@@ -255,10 +294,13 @@ final class PlacementModeController {
     }
 
     private func endSession() {
-        guard isActive || overlay != nil || monitor != nil else { return }
+        guard isActive || finishing || overlay != nil || monitor != nil else { return }
         setActive(false)
+        setFinishing(false)
         timeoutWorkItem?.cancel()
         timeoutWorkItem = nil
+        revealWorkItem?.cancel()
+        revealWorkItem = nil
         monitor?.stop()
         monitor = nil
         overlay?.orderOut(nil)

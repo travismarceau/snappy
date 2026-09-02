@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F1AC0DE00000000000000201 /* PlacementModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000101 /* PlacementModel.swift */; };
-		F1AC0DE00000000000000202 /* PlacementMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000102 /* PlacementMode.swift */; };
-		F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000103 /* PlacementOverlay.swift */; };
-		F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */; };
-		F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000105 /* PlacementConfigViews.swift */; };
-		F1AC0DE00000000000000206 /* PlacementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000106 /* PlacementTests.swift */; };
 		01f52cab9bce43359775bdd7 /* JSONDefaultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = de0950b8b00f40308934a523 /* JSONDefaultTests.swift */; };
 		05DBEA44B55E6F8C5FC3D6E0 /* MiddleLeftTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEABF10E66D648DDB37DABBA /* MiddleLeftTwelfthCalculation.swift */; };
 		0F29956694B5BB31EBDAE445 /* UpperMiddleRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B5B09465C38F8B766B3C3C /* UpperMiddleRightSixteenthCalculation.swift */; };
@@ -39,12 +33,12 @@
 		666598377754D51045353CD0 /* BottomCenterRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A362206B9F76C269D8F469 /* BottomCenterRightTwelfthCalculation.swift */; };
 		729E0A982AFF76B1006E2F48 /* CenterProminentlyCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729E0A972AFF76B1006E2F48 /* CenterProminentlyCalculation.swift */; };
 		74804F0B2E25521C009F1F7D /* CenterTwoThirdsCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74804F0A2E25521C009F1F7D /* CenterTwoThirdsCalculation.swift */; };
+		7B4C0A1F2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4C0A1E2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift */; };
 		7BE578EF2C5BF4EE0083DAE3 /* CycleSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE578EE2C5BF4ED0083DAE3 /* CycleSize.swift */; };
 		7BE578F12EFA00010083DAE3 /* CooperativeCornerResize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE578F02EFA00010083DAE3 /* CooperativeCornerResize.swift */; };
 		7BE578F32EFE11010083DAE3 /* ActiveSideSplitRatios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE578F22EFE11010083DAE3 /* ActiveSideSplitRatios.swift */; };
 		7EC9E3BAD5BC57E49A7BCEE5 /* TwelfthsRepeated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3592F8E85CE82B8FA662A31 /* TwelfthsRepeated.swift */; };
 		866661F2257D248A00A9CD2D /* RepeatedExecutionsInThirdsCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866661F1257D248A00A9CD2D /* RepeatedExecutionsInThirdsCalculation.swift */; };
-		7B4C0A1F2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4C0A1E2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift */; };
 		88763FEFFA3AECF8502604D6 /* LowerMiddleCenterLeftSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378C96D832D4CC6BCCF9D604 /* LowerMiddleCenterLeftSixteenthCalculation.swift */; };
 		895C73559E1ACEFBBE8DC32D /* UpperMiddleCenterRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3EA35F0C110A170EAD33 /* UpperMiddleCenterRightSixteenthCalculation.swift */; };
 		8B1D14E3A55936EBCCC1E807 /* MiddleRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA84AB4DB9E7EEFCE50AA6D8 /* MiddleRightTwelfthCalculation.swift */; };
@@ -100,10 +94,6 @@
 		9824704F22B189250037B409 /* BestEffortWindowMover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9824704A22B189250037B409 /* BestEffortWindowMover.swift */; };
 		9824705122B28D7A0037B409 /* LeftRightHalfCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9824705022B28D7A0037B409 /* LeftRightHalfCalculation.swift */; };
 		983BBD6F253B609D000D223E /* FootprintWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983BBD6E253B609D000D223E /* FootprintWindow.swift */; };
-		F1AC0DE000000000000000A2 /* StackBadgeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A1 /* StackBadgeGeometry.swift */; };
-		F1AC0DE000000000000000A4 /* StackBadgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A3 /* StackBadgeManager.swift */; };
-		F1AC0DE000000000000000A8 /* StackBadgeListPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A9 /* StackBadgeListPanel.swift */; };
-		F1AC0DE000000000000000AA /* StackBadgeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000AB /* StackBadgeRowView.swift */; };
 		983DD04028A844BE00BF1EEE /* SnapAreaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */; };
 		983DD04428B0639E00BF1EEE /* SnapAreaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DD04328B0639E00BF1EEE /* SnapAreaModel.swift */; };
 		984EDB0F29A42ED200D119D2 /* LaunchOnLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984EDB0E29A42ED200D119D2 /* LaunchOnLogin.swift */; };
@@ -202,7 +192,17 @@
 		D8644560FF112B0748CE1975 /* UpperMiddleLeftSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E2DBE0733F31BC159BC99C /* UpperMiddleLeftSixteenthCalculation.swift */; };
 		DCD3CF2993E9AFAF30820117 /* MiddleCenterRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2AC59501448BD3BAA16EC /* MiddleCenterRightTwelfthCalculation.swift */; };
 		E791B00A88D90C24A4C3D2D1 /* UpperMiddleCenterLeftSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8CA6901E6FE134E930135B /* UpperMiddleCenterLeftSixteenthCalculation.swift */; };
+		F1AC0DE000000000000000A2 /* StackBadgeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A1 /* StackBadgeGeometry.swift */; };
+		F1AC0DE000000000000000A4 /* StackBadgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A3 /* StackBadgeManager.swift */; };
+		F1AC0DE000000000000000A8 /* StackBadgeListPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000A9 /* StackBadgeListPanel.swift */; };
+		F1AC0DE000000000000000AA /* StackBadgeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000AB /* StackBadgeRowView.swift */; };
 		F1AC0DE000000000000000C2 /* OverlapOffsetGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE000000000000000C1 /* OverlapOffsetGeometry.swift */; };
+		F1AC0DE00000000000000201 /* PlacementModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000101 /* PlacementModel.swift */; };
+		F1AC0DE00000000000000202 /* PlacementMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000102 /* PlacementMode.swift */; };
+		F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000103 /* PlacementOverlay.swift */; };
+		F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */; };
+		F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000105 /* PlacementConfigViews.swift */; };
+		F1AC0DE00000000000000206 /* PlacementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000106 /* PlacementTests.swift */; };
 		F4EED30B47FB6C55EA937254 /* TopRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8357E928530D10A806F3CD /* TopRightTwelfthCalculation.swift */; };
 		F51A7467767F8EAF97321A00 /* TopRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD222258713B13274FB651B0 /* TopRightSixteenthCalculation.swift */; };
 		F7B6C43BB57F8064F49DDBB6 /* BottomLeftSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE147786B2CD7350FAFB700 /* BottomLeftSixteenthCalculation.swift */; };
@@ -234,12 +234,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F1AC0DE00000000000000101 /* PlacementModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementModel.swift; sourceTree = "<group>"; };
-		F1AC0DE00000000000000102 /* PlacementMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementMode.swift; sourceTree = "<group>"; };
-		F1AC0DE00000000000000103 /* PlacementOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementOverlay.swift; sourceTree = "<group>"; };
-		F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigWindow.swift; sourceTree = "<group>"; };
-		F1AC0DE00000000000000105 /* PlacementConfigViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigViews.swift; sourceTree = "<group>"; };
-		F1AC0DE00000000000000106 /* PlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementTests.swift; sourceTree = "<group>"; };
 		16B4044DB4809116039F96EB /* SixteenthsRepeated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SixteenthsRepeated.swift; sourceTree = "<group>"; };
 		246168B345ECE6C375ACEEB7 /* BottomLeftTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomLeftTwelfthCalculation.swift; sourceTree = "<group>"; };
 		30166BCF24F27D6A00A38608 /* SpecifiedCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecifiedCalculation.swift; sourceTree = "<group>"; };
@@ -263,13 +257,13 @@
 		71FE3EBE50F91F9EE2989279 /* BottomCenterLeftTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomCenterLeftTwelfthCalculation.swift; sourceTree = "<group>"; };
 		729E0A972AFF76B1006E2F48 /* CenterProminentlyCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterProminentlyCalculation.swift; sourceTree = "<group>"; };
 		74804F0A2E25521C009F1F7D /* CenterTwoThirdsCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTwoThirdsCalculation.swift; sourceTree = "<group>"; };
+		7B4C0A1E2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalvesPreserveOtherAxisSize.swift; sourceTree = "<group>"; };
 		7BE578EE2C5BF4ED0083DAE3 /* CycleSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleSize.swift; sourceTree = "<group>"; };
 		7BE578F02EFA00010083DAE3 /* CooperativeCornerResize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooperativeCornerResize.swift; sourceTree = "<group>"; };
 		7BE578F22EFE11010083DAE3 /* ActiveSideSplitRatios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSideSplitRatios.swift; sourceTree = "<group>"; };
 		7E8357E928530D10A806F3CD /* TopRightTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopRightTwelfthCalculation.swift; sourceTree = "<group>"; };
 		84E2DBE0733F31BC159BC99C /* UpperMiddleLeftSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpperMiddleLeftSixteenthCalculation.swift; sourceTree = "<group>"; };
 		866661F1257D248A00A9CD2D /* RepeatedExecutionsInThirdsCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatedExecutionsInThirdsCalculation.swift; sourceTree = "<group>"; };
-		7B4C0A1E2F1A000100C0FFEE /* HalvesPreserveOtherAxisSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalvesPreserveOtherAxisSize.swift; sourceTree = "<group>"; };
 		87EC57F37CFD790695177AC8 /* LowerMiddleRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowerMiddleRightSixteenthCalculation.swift; sourceTree = "<group>"; };
 		88454ABE5C62BD610AEA3EB5 /* BottomCenterLeftSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomCenterLeftSixteenthCalculation.swift; sourceTree = "<group>"; };
 		8AE08B666CCCD1805CAB08BD /* LowerMiddleCenterRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowerMiddleCenterRightSixteenthCalculation.swift; sourceTree = "<group>"; };
@@ -337,10 +331,6 @@
 		9824704A22B189250037B409 /* BestEffortWindowMover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BestEffortWindowMover.swift; sourceTree = "<group>"; };
 		9824705022B28D7A0037B409 /* LeftRightHalfCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftRightHalfCalculation.swift; sourceTree = "<group>"; };
 		983BBD6E253B609D000D223E /* FootprintWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FootprintWindow.swift; sourceTree = "<group>"; };
-		F1AC0DE000000000000000A1 /* StackBadgeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeGeometry.swift; sourceTree = "<group>"; };
-		F1AC0DE000000000000000A3 /* StackBadgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeManager.swift; sourceTree = "<group>"; };
-		F1AC0DE000000000000000A9 /* StackBadgeListPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeListPanel.swift; sourceTree = "<group>"; };
-		F1AC0DE000000000000000AB /* StackBadgeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeRowView.swift; sourceTree = "<group>"; };
 		983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapAreaViewController.swift; sourceTree = "<group>"; };
 		983DD04328B0639E00BF1EEE /* SnapAreaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapAreaModel.swift; sourceTree = "<group>"; };
 		984EDB0E29A42ED200D119D2 /* LaunchOnLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchOnLogin.swift; sourceTree = "<group>"; };
@@ -437,7 +427,17 @@
 		D7D038C68560DC11F14496F6 /* BottomRightTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRightTwelfthCalculation.swift; sourceTree = "<group>"; };
 		D9FDCA1333C1BF6930A8D7F3 /* TopLeftTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopLeftTwelfthCalculation.swift; sourceTree = "<group>"; };
 		EEABF10E66D648DDB37DABBA /* MiddleLeftTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiddleLeftTwelfthCalculation.swift; sourceTree = "<group>"; };
+		F1AC0DE000000000000000A1 /* StackBadgeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeGeometry.swift; sourceTree = "<group>"; };
+		F1AC0DE000000000000000A3 /* StackBadgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeManager.swift; sourceTree = "<group>"; };
+		F1AC0DE000000000000000A9 /* StackBadgeListPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeListPanel.swift; sourceTree = "<group>"; };
+		F1AC0DE000000000000000AB /* StackBadgeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBadgeRowView.swift; sourceTree = "<group>"; };
 		F1AC0DE000000000000000C1 /* OverlapOffsetGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapOffsetGeometry.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000101 /* PlacementModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementModel.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000102 /* PlacementMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementMode.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000103 /* PlacementOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementOverlay.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigWindow.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000105 /* PlacementConfigViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigViews.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000106 /* PlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementTests.swift; sourceTree = "<group>"; };
 		F3592F8E85CE82B8FA662A31 /* TwelfthsRepeated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelfthsRepeated.swift; sourceTree = "<group>"; };
 		FA34D0FE2F7E896E00EEBEF1 /* SpecificDisplayCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecificDisplayCalculation.swift; sourceTree = "<group>"; };
 		FD222258713B13274FB651B0 /* TopRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopRightSixteenthCalculation.swift; sourceTree = "<group>"; };
@@ -770,16 +770,6 @@
 			path = Popover;
 			sourceTree = "<group>";
 		};
-		F1AC0DE00000000000000100 /* Placement */ = {
-			isa = PBXGroup;
-			children = (
-				F1AC0DE00000000000000101 /* PlacementModel.swift */,
-				F1AC0DE00000000000000102 /* PlacementMode.swift */,
-				F1AC0DE00000000000000103 /* PlacementOverlay.swift */,
-			);
-			path = Placement;
-			sourceTree = "<group>";
-		};
 		98910B3C2311304D0066EC23 /* PrefsWindow */ = {
 			isa = PBXGroup;
 			children = (
@@ -839,6 +829,16 @@
 				F1AC0DE000000000000000AB /* StackBadgeRowView.swift */,
 			);
 			path = StackBadge;
+			sourceTree = "<group>";
+		};
+		F1AC0DE00000000000000100 /* Placement */ = {
+			isa = PBXGroup;
+			children = (
+				F1AC0DE00000000000000101 /* PlacementModel.swift */,
+				F1AC0DE00000000000000102 /* PlacementMode.swift */,
+				F1AC0DE00000000000000103 /* PlacementOverlay.swift */,
+			);
+			path = Placement;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1458,15 +1458,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_OTHER_FLAGS = "--enable-icon-stack-fallback-generation=disabled";
+				BUNDLE_DISPLAY_NAME = Divvtangle;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Rectangle/Rectangle.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				BUNDLE_DISPLAY_NAME = Divvtangle;
 				CURRENT_PROJECT_VERSION = 106;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P78K4VHEL3;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = Rectangle/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1500,7 +1500,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 106;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = XSYZ3E4B7D;
+				DEVELOPMENT_TEAM = P78K4VHEL3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Rectangle/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
