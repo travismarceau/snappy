@@ -313,8 +313,8 @@
             <objects>
                 <tabViewController selectedTabViewItemIndex="0" tabStyle="toolbar" id="5pc-CV-2b9" sceneMemberID="viewController">
                     <tabViewItems>
-                        <tabViewItem label="Snap Areas" image="snapAreaTemplate" id="Fap-R2-Aj6"/>
                         <tabViewItem label="Placement" image="keyboardToolbarTemplate" id="Plc-Cf-tb1"/>
+                        <tabViewItem label="Snap Areas" image="snapAreaTemplate" id="Fap-R2-Aj6"/>
                         <tabViewItem label="General" image="toolbarSettingsTemplate" id="gtf-PD-IHm"/>
                     </tabViewItems>
                     <viewControllerTransitionOptions key="transitionOptions" allowUserInteraction="YES"/>
@@ -328,8 +328,8 @@
                     </tabView>
                     <connections>
                         <outlet property="tabView" destination="Tya-24-HNL" id="TDu-Z5-7uP"/>
-                        <segue destination="t2d-Q7-RLy" kind="relationship" relationship="tabItems" id="Tnv-BY-sch"/>
                         <segue destination="Plc-Cf-vc1" kind="relationship" relationship="tabItems" id="Plc-Cf-sg1"/>
+                        <segue destination="t2d-Q7-RLy" kind="relationship" relationship="tabItems" id="Tnv-BY-sch"/>
                         <segue destination="yhc-gS-h02" kind="relationship" relationship="tabItems" id="LMQ-qb-ja6"/>
                     </connections>
                 </tabViewController>
