@@ -151,17 +151,12 @@ class ShortcutManager {
     }
 
     private func registerDefaults() {
-
-        let defaultShortcuts = WindowAction.active.reduce(into: [String: MASShortcut]()) { dict, windowAction in
-            guard let defaultShortcut = Defaults.alternateDefaultShortcuts.enabled
-                ? windowAction.alternateDefault
-                : windowAction.spectacleDefault
-            else { return }
-            let shortcut = MASShortcut(keyCode: defaultShortcut.keyCode, modifierFlags: NSEvent.ModifierFlags(rawValue: defaultShortcut.modifierFlags))
-            dict[windowAction.name] = shortcut
-        }
-
-        bindingStore.registerDefaultShortcuts(defaultShortcuts)
+        // Snappy has no preset chord shortcuts and no Shortcuts settings pane:
+        // window placement is driven entirely by the leader-key grid overlay
+        // (PlacementModeManager). This manager stays as the dispatcher for
+        // placement, drag-to-snap and Todo actions, but binds no per-action
+        // global chords.
+        bindingStore.registerDefaultShortcuts([:])
     }
 
     @objc private func sessionDidResignActive(_ notification: Notification) {

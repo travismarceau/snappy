@@ -66,10 +66,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
-        addWindowActionMenuItems()
         insertPlacementMenuItem()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(rebuildMenu), name: .showAdditionalSizesInMenuChanged, object: nil)
 
         Notification.Name.configImported.onPost(using: { _ in
             self.statusItem.refreshVisibility()
@@ -105,11 +102,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         } else {
-            // First run: apply the recommended defaults directly (no welcome prompt).
+            // First run.
             Defaults.installVersion.value = currentVersion
             Defaults.allowAnyShortcut.enabled = true
-            Defaults.alternateDefaultShortcuts.enabled = true
-            Defaults.subsequentExecutionMode.value = .acrossMonitor
         }
         MASShortcutMigration.syncRenamedSideShortcutAliases()
         
@@ -456,13 +451,9 @@ extension AppDelegate: NSMenuDelegate {
     }
 
     @objc func rebuildMenu() {
-        // Remove all dynamically added items
-        for _ in 0..<dynamicMenuItemCount {
-            mainStatusMenu.removeItem(at: 0)
-        }
+        // Snappy no longer lists window actions in the status menu.
         dynamicMenuItemCount = 0
         additionalSizeMenuItems.removeAll()
-        addWindowActionMenuItems()
     }
 
     private func migrateShowEighthsInMenu() {
