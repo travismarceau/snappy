@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the Divvtangle app icon: a monochrome take on Rectangle's snapped
+"""Render the Snappy app icon: a monochrome take on Rectangle's snapped
 window sitting on a Divvy-style grid. White ground, one dark region, gray grid."""
 
 import os
@@ -90,9 +90,9 @@ sizes = {
     "mac256pts1x.png": 256, "mac256pts2x.png": 512,
     "mac512pts1x.png": 512, "mac512pts2x.png": 1024,
 }
-setdir = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets", "DivvtangleIcon.appiconset")
+setdir = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets", "SnappyIcon.appiconset")
 if not os.path.isdir(setdir):
-    setdir = os.path.join(out, "DivvtangleIcon.appiconset")
+    setdir = os.path.join(out, "SnappyIcon.appiconset")
     os.makedirs(setdir, exist_ok=True)
 for name, n in sizes.items():
     src = master if n == U else icon.resize((n, n), Image.LANCZOS)

@@ -1212,7 +1212,7 @@
       }
     },
     "1Xt-HY-uBw.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Divvtangle\"; ObjectID = \"1Xt-HY-uBw\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Snappy\"; ObjectID = \"1Xt-HY-uBw\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -1224,175 +1224,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         }
       }
@@ -3786,7 +3786,7 @@
       }
     },
     "4sb-4s-VLi.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Divvtangle\"; ObjectID = \"4sb-4s-VLi\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Snappy\"; ObjectID = \"4sb-4s-VLi\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -3798,181 +3798,181 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončit Divvtangle"
+            "value" : "Ukončit Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle beenden"
+            "value" : "Snappy beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit Divvtangle"
+            "value" : "Quit Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quitter Divvtangle"
+            "value" : "Quitter Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keluar Divvtangle"
+            "value" : "Keluar Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esci da Divvtangle"
+            "value" : "Esci da Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを終了"
+            "value" : "Snappyを終了"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 종료"
+            "value" : "Snappy 종료"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Išeiti iš Divvtangle"
+            "value" : "Išeiti iš Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle stoppen"
+            "value" : "Snappy stoppen"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wyjdź z Divvtangle"
+            "value" : "Wyjdź z Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fechar Divvtangle"
+            "value" : "Fechar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sair do Divvtangle"
+            "value" : "Sair do Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Închide Divvtangle"
+            "value" : "Închide Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выход из Divvtangle"
+            "value" : "Выход из Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončiť Divvtangle"
+            "value" : "Ukončiť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avsluta Divvtangle"
+            "value" : "Avsluta Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'dan Çık"
+            "value" : "Snappy'dan Çık"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вийти з Divvtangle"
+            "value" : "Вийти з Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thoát Divvtangle"
+            "value" : "Thoát Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "退出 Divvtangle"
+            "value" : "退出 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束 Divvtangle"
+            "value" : "結束 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束Divvtangle"
+            "value" : "結束Snappy"
           }
         }
       }
     },
     "5kV-Vb-QxS.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"About Divvtangle\"; ObjectID = \"5kV-Vb-QxS\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"About Snappy\"; ObjectID = \"5kV-Vb-QxS\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -3984,175 +3984,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quant a Divvtangle"
+            "value" : "Quant a Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quant a Divvtangle"
+            "value" : "Quant a Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O aplikaci Divvtangle"
+            "value" : "O aplikaci Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Über Divvtangle"
+            "value" : "Über Snappy"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "About Divvtangle"
+            "value" : "About Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acerca de Divvtangle"
+            "value" : "Acerca de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acerca de Divvtangle"
+            "value" : "Acerca de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "À propos de Divvtangle"
+            "value" : "À propos de Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tentang Divvtangle"
+            "value" : "Tentang Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informazioni su Divvtangle"
+            "value" : "Informazioni su Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleについて"
+            "value" : "Snappyについて"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 정보"
+            "value" : "Snappy 정보"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apie Divvtangle"
+            "value" : "Apie Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Om Divvtangle"
+            "value" : "Om Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Over Divvtangle"
+            "value" : "Over Snappy"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Om Divvtangle"
+            "value" : "Om Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Divvtangle"
+            "value" : "O Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sobre o Divvtangle"
+            "value" : "Sobre o Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sobre o Divvtangle"
+            "value" : "Sobre o Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Despre Divvtangle"
+            "value" : "Despre Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "О Divvtangle"
+            "value" : "О Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O aplikácii Divvtangle"
+            "value" : "O aplikácii Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Om Divvtangle"
+            "value" : "Om Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle Hakkında"
+            "value" : "Snappy Hakkında"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Про Divvtangle"
+            "value" : "Про Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Giới thiệu Divvtangle"
+            "value" : "Giới thiệu Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "关于 Divvtangle"
+            "value" : "关于 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "關於 Divvtangle"
+            "value" : "關於 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "關於Divvtangle"
+            "value" : "關於Snappy"
           }
         }
       }
@@ -6204,187 +6204,187 @@
       }
     },
     "8dv-v2-SPu.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"3. In the Divvtangle menu, enable Todo Mode.\"; ObjectID = \"8dv-v2-SPu\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"3. In the Snappy menu, enable Todo Mode.\"; ObjectID = \"8dv-v2-SPu\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. في قائمة Divvtangle ، قم بتمكين Todo Mode"
+            "value" : "3. في قائمة Snappy ، قم بتمكين Todo Mode"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Al menú Divvtangle, habilita el mode Todo."
+            "value" : "3. Al menú Snappy, habilita el mode Todo."
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Al menú Divvtangle, habilita el mode Todo."
+            "value" : "3. Al menú Snappy, habilita el mode Todo."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Zapněte Todo mód v Divvtangle menu."
+            "value" : "3. Zapněte Todo mód v Snappy menu."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Aktiviere den To-do-Modus im Divvtangle-Menü."
+            "value" : "3. Aktiviere den To-do-Modus im Snappy-Menü."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "3. In the Divvtangle menu, enable Todo Mode."
+            "value" : "3. In the Snappy menu, enable Todo Mode."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. En el menú de Divvtangle, activa el modo Todo."
+            "value" : "3. En el menú de Snappy, activa el modo Todo."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. En el menú de Divvtangle, activa el modo Todo."
+            "value" : "3. En el menú de Snappy, activa el modo Todo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Dans le menu de Divvtangle, activer le mode Todo."
+            "value" : "3. Dans le menu de Snappy, activer le mode Todo."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Di Menu Divvtangle, Aktifkan mode Todo."
+            "value" : "3. Di Menu Snappy, Aktifkan mode Todo."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Nel menu di Divvtangle, attiva modalità In evidenza"
+            "value" : "3. Nel menu di Snappy, attiva modalità In evidenza"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. DivvtangleのメニューからToDoモードを有効にします。"
+            "value" : "3. SnappyのメニューからToDoモードを有効にします。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Divvtangle 메뉴에서, Todo 모드를 켭니다"
+            "value" : "3. Snappy 메뉴에서, Todo 모드를 켭니다"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. „Divvtangle“ meniu įjunkite Todo režimą."
+            "value" : "3. „Snappy“ meniu įjunkite Todo režimą."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. I Divvtangle-menyen: aktiver Gjøreliste-modus."
+            "value" : "3. I Snappy-menyen: aktiver Gjøreliste-modus."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. In the Divvtangle menu, enable Todo Mode."
+            "value" : "3. In the Snappy menu, enable Todo Mode."
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. I Divvtangle-menyen: aktiver Gjereliste-modus."
+            "value" : "3. I Snappy-menyen: aktiver Gjereliste-modus."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. In the Divvtangle menu, enable Todo Mode."
+            "value" : "3. In the Snappy menu, enable Todo Mode."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. No menu do Divvtangle, habilite o Todo Mode."
+            "value" : "3. No menu do Snappy, habilite o Todo Mode."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. In the Divvtangle menu, enable Todo Mode."
+            "value" : "3. In the Snappy menu, enable Todo Mode."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Activează modul Todo în meniul Divvtangle."
+            "value" : "3. Activează modul Todo în meniul Snappy."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3.  В меню Divvtangle включите Todo режим."
+            "value" : "3.  В меню Snappy включите Todo режим."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Zapni Todo režim v Divvtangle menu."
+            "value" : "3. Zapni Todo režim v Snappy menu."
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. I Divvtangle-menyn, aktivera Att göra-läge."
+            "value" : "3. I Snappy-menyn, aktivera Att göra-läge."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Divvtangle menüsünde,  Todo Modunu aktif edin."
+            "value" : "3. Snappy menüsünde,  Todo Modunu aktif edin."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. В меню Divvtangle увімкніть режим Завдань."
+            "value" : "3. В меню Snappy увімкніть режим Завдань."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3. Trên menu của Divvtangle, bật chế độ Todo."
+            "value" : "3. Trên menu của Snappy, bật chế độ Todo."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒊在 Divvtangle 菜单中，启用待办模式"
+            "value" : "⒊在 Snappy 菜单中，启用待办模式"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒊ 在 Divvtangle 選單中，啟用待辦模式。"
+            "value" : "⒊ 在 Snappy 選單中，啟用待辦模式。"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒊在Divvtangle選單中，啟用待辦模式。"
+            "value" : "⒊在Snappy選單中，啟用待辦模式。"
           }
         }
       }
@@ -7044,7 +7044,7 @@
       }
     },
     "9JD-tZ-7jf.title" : {
-      "comment" : "Class = \"NSWindow\"; title = \"Authorize Divvtangle\"; ObjectID = \"9JD-tZ-7jf\";",
+      "comment" : "Class = \"NSWindow\"; title = \"Authorize Snappy\"; ObjectID = \"9JD-tZ-7jf\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -7056,181 +7056,181 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoritzar el Divvtangle"
+            "value" : "Autoritzar el Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoritzar el Divvtangle"
+            "value" : "Autoritzar el Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizovat Divvtangle"
+            "value" : "Autorizovat Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle autorisieren"
+            "value" : "Snappy autorisieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Authorize Divvtangle"
+            "value" : "Authorize Snappy"
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authorise Divvtangle"
+            "value" : "Authorise Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Izinkan Divvtangle"
+            "value" : "Izinkan Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizza Divvtangle"
+            "value" : "Autorizza Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを許可"
+            "value" : "Snappyを許可"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 승인"
+            "value" : "Snappy 승인"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Leisti Divvtangle"
+            "value" : "Leisti Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle toestemming geven"
+            "value" : "Snappy toestemming geven"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoryzuj Divvtangle"
+            "value" : "Autoryzuj Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizează Divvtangle"
+            "value" : "Autorizează Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разрешить Divvtangle"
+            "value" : "Разрешить Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Povoliť Divvtangle"
+            "value" : "Povoliť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auktorisera Divvtangle"
+            "value" : "Auktorisera Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'ı Yetkilendir"
+            "value" : "Snappy'ı Yetkilendir"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Авторизувати Divvtangle"
+            "value" : "Авторизувати Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cấp phép cho Divvtangle"
+            "value" : "Cấp phép cho Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授权 Divvtangle"
+            "value" : "授权 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授權 Divvtangle"
+            "value" : "授權 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授權Divvtangle"
+            "value" : "授權Snappy"
           }
         }
       }
@@ -8004,7 +8004,7 @@
       }
     },
     "A66-A4-cGD.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Divvtangle\"; ObjectID = \"A66-A4-cGD\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Snappy\"; ObjectID = \"A66-A4-cGD\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -8016,175 +8016,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončit Divvtangle"
+            "value" : "Ukončit Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle beenden"
+            "value" : "Snappy beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit Divvtangle"
+            "value" : "Quit Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quitter Divvtangle"
+            "value" : "Quitter Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keluar Divvtangle"
+            "value" : "Keluar Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esci da Divvtangle"
+            "value" : "Esci da Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを終了"
+            "value" : "Snappyを終了"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 종료"
+            "value" : "Snappy 종료"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Išeiti iš Divvtangle"
+            "value" : "Išeiti iš Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle stoppen"
+            "value" : "Snappy stoppen"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wyjdź z Divvtangle"
+            "value" : "Wyjdź z Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fechar Divvtangle"
+            "value" : "Fechar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sair do Divvtangle"
+            "value" : "Sair do Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Închide Divvtangle"
+            "value" : "Închide Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выход из Divvtangle"
+            "value" : "Выход из Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončiť Divvtangle"
+            "value" : "Ukončiť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avsluta Divvtangle"
+            "value" : "Avsluta Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'dan Çık"
+            "value" : "Snappy'dan Çık"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вийти з Divvtangle"
+            "value" : "Вийти з Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thoát Divvtangle"
+            "value" : "Thoát Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "退出 Divvtangle"
+            "value" : "退出 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束 Divvtangle"
+            "value" : "結束 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束Divvtangle"
+            "value" : "結束Snappy"
           }
         }
       }
@@ -14270,43 +14270,43 @@
         }
       }
     },
-    "Disable in Divvtangle" : {
+    "Disable in Snappy" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In Divvtangle deaktivieren"
+            "value" : "In Snappy deaktivieren"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 側を無効化"
+            "value" : "Snappy 側を無効化"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle의 기능 끄기"
+            "value" : "Snappy의 기능 끄기"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypnúť v Divvtangle"
+            "value" : "Vypnúť v Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vô hiệu hóa trong Divvtangle"
+            "value" : "Vô hiệu hóa trong Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Divvtangle 里禁用"
+            "value" : "在 Snappy 里禁用"
           }
         }
       }
@@ -14718,13 +14718,13 @@
       "comment" : "Text to be displayed in the center of the view when no placement is selected.",
       "isCommentAutoGenerated" : true
     },
-    "Drag to screen edge tiling is enabled in both Divvtangle and macOS." : {
+    "Drag to screen edge tiling is enabled in both Snappy and macOS." : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Ziehen zum Bildschirmrand für das Anordnen von Fenstern ist sowohl in Divvtangle als auch in den macOS Systemeinstellungen aktiviert."
+            "value" : "Das Ziehen zum Bildschirmrand für das Anordnen von Fenstern ist sowohl in Snappy als auch in den macOS Systemeinstellungen aktiviert."
           }
         },
         "ja" : {
@@ -14736,25 +14736,25 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "화면 가장자리로 드래그해 타일을 정렬하는 기능이 Divvtangle과 macOS 설정에서 모두 켜져 있습니다."
+            "value" : "화면 가장자리로 드래그해 타일을 정렬하는 기능이 Snappy과 macOS 설정에서 모두 켜져 있습니다."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Potiahnutie na okraj obrazovky je zapnuté v Divvtangle aj macOS."
+            "value" : "Potiahnutie na okraj obrazovky je zapnuté v Snappy aj macOS."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tính năng kéo để ghép cạnh màn hình được bật trong cả Divvtangle và macOS."
+            "value" : "Tính năng kéo để ghép cạnh màn hình được bật trong cả Snappy và macOS."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Divvtangle 和 macOS 中都启用了拖移窗口至屏幕边缘实现平铺"
+            "value" : "在 Snappy 和 macOS 中都启用了拖移窗口至屏幕边缘实现平铺"
           }
         }
       }
@@ -17774,7 +17774,7 @@
       }
     },
     "FKE-Sm-Kum.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Divvtangle Help\"; ObjectID = \"FKE-Sm-Kum\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Snappy Help\"; ObjectID = \"FKE-Sm-Kum\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -17786,175 +17786,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda de Divvtangle"
+            "value" : "Ajuda de Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda de Divvtangle"
+            "value" : "Ajuda de Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle nápověda"
+            "value" : "Snappy nápověda"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle-Hilfe"
+            "value" : "Snappy-Hilfe"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Divvtangle Help"
+            "value" : "Snappy Help"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ayuda de Divvtangle"
+            "value" : "Ayuda de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ayuda de Divvtangle"
+            "value" : "Ayuda de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aide Divvtangle"
+            "value" : "Aide Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bantuan Divvtangle"
+            "value" : "Bantuan Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aiuto su Divvtangle"
+            "value" : "Aiuto su Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleヘルプ"
+            "value" : "Snappyヘルプ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 도움말"
+            "value" : "Snappy 도움말"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle Pagalba"
+            "value" : "Snappy Pagalba"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle-hjelp"
+            "value" : "Snappy-hjelp"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle hulp"
+            "value" : "Snappy hulp"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle-hjelp"
+            "value" : "Snappy-hjelp"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pomoc Divvtangle"
+            "value" : "Pomoc Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda do Divvtangle"
+            "value" : "Ajuda do Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda do Divvtangle"
+            "value" : "Ajuda do Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajutor Divvtangle"
+            "value" : "Ajutor Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle Справка"
+            "value" : "Snappy Справка"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pomocník pre Divvtangle"
+            "value" : "Pomocník pre Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle-hjälp"
+            "value" : "Snappy-hjälp"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle Yardım"
+            "value" : "Snappy Yardım"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Довідка по Divvtangle"
+            "value" : "Довідка по Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trợ giúp của Divvtangle"
+            "value" : "Trợ giúp của Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 帮助"
+            "value" : "Snappy 帮助"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 輔助說明"
+            "value" : "Snappy 輔助說明"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle輔助說明"
+            "value" : "Snappy輔助說明"
           }
         }
       }
@@ -19616,7 +19616,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleについて"
+            "value" : "Snappyについて"
           }
         },
         "ko" : {
@@ -19652,7 +19652,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Divvtangle"
+            "value" : "O Snappy"
           }
         },
         "pt-BR" : {
@@ -20747,7 +20747,7 @@
       }
     },
     "gyg-xl-dPn.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"Divvtangle needs your permission to control your window positions.\"; ObjectID = \"gyg-xl-dPn\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Snappy needs your permission to control your window positions.\"; ObjectID = \"gyg-xl-dPn\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -20759,175 +20759,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle necessita el vostre permís per controlar les posicions de les finestres."
+            "value" : "Snappy necessita el vostre permís per controlar les posicions de les finestres."
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle necessita el vostre permís per controlar les posicions de les finestres."
+            "value" : "Snappy necessita el vostre permís per controlar les posicions de les finestres."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle potřebuje vaše povolení, aby mohl ovládat pozice oken."
+            "value" : "Snappy potřebuje vaše povolení, aby mohl ovládat pozice oken."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle benötigt deine Erlaubnis, um Fensterpositionen zu steuern."
+            "value" : "Snappy benötigt deine Erlaubnis, um Fensterpositionen zu steuern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Divvtangle needs your permission to control your window positions."
+            "value" : "Snappy needs your permission to control your window positions."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle necesita su permiso para controlar la posición de las ventanas."
+            "value" : "Snappy necesita su permiso para controlar la posición de las ventanas."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle necesita su permiso para controlar la posición de las ventanas."
+            "value" : "Snappy necesita su permiso para controlar la posición de las ventanas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle requiert votre permission pour contrôler la position de vos fenêtres."
+            "value" : "Snappy requiert votre permission pour contrôler la position de vos fenêtres."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle memerlukan izin anda untuk mengatur posisi jendela."
+            "value" : "Snappy memerlukan izin anda untuk mengatur posisi jendela."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle ha bisogno del tuo permesso per controllare le posizioni delle tue finestre."
+            "value" : "Snappy ha bisogno del tuo permesso per controllare le posizioni delle tue finestre."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleがウインドウの位置を制御するには許可が必要です。"
+            "value" : "Snappyがウインドウの位置を制御するには許可が必要です。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle은 창 위치를 제어하기 위해 권한이 필요합니다."
+            "value" : "Snappy은 창 위치를 제어하기 위해 권한이 필요합니다."
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle reikia jūsų leidimo valdyti langų padėtį"
+            "value" : "Snappy reikia jūsų leidimo valdyti langų padėtį"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle trenger lov av deg for å kontrollere vindusposisjonene."
+            "value" : "Snappy trenger lov av deg for å kontrollere vindusposisjonene."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle heeft uw toestemming nodig om uw vensterposities te kunnen aanpassen."
+            "value" : "Snappy heeft uw toestemming nodig om uw vensterposities te kunnen aanpassen."
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle treng lov av deg for å kontrollera vindaugsposisjonane."
+            "value" : "Snappy treng lov av deg for å kontrollera vindaugsposisjonane."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle potrzebuje twojego pozwolenia, aby móc sterować pozycjami okna."
+            "value" : "Snappy potrzebuje twojego pozwolenia, aby móc sterować pozycjami okna."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Divvtangle precisa de sua permissão para controlar a posição das janelas."
+            "value" : "O Snappy precisa de sua permissão para controlar a posição das janelas."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Divvtangle precisa da sua permissão para controlar as posições das janelas."
+            "value" : "O Snappy precisa da sua permissão para controlar as posições das janelas."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle are nevoie de permisiunea ta pentru a controla poziția ferestrelor tale."
+            "value" : "Snappy are nevoie de permisiunea ta pentru a controla poziția ferestrelor tale."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle необходимо ваше разрешение для управления положением окон"
+            "value" : "Snappy необходимо ваше разрешение для управления положением окон"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle potrebuje povolenie na ovládanie umiestnenia tvojich okien."
+            "value" : "Snappy potrebuje povolenie na ovládanie umiestnenia tvojich okien."
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle behöver ditt tillstånd för att kontrollera dina fönsterpositioner."
+            "value" : "Snappy behöver ditt tillstånd för att kontrollera dina fönsterpositioner."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'ın pencere konumlarını değiştirebilmek için izninize ihtiyacı var."
+            "value" : "Snappy'ın pencere konumlarını değiştirebilmek için izninize ihtiyacı var."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle потребує вашого дозволу для керування позиціями ваших вікон."
+            "value" : "Snappy потребує вашого дозволу для керування позиціями ваших вікон."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle cần sự cho phép của bạn để điều khỉển vị trí cửa sổ."
+            "value" : "Snappy cần sự cho phép của bạn để điều khỉển vị trí cửa sổ."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 需要您的允许以控制窗口位置。"
+            "value" : "Snappy 需要您的允许以控制窗口位置。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 需要您的許可來控制視窗位置。"
+            "value" : "Snappy 需要您的許可來控制視窗位置。"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle需要你的允許以控制視窗位置。"
+            "value" : "Snappy需要你的允許以控制視窗位置。"
           }
         }
       }
@@ -24498,7 +24498,7 @@
       }
     },
     "iXo-XL-T6q.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"Authorize Divvtangle\"; ObjectID = \"iXo-XL-T6q\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Authorize Snappy\"; ObjectID = \"iXo-XL-T6q\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -24510,181 +24510,181 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoritza Divvtangle"
+            "value" : "Autoritza Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoritza Divvtangle"
+            "value" : "Autoritza Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizovat Divvtangle"
+            "value" : "Autorizovat Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle autorisieren"
+            "value" : "Snappy autorisieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Authorize Divvtangle"
+            "value" : "Authorize Snappy"
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authorise Divvtangle"
+            "value" : "Authorise Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Izinkan Divvtangle"
+            "value" : "Izinkan Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizza Divvtangle"
+            "value" : "Autorizza Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを許可"
+            "value" : "Snappyを許可"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 승인"
+            "value" : "Snappy 승인"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suteikti Divvtangle prieigą"
+            "value" : "Suteikti Snappy prieigą"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle toestemming geven"
+            "value" : "Snappy toestemming geven"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Divvtangle"
+            "value" : "Autoriser Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoryzacja Divvtangle"
+            "value" : "Autoryzacja Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizar Divvtangle"
+            "value" : "Autorizar Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizare Divvtangle"
+            "value" : "Autorizare Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Дать Divvtangle доступ"
+            "value" : "Дать Snappy доступ"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Povoliť Divvtangle"
+            "value" : "Povoliť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auktorisera Divvtangle"
+            "value" : "Auktorisera Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'ı Yetkilendir"
+            "value" : "Snappy'ı Yetkilendir"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Авторизувати Divvtangle"
+            "value" : "Авторизувати Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cấp phép cho Divvtangle"
+            "value" : "Cấp phép cho Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授权Divvtangle"
+            "value" : "授权Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授權 Divvtangle"
+            "value" : "授權 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授權Divvtangle"
+            "value" : "授權Snappy"
           }
         }
       }
@@ -26058,7 +26058,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleについて"
+            "value" : "Snappyについて"
           }
         },
         "ko" : {
@@ -26070,7 +26070,7 @@
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apie Divvtangle"
+            "value" : "Apie Snappy"
           }
         },
         "nb" : {
@@ -26094,7 +26094,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Divvtangle"
+            "value" : "O Snappy"
           }
         },
         "pt-BR" : {
@@ -26118,7 +26118,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "О Divvtangle"
+            "value" : "О Snappy"
           }
         },
         "sk" : {
@@ -27337,7 +27337,7 @@
       }
     },
     "kYm-Ye-gOR.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"Welcome to Divvtangle!\"; ObjectID = \"kYm-Ye-gOR\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Welcome to Snappy!\"; ObjectID = \"kYm-Ye-gOR\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -27349,175 +27349,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benvingut a Divvtangle!"
+            "value" : "Benvingut a Snappy!"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benvingut a Divvtangle!"
+            "value" : "Benvingut a Snappy!"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vítejte do Divvtangle!"
+            "value" : "Vítejte do Snappy!"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Willkommen bei Divvtangle!"
+            "value" : "Willkommen bei Snappy!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Welcome to Divvtangle!"
+            "value" : "Welcome to Snappy!"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Bienvenido a Divvtangle!"
+            "value" : "¡Bienvenido a Snappy!"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Bienvenido a Divvtangle!"
+            "value" : "¡Bienvenido a Snappy!"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bienvenue dans Divvtangle !"
+            "value" : "Bienvenue dans Snappy !"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selamat Datang di Divvtangle!"
+            "value" : "Selamat Datang di Snappy!"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle ti dà il benvenuto!"
+            "value" : "Snappy ti dà il benvenuto!"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleへようこそ!"
+            "value" : "Snappyへようこそ!"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle에 오신 것을 환영합니다!"
+            "value" : "Snappy에 오신 것을 환영합니다!"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sveiki atvykę į Divvtangle!"
+            "value" : "Sveiki atvykę į Snappy!"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Velkommen til Divvtangle!"
+            "value" : "Velkommen til Snappy!"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to Divvtangle!"
+            "value" : "Welcome to Snappy!"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Velkomen til Divvtangle!"
+            "value" : "Velkomen til Snappy!"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Witaj w Divvtangle!"
+            "value" : "Witaj w Snappy!"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bem vindo ao Divvtangle!"
+            "value" : "Bem vindo ao Snappy!"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bem-vindo ao Divvtangle!"
+            "value" : "Bem-vindo ao Snappy!"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bine ai venit în Divvtangle!"
+            "value" : "Bine ai venit în Snappy!"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добро пожаловать в Divvtangle!"
+            "value" : "Добро пожаловать в Snappy!"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Víta Ťa Divvtangle!"
+            "value" : "Víta Ťa Snappy!"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Välkommen till Divvtangle!"
+            "value" : "Välkommen till Snappy!"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'a Hoşgeldiniz!"
+            "value" : "Snappy'a Hoşgeldiniz!"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ласкаво просимо до Divvtangle!"
+            "value" : "Ласкаво просимо до Snappy!"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chào mừng đến với Divvtangle!"
+            "value" : "Chào mừng đến với Snappy!"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "欢迎使用 Divvtangle！"
+            "value" : "欢迎使用 Snappy！"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "歡迎使用 Divvtangle！"
+            "value" : "歡迎使用 Snappy！"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "歡迎使用Divvtangle！"
+            "value" : "歡迎使用Snappy！"
           }
         }
       }
@@ -28566,7 +28566,7 @@
       }
     },
     "ltc-mf-BHr.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"When the menu bar icon is hidden, relaunch Divvtangle from Finder to open\"; ObjectID = \"ltc-mf-BHr\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"When the menu bar icon is hidden, relaunch Snappy from Finder to open\"; ObjectID = \"ltc-mf-BHr\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -28578,175 +28578,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quan la icona de la barra de menús estigui amagada, torneu a iniciar Divvtangle des del Finder per obrir el menú."
+            "value" : "Quan la icona de la barra de menús estigui amagada, torneu a iniciar Snappy des del Finder per obrir el menú."
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quan la icona de la barra de menús estigui amagada, torneu a iniciar Divvtangle des del Finder per obrir el menú."
+            "value" : "Quan la icona de la barra de menús estigui amagada, torneu a iniciar Snappy des del Finder per obrir el menú."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pokud je ikona skrytá v řádku nabídek, tak znovu spusťte Divvtangle přes Finder"
+            "value" : "Pokud je ikona skrytá v řádku nabídek, tak znovu spusťte Snappy přes Finder"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn das Menüleistensymbol ausgeblendet ist, starte Divvtangle im Finder neu, um die Divvtangle-Einstellungen zu öffnen."
+            "value" : "Wenn das Menüleistensymbol ausgeblendet ist, starte Snappy im Finder neu, um die Snappy-Einstellungen zu öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "When the menu bar icon is hidden, relaunch Divvtangle from Finder to open"
+            "value" : "When the menu bar icon is hidden, relaunch Snappy from Finder to open"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando el icono de la barra de menús esté oculto, vuelva a iniciar Divvtangle desde el Finder para abrir el menú."
+            "value" : "Cuando el icono de la barra de menús esté oculto, vuelva a iniciar Snappy desde el Finder para abrir el menú."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando el icono de la barra de menús esté oculto, vuelva a iniciar Divvtangle desde el Finder para abrir el menú."
+            "value" : "Cuando el icono de la barra de menús esté oculto, vuelva a iniciar Snappy desde el Finder para abrir el menú."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lorsque l'icône de la barre des menus est masquée, relancez Divvtangle depuis le Finder pour ouvrir le menu."
+            "value" : "Lorsque l'icône de la barre des menus est masquée, relancez Snappy depuis le Finder pour ouvrir le menu."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saat ikon bilah menu disembunyikan, luncurkan kembali Divvtangle dari Finder untuk membuka menu."
+            "value" : "Saat ikon bilah menu disembunyikan, luncurkan kembali Snappy dari Finder untuk membuka menu."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quando l'icona dalla barra dei menu è nascosta, rilancia Divvtangle dal Finder per aprire il menu."
+            "value" : "Quando l'icona dalla barra dei menu è nascosta, rilancia Snappy dal Finder per aprire il menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューバーのアイコンが非表示の場合にメニューを開くには、FinderからDivvtangleを再起動してください。"
+            "value" : "メニューバーのアイコンが非表示の場合にメニューを開くには、FinderからSnappyを再起動してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "메뉴 막대 아이콘이 숨겨져 있을 경우, Finder에서 Divvtangle를 다시 시작하여 메뉴를 여십시오."
+            "value" : "메뉴 막대 아이콘이 숨겨져 있을 경우, Finder에서 Snappy를 다시 시작하여 메뉴를 여십시오."
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jei meniu juostos piktograma yra paslėpta, paleiskite Divvtangle programą iš Finder, kad atidarytumėte meniu."
+            "value" : "Jei meniu juostos piktograma yra paslėpta, paleiskite Snappy programą iš Finder, kad atidarytumėte meniu."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Når menyradikonet er skjult kan du starte Divvtangle fra Finder for å åpne menyen."
+            "value" : "Når menyradikonet er skjult kan du starte Snappy fra Finder for å åpne menyen."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Als het menubalk-pictogram verborgen is, start u Divvtangle opnieuw vanuit Finder om het menu te openen."
+            "value" : "Als het menubalk-pictogram verborgen is, start u Snappy opnieuw vanuit Finder om het menu te openen."
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Når menyradikonet er gøymd kan du starta Divvtangle frå Finder for å opna menyen."
+            "value" : "Når menyradikonet er gøymd kan du starta Snappy frå Finder for å opna menyen."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gdy ikona paska menu jest ukryta, ponownie uruchom Divvtangle z Findera, aby otworzyć menu."
+            "value" : "Gdy ikona paska menu jest ukryta, ponownie uruchom Snappy z Findera, aby otworzyć menu."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quando o ícone da barra de menus estiver oculto, reinicie o Divvtangle pelo Finder para abrir o menu."
+            "value" : "Quando o ícone da barra de menus estiver oculto, reinicie o Snappy pelo Finder para abrir o menu."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quando o ícone da barra de menus estiver oculto, reinicie o Divvtangle do Finder para abrir o menu."
+            "value" : "Quando o ícone da barra de menus estiver oculto, reinicie o Snappy do Finder para abrir o menu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dacă iconița din bara de meniu este ascunsă, repornește Divvtangle din Finder"
+            "value" : "Dacă iconița din bara de meniu este ascunsă, repornește Snappy din Finder"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если значок строки меню скрыт, перезапустите программу Divvtangle из Finder, чтобы открыть меню."
+            "value" : "Если значок строки меню скрыт, перезапустите программу Snappy из Finder, чтобы открыть меню."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ak je ikona v lište skrytá, znovu spusti Divvtangle z Findera"
+            "value" : "Ak je ikona v lište skrytá, znovu spusti Snappy z Findera"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "När menyradens ikon är dold, starta då Divvtangle från Finder för att öppna menyn."
+            "value" : "När menyradens ikon är dold, starta då Snappy från Finder för att öppna menyn."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menü simgesi gizlendiğinde, menüyü açmak için Divvtangle'ı Finder ile yeniden açın."
+            "value" : "Menü simgesi gizlendiğinde, menüyü açmak için Snappy'ı Finder ile yeniden açın."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коли піктограма у рядку меню прихована, перезапустіть Divvtangle з Finder для відкриття"
+            "value" : "Коли піктограма у рядку меню прихована, перезапустіть Snappy з Finder для відкриття"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Khi biểu tượng trên thanh menu bị ẩn, khởi chạy Divvtangle từ Finder để mở lại"
+            "value" : "Khi biểu tượng trên thanh menu bị ẩn, khởi chạy Snappy từ Finder để mở lại"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当菜单栏图标被隐藏时，从访达重新开启Divvtangle以打开。"
+            "value" : "当菜单栏图标被隐藏时，从访达重新开启Snappy以打开。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選單列圖示被隱藏時，從 Finder 重新啟動 Divvtangle 來打開。"
+            "value" : "選單列圖示被隱藏時，從 Finder 重新啟動 Snappy 來打開。"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選單列圖像被隱藏時，從Finder重新啟動Divvtangle以開啟。"
+            "value" : "選單列圖像被隱藏時，從Finder重新啟動Snappy以開啟。"
           }
         }
       }
@@ -33049,7 +33049,7 @@
       }
     },
     "Olw-nP-bQN.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Hide Divvtangle\"; ObjectID = \"Olw-nP-bQN\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Hide Snappy\"; ObjectID = \"Olw-nP-bQN\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -33061,175 +33061,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Amaga Divvtangle"
+            "value" : "Amaga Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Amaga Divvtangle"
+            "value" : "Amaga Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skrýt Divvtangle"
+            "value" : "Skrýt Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle ausblenden"
+            "value" : "Snappy ausblenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Hide Divvtangle"
+            "value" : "Hide Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ocultar Divvtangle"
+            "value" : "Ocultar Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ocultar Divvtangle"
+            "value" : "Ocultar Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Masquer Divvtangle"
+            "value" : "Masquer Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sembunyikan Divvtangle"
+            "value" : "Sembunyikan Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nascondi Divvtangle"
+            "value" : "Nascondi Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを非表示"
+            "value" : "Snappyを非表示"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 가리기"
+            "value" : "Snappy 가리기"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slėpti Divvtangle"
+            "value" : "Slėpti Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skjul Divvtangle"
+            "value" : "Skjul Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verberg Divvtangle"
+            "value" : "Verberg Snappy"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gøym Divvtangle"
+            "value" : "Gøym Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukryj Divvtangle"
+            "value" : "Ukryj Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ocultar Divvtangle"
+            "value" : "Ocultar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ocultar Divvtangle"
+            "value" : "Ocultar Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ascunde Divvtangle"
+            "value" : "Ascunde Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть Divvtangle"
+            "value" : "Скрыть Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skryť Divvtangle"
+            "value" : "Skryť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dölj Divvtangle"
+            "value" : "Dölj Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'ı Gizle"
+            "value" : "Snappy'ı Gizle"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сховати Divvtangle"
+            "value" : "Сховати Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ẩn Divvtangle"
+            "value" : "Ẩn Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隐藏 Divvtangle"
+            "value" : "隐藏 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隱藏 Divvtangle"
+            "value" : "隱藏 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隱藏Divvtangle"
+            "value" : "隱藏Snappy"
           }
         }
       }
@@ -35697,187 +35697,187 @@
       }
     },
     "q9C-qZ-xw5.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"While in Todo Mode, you can refresh the Todo Mode layout by selecting \\\"Reflow Todo\\\" in the Divvtangle menu or executing the associated keyboard shortcut.\"; ObjectID = \"q9C-qZ-xw5\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"While in Todo Mode, you can refresh the Todo Mode layout by selecting \\\"Reflow Todo\\\" in the Snappy menu or executing the associated keyboard shortcut.\"; ObjectID = \"q9C-qZ-xw5\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أثناء وجودك في Todo Mode ، يمكنك تحديث تخطيط Todo Mode عن طريق تحديد  'Reflow Todo ' في قائمة Divvtangle أو تنفيذ اختصار لوحة المفاتيح المرتبط"
+            "value" : "أثناء وجودك في Todo Mode ، يمكنك تحديث تخطيط Todo Mode عن طريق تحديد  'Reflow Todo ' في قائمة Snappy أو تنفيذ اختصار لوحة المفاتيح المرتبط"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mentre esteu al mode Todo, podeu actualitzar el disseny del mode TodoO seleccionant \"Redistribuir Todo\" al menú Divvtangle o executant la drecera de teclat associada."
+            "value" : "Mentre esteu al mode Todo, podeu actualitzar el disseny del mode TodoO seleccionant \"Redistribuir Todo\" al menú Snappy o executant la drecera de teclat associada."
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mentre esteu al mode Todo, podeu actualitzar el disseny del mode TodoO seleccionant \"Redistribuir Todo\" al menú Divvtangle o executant la drecera de teclat associada."
+            "value" : "Mentre esteu al mode Todo, podeu actualitzar el disseny del mode TodoO seleccionant \"Redistribuir Todo\" al menú Snappy o executant la drecera de teclat associada."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rozložení Todo módu můžete obnovit vybráním \"Zobrazit Todo\" v Divvtangle menu nebo exekucí nastavené zkratky."
+            "value" : "Rozložení Todo módu můžete obnovit vybráním \"Zobrazit Todo\" v Snappy menu nebo exekucí nastavené zkratky."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du kannst im To-do-Modus die To-do-Anwendung neu ausrichten indem du \"To-do neu ausrichten\" im Divvtangle-Menü auswählst oder die zugewiesene Tastenkombination ausführst."
+            "value" : "Du kannst im To-do-Modus die To-do-Anwendung neu ausrichten indem du \"To-do neu ausrichten\" im Snappy-Menü auswählst oder die zugewiesene Tastenkombination ausführst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Divvtangle menu or executing the associated keyboard shortcut."
+            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Snappy menu or executing the associated keyboard shortcut."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mientras esté en modo 'Todo', puede refrescar la disposición del modo 'Todo' seleccionando \"Reflujo en 'Todo'\" en el menú de Divvtangle o usando el atajo de teclado asociado."
+            "value" : "Mientras esté en modo 'Todo', puede refrescar la disposición del modo 'Todo' seleccionando \"Reflujo en 'Todo'\" en el menú de Snappy o usando el atajo de teclado asociado."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mientras esté en modo 'Todo', puede refrescar la disposición del modo 'Todo' seleccionando \"Reflujo en 'Todo'\" en el menú de Divvtangle o usando el atajo de teclado asociado."
+            "value" : "Mientras esté en modo 'Todo', puede refrescar la disposición del modo 'Todo' seleccionando \"Reflujo en 'Todo'\" en el menú de Snappy o usando el atajo de teclado asociado."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lorsque vous êtes en mode Todo, vous pouvez rafraîchir la vue en sélectionnant « Rafraîchir Todo » dans le menu de Divvtangle ou en utilisant le raccourci clavier associé."
+            "value" : "Lorsque vous êtes en mode Todo, vous pouvez rafraîchir la vue en sélectionnant « Rafraîchir Todo » dans le menu de Snappy ou en utilisant le raccourci clavier associé."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saat dalam Mode Todo, Anda dapat menyegarkan tata letak Mode Todo dengan memilih \"Alur Ulang Todo » di menu Divvtangle menu atau menjalankan pintasan keyboard terkait."
+            "value" : "Saat dalam Mode Todo, Anda dapat menyegarkan tata letak Mode Todo dengan memilih \"Alur Ulang Todo » di menu Snappy menu atau menjalankan pintasan keyboard terkait."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Durante la modalità In evidenza, puoi reimpostarla selezionando \"Reimposta In Evidenza\" nel menu di Divvtangle o con l'abbreviazione da tastiera impostata."
+            "value" : "Durante la modalità In evidenza, puoi reimpostarla selezionando \"Reimposta In Evidenza\" nel menu di Snappy o con l'abbreviazione da tastiera impostata."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ToDoモードのウインドウ配置を復元するには、ToDoモードのときに、Divvtangleのメニューにある\"ToDoモードを再設定\"を選択するか、指定されたキーボードショートカットを押します。"
+            "value" : "ToDoモードのウインドウ配置を復元するには、ToDoモードのときに、Snappyのメニューにある\"ToDoモードを再設定\"を選択するか、指定されたキーボードショートカットを押します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todo 모드를 사용하는 동안, Divvtangle 메뉴에서 \"Todo 재배치\"를 클릭하거나 키보드 단축키를 사용해 Todo 모드 레이아웃을 새로고칠 수 있습니다."
+            "value" : "Todo 모드를 사용하는 동안, Snappy 메뉴에서 \"Todo 재배치\"를 클릭하거나 키보드 단축키를 사용해 Todo 모드 레이아웃을 새로고칠 수 있습니다."
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kai įjungtas Todo režimas, galite atnaujinti Todo režimo išdėstymą pasirinkdami „Atnaujinti Todo“ Divvtangle meniu arba įvykdę susietą klaviatūros trumpinį."
+            "value" : "Kai įjungtas Todo režimas, galite atnaujinti Todo režimo išdėstymą pasirinkdami „Atnaujinti Todo“ Snappy meniu arba įvykdę susietą klaviatūros trumpinį."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Når du er i Gjøreliste-modus kan du oppdatere Gjøreliste-oppsettet ved å velge \"Flytt om på Gjøreliste\" i Divvtangle-menyen eller ved å benytte definerte tastatursnarveger."
+            "value" : "Når du er i Gjøreliste-modus kan du oppdatere Gjøreliste-oppsettet ved å velge \"Flytt om på Gjøreliste\" i Snappy-menyen eller ved å benytte definerte tastatursnarveger."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Divvtangle menu or executing the associated keyboard shortcut."
+            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Snappy menu or executing the associated keyboard shortcut."
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Når du er i Gjereliste-modus kan du oppdatera Gjereliste-oppsettet ved å velja \"Flytt om på Gjereliste\" i Divvtangle-menyen eller ved å nytta definerte tastatursnarvegar."
+            "value" : "Når du er i Gjereliste-modus kan du oppdatera Gjereliste-oppsettet ved å velja \"Flytt om på Gjereliste\" i Snappy-menyen eller ved å nytta definerte tastatursnarvegar."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Divvtangle menu or executing the associated keyboard shortcut."
+            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Snappy menu or executing the associated keyboard shortcut."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Divvtangle menu or executing the associated keyboard shortcut."
+            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Snappy menu or executing the associated keyboard shortcut."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Divvtangle menu or executing the associated keyboard shortcut."
+            "value" : "While in Todo Mode, you can refresh the Todo Mode layout by selecting \"Reflow Todo\" in the Snappy menu or executing the associated keyboard shortcut."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Din Modul Todo, poți reactualiza aspectul Modului Todo selectând \"Reflow Todo\" în meniul Divvtangle sau folosind scurtătura asociată acestuia."
+            "value" : "Din Modul Todo, poți reactualiza aspectul Modului Todo selectând \"Reflow Todo\" în meniul Snappy sau folosind scurtătura asociată acestuia."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "При включенном Todo режиме вы можете обновить положение окна Todo приложения выбрав \"Обновить положение Todo окна\" в меню Divvtangle или при помощи соответствующей горячей клавиши."
+            "value" : "При включенном Todo режиме вы можете обновить положение окна Todo приложения выбрав \"Обновить положение Todo окна\" в меню Snappy или при помощи соответствующей горячей клавиши."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "V Todo režime môžeš obnoviť rozloženie Todo režimu vyberom \"Preusporiadať Todo\" v Divvtangle menu alebo pomocou príslušnej skratky."
+            "value" : "V Todo režime môžeš obnoviť rozloženie Todo režimu vyberom \"Preusporiadať Todo\" v Snappy menu alebo pomocou príslušnej skratky."
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "När du är i Att göra-läget kan du uppdatera Att göra-layouten genom att välja \"Ordna om Att göra\" i Divvtangle-menyn eller genom att använda tilldelat tangentbordsgenväg."
+            "value" : "När du är i Att göra-läget kan du uppdatera Att göra-layouten genom att välja \"Ordna om Att göra\" i Snappy-menyn eller genom att använda tilldelat tangentbordsgenväg."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todo Modu aktifken Divvtangle menüsündeki  \"Todo'yu Yeniden Ayarla\" seçeneği ile veya tanımladığınız klavye kısayolu ile ekran düzenini tazeleyebilirsiniz."
+            "value" : "Todo Modu aktifken Snappy menüsündeki  \"Todo'yu Yeniden Ayarla\" seçeneği ile veya tanımladığınız klavye kısayolu ile ekran düzenini tazeleyebilirsiniz."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Під час роботи в режимі Завдань ви можете оновити макет режиму Завдань, вибравши «Переформатувати вікна Завдань» у меню Divvtangle або виконавши пов’язану комбінацію клавіш."
+            "value" : "Під час роботи в режимі Завдань ви можете оновити макет режиму Завдань, вибравши «Переформатувати вікна Завдань» у меню Snappy або виконавши пов’язану комбінацію клавіш."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Khi ở chế độ Todo, bạn có thể làm mới bố cục của chế độ Todo bằng cách chọn \"Làm mới Todo\" trong menu của Divvtangle hoặc ấn phím tắt tương ứng."
+            "value" : "Khi ở chế độ Todo, bạn có thể làm mới bố cục của chế độ Todo bằng cách chọn \"Làm mới Todo\" trong menu của Snappy hoặc ấn phím tắt tương ứng."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在“待办模式”下，若要刷新待办模式布局，您可以从 Divvtangle 菜单中选择“重新排列待办”，或使用对应的键盘快捷键。"
+            "value" : "在“待办模式”下，若要刷新待办模式布局，您可以从 Snappy 菜单中选择“重新排列待办”，或使用对应的键盘快捷键。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在待辦模式下，若要重新整理待辦模式佈局，您可以從 Divvtangle 選單中選擇「重新排列待辦」，或使用相應的鍵盤快速鍵"
+            "value" : "在待辦模式下，若要重新整理待辦模式佈局，您可以從 Snappy 選單中選擇「重新排列待辦」，或使用相應的鍵盤快速鍵"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在待辦模式下，若要重新整理待辦模式佈局，你可以從Divvtangle選單中選擇「重新排列待辦」，或使用相應的鍵盤快捷鍵"
+            "value" : "在待辦模式下，若要重新整理待辦模式佈局，你可以從Snappy選單中選擇「重新排列待辦」，或使用相應的鍵盤快捷鍵"
           }
         }
       }
@@ -39763,7 +39763,7 @@
       }
     },
     "STb-JK-oB1.title" : {
-      "comment" : "Class = \"NSWindow\"; title = \"Divvtangle Settings\"; ObjectID = \"STb-JK-oB1\";",
+      "comment" : "Class = \"NSWindow\"; title = \"Snappy Settings\"; ObjectID = \"STb-JK-oB1\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -39775,175 +39775,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferències de Divvtangle"
+            "value" : "Preferències de Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferències de Divvtangle"
+            "value" : "Preferències de Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle předvolby"
+            "value" : "Snappy předvolby"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle-Einstellungen"
+            "value" : "Snappy-Einstellungen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Divvtangle Settings"
+            "value" : "Snappy Settings"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferencias de Divvtangle"
+            "value" : "Preferencias de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferencias de Divvtangle"
+            "value" : "Preferencias de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Préférences Divvtangle"
+            "value" : "Préférences Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferensi Divvtangle"
+            "value" : "Preferensi Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferenze Divvtangle"
+            "value" : "Preferenze Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle環境設定"
+            "value" : "Snappy環境設定"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 설정"
+            "value" : "Snappy 설정"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle nustatymai"
+            "value" : "Snappy nustatymai"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle-innstillinger"
+            "value" : "Snappy-innstillinger"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Voorkeuren Divvtangle"
+            "value" : "Voorkeuren Snappy"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle-innstillingar"
+            "value" : "Snappy-innstillingar"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferencje Divvtangle"
+            "value" : "Preferencje Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferências do Divvtangle"
+            "value" : "Preferências do Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferências do Divvtangle"
+            "value" : "Preferências do Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preferințe Divvtangle"
+            "value" : "Preferințe Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Настройки Divvtangle"
+            "value" : "Настройки Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle predvoľby"
+            "value" : "Snappy predvoľby"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle-inställningar"
+            "value" : "Snappy-inställningar"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle Tercihleri"
+            "value" : "Snappy Tercihleri"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Налаштування Divvtangle"
+            "value" : "Налаштування Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cài đặt của Divvtangle"
+            "value" : "Cài đặt của Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle 偏好设置"
+            "value" : "Snappy 偏好设置"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle 偏好設定"
+            "value" : "Snappy 偏好設定"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Divvtangle偏好設定"
+            "value" : "Snappy偏好設定"
           }
         }
       }
@@ -40087,187 +40087,187 @@
       }
     },
     "t7n-mU-75I.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"Enable Divvtangle.app\"; ObjectID = \"t7n-mU-75I\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Enable Snappy.app\"; ObjectID = \"t7n-mU-75I\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تحقق من Divvtangle.app"
+            "value" : "تحقق من Snappy.app"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comprova Divvtangle.app"
+            "value" : "Comprova Snappy.app"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comprova Divvtangle.app"
+            "value" : "Comprova Snappy.app"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zkontrolovat Divvtangle.app"
+            "value" : "Zkontrolovat Snappy.app"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle.app prüfen"
+            "value" : "Snappy.app prüfen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Enable Divvtangle.app"
+            "value" : "Enable Snappy.app"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compruebe Divvtangle.app"
+            "value" : "Compruebe Snappy.app"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compruebe Divvtangle.app"
+            "value" : "Compruebe Snappy.app"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérifier Divvtangle.app"
+            "value" : "Vérifier Snappy.app"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Periksa Divvtangle.app"
+            "value" : "Periksa Snappy.app"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Controlla Divvtangle.app"
+            "value" : "Controlla Snappy.app"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle.appを確認してください"
+            "value" : "Snappy.appを確認してください"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle.app 확인하기"
+            "value" : "Snappy.app 확인하기"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patikrinkite failą Divvtangle.app."
+            "value" : "Patikrinkite failą Snappy.app."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sjekk Divvtangle.app"
+            "value" : "Sjekk Snappy.app"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Controleer Divvtangle.app"
+            "value" : "Controleer Snappy.app"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sjekk Divvtangle.app"
+            "value" : "Sjekk Snappy.app"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sprawdź Divvtangle.app."
+            "value" : "Sprawdź Snappy.app."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verificar Divvtangle.app"
+            "value" : "Verificar Snappy.app"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verificar Divvtangle.app"
+            "value" : "Verificar Snappy.app"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verifică Divvtangle.app"
+            "value" : "Verifică Snappy.app"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проверьте файл Divvtangle.app."
+            "value" : "Проверьте файл Snappy.app."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skontrolovať Divvtangle.app"
+            "value" : "Skontrolovať Snappy.app"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kontrollera Divvtangle.app"
+            "value" : "Kontrollera Snappy.app"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle.app'ı işaretleyerek izin verin"
+            "value" : "Snappy.app'ı işaretleyerek izin verin"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Увімкнути Divvtangle.app"
+            "value" : "Увімкнути Snappy.app"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bật Divvtangle.app"
+            "value" : "Bật Snappy.app"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用 Divvtangle.app"
+            "value" : "启用 Snappy.app"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "啟用 Divvtangle.app"
+            "value" : "啟用 Snappy.app"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "啟用Divvtangle.app"
+            "value" : "啟用Snappy.app"
           }
         }
       }
@@ -41227,13 +41227,13 @@
         }
       }
     },
-    "Tiling in Divvtangle has been disabled" : {
+    "Tiling in Snappy has been disabled" : {
       "extractionState" : "manual",
       "localizations" : {
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle의 타일 정리 기능이 비활성화됨"
+            "value" : "Snappy의 타일 정리 기능이 비활성화됨"
           }
         },
         "vi" : {
@@ -41399,180 +41399,180 @@
         }
       }
     },
-    "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting." : {
+    "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour permettre à Divvtangle de gérer la fonctionnalité de double-clic sur la barre de titre d'une fenêtre, vous devez désactiver le paramètre macOS correspondant."
+            "value" : "Pour permettre à Snappy de gérer la fonctionnalité de double-clic sur la barre de titre d'une fenêtre, vous devez désactiver le paramètre macOS correspondant."
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Damit Divvtangle die Doppelklickfunktion der Titelleiste verwalten kann, muss die entsprechende macOS Systemeinstellung deaktiviert werden."
+            "value" : "Damit Snappy die Doppelklickfunktion der Titelleiste verwalten kann, muss die entsprechende macOS Systemeinstellung deaktiviert werden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para permitir que Divvtangle administre la funcionalidad de doble click en la barra de título, debes deshabilitar los ajustes correspondientes de macOS."
+            "value" : "Para permitir que Snappy administre la funcionalidad de doble click en la barra de título, debes deshabilitar los ajustes correspondientes de macOS."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para permitir que Divvtangle administre la funcionalidad de doble click en la barra de título, debes deshabilitar los ajustes correspondientes de macOS."
+            "value" : "Para permitir que Snappy administre la funcionalidad de doble click en la barra de título, debes deshabilitar los ajustes correspondientes de macOS."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour permettre à Divvtangle de gérer la fonctionnalité de double-clic sur la barre de titre d'une fenêtre, vous devez désactiver le paramètre macOS correspondant."
+            "value" : "Pour permettre à Snappy de gérer la fonctionnalité de double-clic sur la barre de titre d'une fenêtre, vous devez désactiver le paramètre macOS correspondant."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Per permettere a Divvtangle di gestire la funzione di doppio clic sulla barra del titolo, devi disabilitare l'impostazione di macOS corrispondente."
+            "value" : "Per permettere a Snappy di gestire la funzione di doppio clic sulla barra del titolo, devi disabilitare l'impostazione di macOS corrispondente."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleがタイトルバーのダブルクリック機能を管理するには、該当するmacOSの設定を無効にする必要があります。"
+            "value" : "Snappyがタイトルバーのダブルクリック機能を管理するには、該当するmacOSの設定を無効にする必要があります。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle이 제목 막대 두 번 클릭 기능을 제어하려면, 해당하는 macOS 설정을 꺼야 합니다."
+            "value" : "Snappy이 제목 막대 두 번 클릭 기능을 제어하려면, 해당하는 macOS 설정을 꺼야 합니다."
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Norėdami leisti „Divvtangle“ valdyti antraštės juostos dvigubą spustelėjimą, turite išjungti atitinkamą „macOS“ nustatymą."
+            "value" : "Norėdami leisti „Snappy“ valdyti antraštės juostos dvigubą spustelėjimą, turite išjungti atitinkamą „macOS“ nustatymą."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "For å la Divvtangle styre dobbeltklikking i vindustittelen må du slå av den tilsvarende innstillinga i macOS."
+            "value" : "For å la Snappy styre dobbeltklikking i vindustittelen må du slå av den tilsvarende innstillinga i macOS."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "For å la Divvtangle styra dobbeltklikking i vindaugstittelen må du slå av den tilsvarande innstillinga i macOS."
+            "value" : "For å la Snappy styra dobbeltklikking i vindaugstittelen må du slå av den tilsvarande innstillinga i macOS."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Чтобы позволить Divvtangle управлять функцией двойного щелчка в заголовке, необходимо отключить соответствующую настройку macOS."
+            "value" : "Чтобы позволить Snappy управлять функцией двойного щелчка в заголовке, необходимо отключить соответствующую настройку macOS."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aby Divvtangle mohol spravovať funkciu dvojitého kliknutia v lište s názvom, musíš vypnúť príslušné nastavenie v macOS."
+            "value" : "Aby Snappy mohol spravovať funkciu dvojitého kliknutia v lište s názvom, musíš vypnúť príslušné nastavenie v macOS."
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Để cho phép Divvtangle quản lý chức năng nhấp đúp vào thanh tiêu đề, bạn cần phải tắt cài đặt macOS tương ứng."
+            "value" : "Để cho phép Snappy quản lý chức năng nhấp đúp vào thanh tiêu đề, bạn cần phải tắt cài đặt macOS tương ứng."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你需要禁用 macOS 中对应的设置以使用 Divvtangle 管理连按窗口标题功能。"
+            "value" : "你需要禁用 macOS 中对应的设置以使用 Snappy 管理连按窗口标题功能。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "若要讓 Divvtangle 管理標題列連點功能，您需要停用對應的 macOS 設定。"
+            "value" : "若要讓 Snappy 管理標題列連點功能，您需要停用對應的 macOS 設定。"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting."
+            "value" : "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting."
           }
         }
       }
@@ -43010,7 +43010,7 @@
       }
     },
     "uQy-DD-JDr.title" : {
-      "comment" : "Class = \"NSMenu\"; title = \"Divvtangle\"; ObjectID = \"uQy-DD-JDr\";",
+      "comment" : "Class = \"NSMenu\"; title = \"Snappy\"; ObjectID = \"uQy-DD-JDr\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -43022,175 +43022,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle"
+            "value" : "Snappy"
           }
         }
       }
@@ -48353,7 +48353,7 @@
       }
     },
     "xNi-9K-fnJ.title" : {
-      "comment" : "Class = \"NSTextFieldCell\"; title = \"2. In the Divvtangle menu, select\\n\\\"Use [Application] as Todo App\\\"\"; ObjectID = \"xNi-9K-fnJ\";",
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"2. In the Snappy menu, select\\n\\\"Use [Application] as Todo App\\\"\"; ObjectID = \"xNi-9K-fnJ\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
@@ -48365,175 +48365,175 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Al menú Divvtangle, selecciona\n\"Utilitza [Application] com a app Todo\""
+            "value" : "2. Al menú Snappy, selecciona\n\"Utilitza [Application] com a app Todo\""
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Al menú Divvtangle, selecciona\n\"Utilitza [Application] com a app Todo\""
+            "value" : "2. Al menú Snappy, selecciona\n\"Utilitza [Application] com a app Todo\""
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. V Divvtangle menu, zvolte\n\"Vybrat [Application] jako Todo aplikaci\""
+            "value" : "2. V Snappy menu, zvolte\n\"Vybrat [Application] jako Todo aplikaci\""
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Wähle \n\"Verwende [Application] als To-do-Anwendung\" im Divvtangle-Menü."
+            "value" : "2. Wähle \n\"Verwende [Application] als To-do-Anwendung\" im Snappy-Menü."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "2. In the Divvtangle menu, select\n\"Use [Application] as Todo App\""
+            "value" : "2. In the Snappy menu, select\n\"Use [Application] as Todo App\""
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. En el menú de Divvtangle, selecciona\n\"Usar [Aplicación] como aplicación 'Todo'\""
+            "value" : "2. En el menú de Snappy, selecciona\n\"Usar [Aplicación] como aplicación 'Todo'\""
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. En el menú de Divvtangle, selecciona\n\"Usar [Aplicación] como aplicación 'Todo'\""
+            "value" : "2. En el menú de Snappy, selecciona\n\"Usar [Aplicación] como aplicación 'Todo'\""
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Dans le menu de Divvtangle, sélectionner\n« Utiliser [Application] comme App Todo »"
+            "value" : "2. Dans le menu de Snappy, sélectionner\n« Utiliser [Application] comme App Todo »"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Di Menu Divvtangle, pilih\n\"Gunakan [Application] sebagai Aplikasi Todo\""
+            "value" : "2. Di Menu Snappy, pilih\n\"Gunakan [Application] sebagai Aplikasi Todo\""
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Nel menu di Divvtangle, seleziona \n\"Usa [Applicazione] come applicazione in evidenza\""
+            "value" : "2. Nel menu di Snappy, seleziona \n\"Usa [Applicazione] come applicazione in evidenza\""
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Divvtangleのメニューにある\n\"[アプリケーション名]をToDoアプリとして使う\"を選択します"
+            "value" : "2. Snappyのメニューにある\n\"[アプリケーション名]をToDoアプリとして使う\"を選択します"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Divvtangle 메뉴에서, \n\"[Application]을 Todo 앱으로 사용\" 메뉴를 클릭합니다"
+            "value" : "2. Snappy 메뉴에서, \n\"[Application]을 Todo 앱으로 사용\" 메뉴를 클릭합니다"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "„Divvtangle“ meniu pasirinkite „Naudoti [Programą] kaip Todo programą“"
+            "value" : "„Snappy“ meniu pasirinkite „Naudoti [Programą] kaip Todo programą“"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. I Divvtangle-menyen: velg\n\"Bruk [Program] som Gjøreliste-program\""
+            "value" : "2. I Snappy-menyen: velg\n\"Bruk [Program] som Gjøreliste-program\""
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. In the Divvtangle menu, select\n\"Use [Application] as Todo App\""
+            "value" : "2. In the Snappy menu, select\n\"Use [Application] as Todo App\""
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. I Divvtangle-menyen: vel\n\"Bruk [Program] som Gjereliste-program\""
+            "value" : "2. I Snappy-menyen: vel\n\"Bruk [Program] som Gjereliste-program\""
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. In the Divvtangle menu, select\n\"Use [Application] as Todo App\""
+            "value" : "2. In the Snappy menu, select\n\"Use [Application] as Todo App\""
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. No menu do Divvtangle, selecione\n\"Use [Aplicativo] como Todo App\""
+            "value" : "2. No menu do Snappy, selecione\n\"Use [Aplicativo] como Todo App\""
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. In the Divvtangle menu, select\n\"Use [Application] as Todo App\""
+            "value" : "2. In the Snappy menu, select\n\"Use [Application] as Todo App\""
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. În meniul Divvtangle, selectează\n\"Folosește [Application] ca și Todo App\""
+            "value" : "2. În meniul Snappy, selectează\n\"Folosește [Application] ca și Todo App\""
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. В меню Divvtangle выберите \"Использовать [Приложение] в качестве приложения Todo\""
+            "value" : "2. В меню Snappy выберите \"Использовать [Приложение] в качестве приложения Todo\""
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. V Divvtangle menu, zvoľ\n\"Použiť [Aplikácia] ako Todo aplikáciu\""
+            "value" : "2. V Snappy menu, zvoľ\n\"Použiť [Aplikácia] ako Todo aplikáciu\""
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. I Divvtangle-menyn, välj\n\"Använd [Applikation] som Att göra-app\""
+            "value" : "2. I Snappy-menyn, välj\n\"Använd [Applikation] som Att göra-app\""
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Divvtangle menüsünde \n\"[Uygulama Adı]nı Todo App olarak kullan\" seçeneğini seçin"
+            "value" : "2. Snappy menüsünde \n\"[Uygulama Adı]nı Todo App olarak kullan\" seçeneğini seçin"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. У меню Divvtangle виберіть\n\"Використовувати [Застосунок] як застосунок Завдань\""
+            "value" : "2. У меню Snappy виберіть\n\"Використовувати [Застосунок] як застосунок Завдань\""
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2. Trên menu của Divvtangle, chọn\n\"Sử dụng [Ứng dụng] làm ứng dụng Todo\""
+            "value" : "2. Trên menu của Snappy, chọn\n\"Sử dụng [Ứng dụng] làm ứng dụng Todo\""
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒉在 Divvtangle 菜单中，选择\n“使用［应用程序］作为待办应用”"
+            "value" : "⒉在 Snappy 菜单中，选择\n“使用［应用程序］作为待办应用”"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒉ 在 Divvtangle 選單中，選擇\n「使用［應用程式］作為待辦應用程式」"
+            "value" : "⒉ 在 Snappy 選單中，選擇\n「使用［應用程式］作為待辦應用程式」"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⒉在Divvtangle選單中，選擇\n「使用［應用程式］作為待辦應用」"
+            "value" : "⒉在Snappy選單中，選擇\n「使用［應用程式］作為待辦應用」"
           }
         }
       }
@@ -49643,181 +49643,181 @@
       }
     },
     "yvN-PE-bxn.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Divvtangle\"; ObjectID = \"yvN-PE-bxn\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Quit Snappy\"; ObjectID = \"yvN-PE-bxn\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "ca-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortir de Divvtangle"
+            "value" : "Sortir de Snappy"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončit Divvtangle"
+            "value" : "Ukončit Snappy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle beenden"
+            "value" : "Snappy beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit Divvtangle"
+            "value" : "Quit Snappy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salir de Divvtangle"
+            "value" : "Salir de Snappy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quitter Divvtangle"
+            "value" : "Quitter Snappy"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keluar Divvtangle"
+            "value" : "Keluar Snappy"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esci da Divvtangle"
+            "value" : "Esci da Snappy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangleを終了"
+            "value" : "Snappyを終了"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle 종료"
+            "value" : "Snappy 종료"
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Išeiti iš Divvtangle"
+            "value" : "Išeiti iš Snappy"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle stoppen"
+            "value" : "Snappy stoppen"
           }
         },
         "nn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avslutt Divvtangle"
+            "value" : "Avslutt Snappy"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wyjdź z Divvtangle."
+            "value" : "Wyjdź z Snappy."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fechar Divvtangle"
+            "value" : "Fechar Snappy"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sair do Divvtangle"
+            "value" : "Sair do Snappy"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Închide Divvtangle"
+            "value" : "Închide Snappy"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выход из Divvtangle"
+            "value" : "Выход из Snappy"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukončiť Divvtangle"
+            "value" : "Ukončiť Snappy"
           }
         },
         "sv-SE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avsluta Divvtangle"
+            "value" : "Avsluta Snappy"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Divvtangle'dan Çık"
+            "value" : "Snappy'dan Çık"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вийти з Divvtangle"
+            "value" : "Вийти з Snappy"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thoát Divvtangle"
+            "value" : "Thoát Snappy"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "退出 Divvtangle"
+            "value" : "退出 Snappy"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束 Divvtangle"
+            "value" : "結束 Snappy"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "結束Divvtangle"
+            "value" : "結束Snappy"
           }
         }
       }

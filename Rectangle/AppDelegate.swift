@@ -7,7 +7,7 @@ import os.log
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static let launcherAppId = "com.travismarceau.divvtangle.Launcher"
+    static let launcherAppId = "com.travismarceau.snappy.Launcher"
 
     private let accessibilityAuthorization = AccessibilityAuthorization()
     private let statusItem = RectangleStatusItem.instance
@@ -161,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for app in runningApps {
             guard let bundleId = app.bundleIdentifier else { continue }
             if let conflictingAppName = conflictingAppsIds[bundleId] {
-                AlertUtil.oneButtonAlert(question: "Potential window manager conflict: \(conflictingAppName)", text: "Since \(conflictingAppName) might have some overlapping behavior with Divvtangle, it's recommended that you either disable or quit \(conflictingAppName).")
+                AlertUtil.oneButtonAlert(question: "Potential window manager conflict: \(conflictingAppName)", text: "Since \(conflictingAppName) might have some overlapping behavior with Snappy, it's recommended that you either disable or quit \(conflictingAppName).")
                 break
             }
         }
@@ -213,7 +213,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let displayNameString = displayNames.joined(separator: "\n")
         
         if !problemBundles.isEmpty {
-            AlertUtil.oneButtonAlert(question: "Known issues with installed applications", text: "\(displayNameString)\n\nThese applications have issues with the drag to screen edge to snap functionality in Divvtangle.\n\nYou can either ignore the applications using the menu item in Divvtangle, or disable drag to screen edge snapping in Divvtangle preferences.")
+            AlertUtil.oneButtonAlert(question: "Known issues with installed applications", text: "\(displayNameString)\n\nThese applications have issues with the drag to screen edge to snap functionality in Snappy.\n\nYou can either ignore the applications using the menu item in Snappy, or disable drag to screen edge snapping in Snappy preferences.")
             Defaults.notifiedOfProblemApps.enabled = true
         }
     }
@@ -651,8 +651,8 @@ extension AppDelegate {
                 }
                 let alert = NSAlert()
                 alert.alertStyle = .warning
-                alert.messageText = "Allow Divvtangle URL action?".localized
-                alert.informativeText = String(format: "An external source asked Divvtangle to perform \"%@\" on app bundle id \"%@\". Allow?".localized, action, bundleId)
+                alert.messageText = "Allow Snappy URL action?".localized
+                alert.informativeText = String(format: "An external source asked Snappy to perform \"%@\" on app bundle id \"%@\". Allow?".localized, action, bundleId)
                 alert.addButton(withTitle: "Allow".localized)
                 alert.addButton(withTitle: "Cancel".localized)
                 NSApp.activate(ignoringOtherApps: true)

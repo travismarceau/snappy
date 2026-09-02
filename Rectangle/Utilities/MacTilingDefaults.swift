@@ -58,7 +58,7 @@ enum MacTilingDefaults: String {
         topTilingByEdgeDrag.disable()
         
         if !Defaults.internalTilingNotified.enabled {
-            // First time running Divvtangle & only has drag to top enabled in macOS
+            // First time running Snappy & only has drag to top enabled in macOS
             let result = AlertUtil.twoButtonAlert(
                 question: "Top screen edge tiling in macOS is now disabled".localized,
                 text: "To adjust macOS tiling, go to System Settings → Desktop & Dock → Windows".localized,
@@ -77,9 +77,9 @@ enum MacTilingDefaults: String {
     private static func resolveStandardTilingConflict() {
         let result = AlertUtil.threeButtonAlert(
             question: "Conflict with macOS tiling".localized,
-            text: "Drag to screen edge tiling is enabled in both Divvtangle and macOS.".localized,
+            text: "Drag to screen edge tiling is enabled in both Snappy and macOS.".localized,
             buttonOneText: "Disable in macOS".localized,
-            buttonTwoText: "Disable in Divvtangle".localized,
+            buttonTwoText: "Disable in Snappy".localized,
             buttonThreeText: "Dismiss".localized)
         switch result {
         case .alertFirstButtonReturn:
@@ -97,7 +97,7 @@ enum MacTilingDefaults: String {
             Notification.Name.windowSnapping.post(object: false)
 
             let result = AlertUtil.twoButtonAlert(
-                question: "Tiling in Divvtangle has been disabled".localized,
+                question: "Tiling in Snappy has been disabled".localized,
                 text: "To adjust macOS tiling, go to System Settings → Desktop & Dock → Windows".localized,
                 cancelText: "Open System Settings".localized)
             if result == .alertSecondButtonReturn {

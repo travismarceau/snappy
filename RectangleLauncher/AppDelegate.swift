@@ -10,7 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             terminate()
             return
         }
-        let mainAppIdentifier = "com.travismarceau.divvtangle"
+        let mainAppIdentifier = "com.travismarceau.snappy"
         let running = NSWorkspace.shared.runningApplications
         let isRunning = !running.filter({$0.bundleIdentifier == mainAppIdentifier}).isEmpty
         
@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             components.removeLast()
             components.removeLast()
             components.append("MacOS")
-            components.append("Divvtangle")
+            components.append("Snappy")
             let newPath = NSString.path(withComponents: components)
             NSWorkspace.shared.launchApplication(newPath)
         }

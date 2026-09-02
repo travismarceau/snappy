@@ -161,7 +161,7 @@ class SettingsViewController: NSViewController {
             let conflictTitleText = NSLocalizedString(
                 "Conflict with system setting", tableName: "Main", value: "", comment: "")
             let conflictDescriptionText = NSLocalizedString(
-                "To let Divvtangle manage the title bar double click functionality, you need to disable the corresponding macOS setting.", tableName: "Main", value: "", comment: "")
+                "To let Snappy manage the title bar double click functionality, you need to disable the corresponding macOS setting.", tableName: "Main", value: "", comment: "")
 
             
             let closeText = NSLocalizedString("DVo-aG-piG.title", tableName: "Main", value: "Close", comment: "")
@@ -249,12 +249,12 @@ class SettingsViewController: NSViewController {
     }
     
     @IBAction func restoreDefaults(_ sender: Any) {
-        // Ask user if they want to restore to Divvtangle or Spectacle defaults
-        let currentDefaults = Defaults.alternateDefaultShortcuts.enabled ? "Divvtangle" : "Spectacle"
+        // Ask user if they want to restore to Snappy or Spectacle defaults
+        let currentDefaults = Defaults.alternateDefaultShortcuts.enabled ? "Snappy" : "Spectacle"
         let defaultShortcutsTitle = NSLocalizedString("Default Shortcuts", tableName: "Main", value: "", comment: "")
         let currentlyUsingText = NSLocalizedString("Currently using: ", tableName: "Main", value: "", comment: "")
         let cancelText = NSLocalizedString("Cancel", tableName: "Main", value: "", comment: "")
-        let response = AlertUtil.threeButtonAlert(question: defaultShortcutsTitle, text: currentlyUsingText + currentDefaults, buttonOneText: "Divvtangle", buttonTwoText: "Spectacle", buttonThreeText: cancelText)
+        let response = AlertUtil.threeButtonAlert(question: defaultShortcutsTitle, text: currentlyUsingText + currentDefaults, buttonOneText: "Snappy", buttonTwoText: "Spectacle", buttonThreeText: cancelText)
         if response == .alertThirdButtonReturn { return }
 
         //  Restore default shortcuts
@@ -273,7 +273,7 @@ class SettingsViewController: NSViewController {
         Notification.Name.windowSnapping.post(object: false)
         let savePanel = NSSavePanel()
         savePanel.allowedFileTypes = ["json"]
-        savePanel.nameFieldStringValue = "DivvtangleConfig"
+        savePanel.nameFieldStringValue = "SnappyConfig"
         let response = savePanel.runModal()
         if response == .OK, let url = savePanel.url {
             do {
