@@ -258,6 +258,48 @@ final class PlacementGridView: NSView {
 
             drawCap(for: binding, in: rect, emphasised: flashed)
         }
+
+        drawLayoutLegend(in: bounds)
+    }
+
+    /// Multi-window layouts can't be drawn as a single region, so list them as
+    /// key chips along the bottom.
+    private func drawLayoutLegend(in bounds: NSRect) {
+        let layouts = keymap.assignedLayouts
+        guard !layouts.isEmpty else { return }
+
+        let font = NSFont.systemFont(ofSize: 13, weight: .medium)
+        let keyFont = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
+        var chips: [(key: String, label: String, keyW: CGFloat, labelW: CGFloat)] = []
+        for layout in layouts {
+            let s = MASShortcut(keyCode: layout.keyCode,
+                                modifierFlags: NSEvent.ModifierFlags(rawValue: layout.modifierFlags))
+            let key = [s.modifierFlagsString, s.keyCodeString].compactMap { $0 }.joined()
+            let label = layout.label.isEmpty ? "\(layout.slots.count) windows" : layout.label
+            let kw = (key as NSString).size(withAttributes: [.font: keyFont]).width
+            let lw = (label as NSString).size(withAttributes: [.font: font]).width
+            chips.append((key, label, kw, lw))
+        }
+
+        let pad: CGFloat = 12, gap: CGFloat = 10, chipGap: CGFloat = 18
+        let widths = chips.map { $0.keyW + gap + $0.labelW + pad * 2 }
+        let totalW = widths.reduce(0, +) + chipGap * CGFloat(max(chips.count - 1, 0))
+        var x = bounds.midX - totalW / 2
+        let y = bounds.minY + 40
+        let h: CGFloat = 34
+
+        for (i, chip) in chips.enumerated() {
+            let rect = NSRect(x: x, y: y, width: widths[i], height: h)
+            NSColor.black.withAlphaComponent(0.32).setFill()
+            NSBezierPath(roundedRect: rect, xRadius: 9, yRadius: 9).fill()
+            (chip.key as NSString).draw(
+                at: NSPoint(x: rect.minX + pad, y: rect.midY - keyFont.pointSize / 2 - 2),
+                withAttributes: [.font: keyFont, .foregroundColor: NSColor.white])
+            (chip.label as NSString).draw(
+                at: NSPoint(x: rect.minX + pad + chip.keyW + gap, y: rect.midY - font.pointSize / 2 - 2),
+                withAttributes: [.font: font, .foregroundColor: NSColor.white.withAlphaComponent(0.75)])
+            x += widths[i] + chipGap
+        }
     }
 
     private func drawGridLines(in bounds: NSRect) {

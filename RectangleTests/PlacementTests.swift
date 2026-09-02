@@ -172,3 +172,59 @@ final class PlacementConfigRoundTripTests: XCTestCase {
         XCTAssertEqual(Defaults.placementKeymap.typedValue, map)
     }
 }
+
+final class WindowLayoutTests: XCTestCase {
+
+    private func slot(_ bid: String, _ span: Int) -> LayoutSlot {
+        LayoutSlot(appBundleId: bid, placement: GridPlacement(col: 0, row: 0, colSpan: span, rowSpan: span))
+    }
+
+    func testLayoutLookupIsKeyAndModifierSensitive() {
+        var map = PlacementKeymap()
+        let cmd: UInt = 1 << 20
+        map.layouts = [
+            WindowLayout(keyCode: 13, label: "code", slots: [slot("com.a", 6)]),
+            WindowLayout(keyCode: 14, modifierFlags: cmd, label: "write", slots: [slot("com.b", 6)]),
+        ]
+        XCTAssertEqual(map.layout(forKeyCode: 13, modifierFlags: 0)?.label, "code")
+        XCTAssertNil(map.layout(forKeyCode: 14, modifierFlags: 0))
+        XCTAssertEqual(map.layout(forKeyCode: 14, modifierFlags: cmd)?.label, "write")
+    }
+
+    func testConflictSpansBindingsAndLayouts() {
+        var map = PlacementKeymap()
+        let b = PlacementBinding(keyCode: 3, placement: GridPlacement(col: 0, row: 0, colSpan: 6, rowSpan: 6))
+        let l = WindowLayout(keyCode: 3, label: "x", slots: [])
+        map.bindings = [b]
+        map.layouts = [l]
+        // the layout's key collides with the binding's key (different ids)
+        XCTAssertTrue(map.hasConflict(keyCode: 3, modifierFlags: 0, excluding: l.id))
+        XCTAssertTrue(map.hasConflict(keyCode: 3, modifierFlags: 0, excluding: b.id))
+        XCTAssertFalse(map.hasConflict(keyCode: 9, modifierFlags: 0, excluding: l.id))
+    }
+
+    func testHasAnyAssignedKey() {
+        var map = PlacementKeymap()
+        XCTAssertFalse(map.hasAnyAssignedKey)
+        map.layouts = [WindowLayout(keyCode: 5, slots: [])]
+        XCTAssertTrue(map.hasAnyAssignedKey)
+    }
+
+    func testKeymapWithLayoutsCodableRoundTrip() throws {
+        var map = PlacementKeymap(grid: PlacementGrid(rows: 4, cols: 8), outerMargin: 6, innerGap: 3)
+        map.bindings = [PlacementBinding(keyCode: 3, label: "L",
+                                        placement: GridPlacement(col: 0, row: 0, colSpan: 4, rowSpan: 4))]
+        map.layouts = [WindowLayout(keyCode: 13, modifierFlags: 1 << 19, label: "coding",
+                                    slots: [slot("com.microsoft.VSCode", 4), slot("com.apple.Terminal", 2)])]
+        let data = try JSONEncoder().encode(map)
+        let decoded = try JSONDecoder().decode(PlacementKeymap.self, from: data)
+        XCTAssertEqual(decoded, map)
+        XCTAssertEqual(decoded.layouts.first?.slots.count, 2)
+    }
+
+    func testOldKeymapJSONWithoutLayoutsStillDecodes() throws {
+        let json = #"{"grid":{"rows":6,"cols":6},"outerMargin":0,"innerGap":0,"bindings":[]}"#
+        let decoded = try JSONDecoder().decode(PlacementKeymap.self, from: Data(json.utf8))
+        XCTAssertEqual(decoded.layouts, [])
+    }
+}

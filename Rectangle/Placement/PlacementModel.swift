@@ -210,6 +210,54 @@ struct PlacementBinding: Codable, Equatable, Identifiable {
     var isAssigned: Bool { keyCode >= 0 }
 }
 
+// MARK: - Multi-window layout
+
+/// One window in a layout: an app, placed on a region of the grid.
+struct LayoutSlot: Codable, Equatable {
+    var appBundleId: String
+    var placement: GridPlacement
+
+    init(appBundleId: String = "", placement: GridPlacement) {
+        self.appBundleId = appBundleId
+        self.placement = placement
+    }
+}
+
+/// A named arrangement of several apps' windows, bound to one key in the same
+/// leader overlay. Pressing the key places every slot in one shot.
+struct WindowLayout: Codable, Equatable, Identifiable {
+    var id: UUID
+    var keyCode: Int
+    var modifierFlags: UInt
+    var label: String
+    var slots: [LayoutSlot]
+
+    init(id: UUID = UUID(),
+         keyCode: Int = PlacementBinding.unassignedKeyCode,
+         modifierFlags: UInt = 0,
+         label: String = "",
+         slots: [LayoutSlot] = []) {
+        self.id = id
+        self.keyCode = keyCode
+        self.modifierFlags = modifierFlags & placementModifierMask
+        self.label = label
+        self.slots = slots
+    }
+
+    enum CodingKeys: String, CodingKey { case id, keyCode, modifierFlags, label, slots }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        keyCode = try c.decodeIfPresent(Int.self, forKey: .keyCode) ?? PlacementBinding.unassignedKeyCode
+        modifierFlags = (try c.decodeIfPresent(UInt.self, forKey: .modifierFlags) ?? 0) & placementModifierMask
+        label = try c.decodeIfPresent(String.self, forKey: .label) ?? ""
+        slots = try c.decodeIfPresent([LayoutSlot].self, forKey: .slots) ?? []
+    }
+
+    var isAssigned: Bool { keyCode >= 0 }
+}
+
 // MARK: - Keymap
 
 struct PlacementKeymap: Codable, Equatable {
@@ -217,21 +265,24 @@ struct PlacementKeymap: Codable, Equatable {
     var outerMargin: CGFloat
     var innerGap: CGFloat
     var bindings: [PlacementBinding]
+    var layouts: [WindowLayout]
 
     static let empty = PlacementKeymap()
 
     init(grid: PlacementGrid = .default,
          outerMargin: CGFloat = 0,
          innerGap: CGFloat = 0,
-         bindings: [PlacementBinding] = []) {
+         bindings: [PlacementBinding] = [],
+         layouts: [WindowLayout] = []) {
         self.grid = grid
         self.outerMargin = max(0, outerMargin)
         self.innerGap = max(0, innerGap)
         self.bindings = bindings
+        self.layouts = layouts
     }
 
     enum CodingKeys: String, CodingKey {
-        case grid, outerMargin, innerGap, bindings
+        case grid, outerMargin, innerGap, bindings, layouts
     }
 
     init(from decoder: Decoder) throws {
@@ -240,30 +291,33 @@ struct PlacementKeymap: Codable, Equatable {
         let outer = try c.decodeIfPresent(CGFloat.self, forKey: .outerMargin) ?? 0
         let inner = try c.decodeIfPresent(CGFloat.self, forKey: .innerGap) ?? 0
         let bindings = try c.decodeIfPresent([PlacementBinding].self, forKey: .bindings) ?? []
-        self.init(grid: grid, outerMargin: outer, innerGap: inner, bindings: bindings)
+        let layouts = try c.decodeIfPresent([WindowLayout].self, forKey: .layouts) ?? []
+        self.init(grid: grid, outerMargin: outer, innerGap: inner, bindings: bindings, layouts: layouts)
     }
 
     var assignedBindings: [PlacementBinding] { bindings.filter { $0.isAssigned } }
+    var assignedLayouts: [WindowLayout] { layouts.filter { $0.isAssigned } }
+    var hasAnyAssignedKey: Bool { !assignedBindings.isEmpty || !assignedLayouts.isEmpty }
+
+    private static func matches(keyCode: Int, modifierFlags: UInt, target: Int, targetMods: UInt) -> Bool {
+        target == keyCode && (targetMods & placementModifierMask) == (modifierFlags & placementModifierMask)
+    }
 
     /// First assigned binding matching the pressed key, or nil.
     func binding(forKeyCode keyCode: Int, modifierFlags: UInt) -> PlacementBinding? {
-        let mods = modifierFlags & placementModifierMask
-        return bindings.first {
-            $0.isAssigned
-                && $0.keyCode == keyCode
-                && ($0.modifierFlags & placementModifierMask) == mods
-        }
+        bindings.first { $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
     }
 
-    /// True if `keyCode`+`mods` is already taken by a *different* binding.
+    /// First assigned layout matching the pressed key, or nil.
+    func layout(forKeyCode keyCode: Int, modifierFlags: UInt) -> WindowLayout? {
+        layouts.first { $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
+    }
+
+    /// True if `keyCode`+`mods` is already taken by a different placement or layout.
     func hasConflict(keyCode: Int, modifierFlags: UInt, excluding id: UUID) -> Bool {
         guard keyCode >= 0 else { return false }
-        let mods = modifierFlags & placementModifierMask
-        return bindings.contains {
-            $0.id != id
-                && $0.isAssigned
-                && $0.keyCode == keyCode
-                && ($0.modifierFlags & placementModifierMask) == mods
-        }
+        let takenByBinding = bindings.contains { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
+        let takenByLayout = layouts.contains { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
+        return takenByBinding || takenByLayout
     }
 }

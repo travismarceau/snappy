@@ -46,6 +46,14 @@ final class PlacementConfigViewController: NSViewController {
     private var placementsLeftColumn = NSView()
     private var placementsRightColumn = NSView()
 
+    // Placements vs. multi-window Layouts, toggled by a segmented control.
+    private let modeControl = NSSegmentedControl(labels: [
+        NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""),
+        NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""),
+    ], trackingMode: .selectOne, target: nil, action: nil)
+    private let placementsRoot = NSView()
+    private lazy var layoutsRoot = LayoutsPaneView()
+
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
@@ -70,11 +78,35 @@ final class PlacementConfigViewController: NSViewController {
             reloadTable()
             selectRow(keymap.bindings.isEmpty ? nil : 0)
         }
+        if !layoutsRoot.isHidden { layoutsRoot.reload() }
     }
 
     // MARK: Layout
 
     private func buildLayout() {
+        modeControl.selectedSegment = 0
+        modeControl.target = self
+        modeControl.action = #selector(modeChanged)
+        modeControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(modeControl)
+
+        for root in [placementsRoot, layoutsRoot] {
+            root.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(root)
+            NSLayoutConstraint.activate([
+                root.topAnchor.constraint(equalTo: modeControl.bottomAnchor, constant: 14),
+                root.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                root.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                root.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            ])
+        }
+        layoutsRoot.isHidden = true
+
+        NSLayoutConstraint.activate([
+            modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+            modeControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        ])
+
         let placementsPane = buildPlacementsPane() // populates placementsLeftColumn / placementsRightColumn
         let general = titledCard(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""), buildGeneralGrid())
         let gridCard = titledCard(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""), buildGridGrid())
@@ -82,31 +114,38 @@ final class PlacementConfigViewController: NSViewController {
 
         for v in [general, gridCard, placements] {
             v.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(v)
+            placementsRoot.addSubview(v)
         }
 
         NSLayoutConstraint.activate([
             // General and Grid share the top row, equal widths.
-            general.topAnchor.constraint(equalTo: view.topAnchor, constant: 18),
-            general.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            general.topAnchor.constraint(equalTo: placementsRoot.topAnchor, constant: 4),
+            general.leadingAnchor.constraint(equalTo: placementsRoot.leadingAnchor, constant: 20),
 
             gridCard.topAnchor.constraint(equalTo: general.topAnchor),
             gridCard.leadingAnchor.constraint(equalTo: general.trailingAnchor, constant: 16),
-            gridCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            gridCard.trailingAnchor.constraint(equalTo: placementsRoot.trailingAnchor, constant: -20),
             gridCard.widthAnchor.constraint(equalTo: general.widthAnchor),
             gridCard.bottomAnchor.constraint(equalTo: general.bottomAnchor),
 
             // Placements fills the rest, full width.
             placements.topAnchor.constraint(equalTo: general.bottomAnchor, constant: 16),
-            placements.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            placements.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            placements.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -18),
+            placements.leadingAnchor.constraint(equalTo: placementsRoot.leadingAnchor, constant: 20),
+            placements.trailingAnchor.constraint(equalTo: placementsRoot.trailingAnchor, constant: -20),
+            placements.bottomAnchor.constraint(equalTo: placementsRoot.bottomAnchor, constant: -18),
 
             // Keep the Placements columns aligned to the cards above: the table
             // ends where General ends, the region editor starts where Grid starts.
             placementsLeftColumn.trailingAnchor.constraint(equalTo: general.trailingAnchor),
             placementsRightColumn.leadingAnchor.constraint(equalTo: gridCard.leadingAnchor),
         ])
+    }
+
+    @objc private func modeChanged() {
+        let layouts = modeControl.selectedSegment == 1
+        placementsRoot.isHidden = layouts
+        layoutsRoot.isHidden = !layouts
+        if layouts { layoutsRoot.reload() }
     }
 
     /// A section header above a rounded, bordered card that wraps `content` with

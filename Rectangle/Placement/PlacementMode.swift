@@ -145,7 +145,7 @@ final class PlacementModeController {
         guard Defaults.placementModeEnabled.userEnabled else { return }
 
         let map = Defaults.placementKeymap.typedValue ?? .empty
-        guard !map.assignedBindings.isEmpty else {
+        guard map.hasAnyAssignedKey else {
             NSSound.beep()
             return
         }
@@ -206,7 +206,9 @@ final class PlacementModeController {
         guard isActive else { return true } // in the flash tail: swallow everything, act on nothing
         if Int(event.keyCode) == kVK_Escape { return true }
         let mods = event.modifierFlags.rawValue & placementModifierMask
-        if currentKeymap.binding(forKeyCode: Int(event.keyCode), modifierFlags: mods) != nil { return true }
+        let code = Int(event.keyCode)
+        if currentKeymap.binding(forKeyCode: code, modifierFlags: mods) != nil { return true }
+        if currentKeymap.layout(forKeyCode: code, modifierFlags: mods) != nil { return true }
         // Bare keystrokes are the "any single key" the user means to capture;
         // swallow them. Unrecognised modified combos (⌘Tab, ⌘Q…) pass through so
         // the user can still switch or quit apps, useful in sticky mode.
@@ -222,19 +224,27 @@ final class PlacementModeController {
             return
         }
         let mods = event.modifierFlags.rawValue & placementModifierMask
-        guard let binding = currentKeymap.binding(forKeyCode: keyCode, modifierFlags: mods) else {
+
+        if let binding = currentKeymap.binding(forKeyCode: keyCode, modifierFlags: mods) {
+            revealWorkItem?.cancel()
+            overlay?.flash(binding)
+            place(binding)
+            finishPlacement()
+        } else if let layout = currentKeymap.layout(forKeyCode: keyCode, modifierFlags: mods) {
+            revealWorkItem?.cancel()
+            applyLayout(layout)
+            finishPlacement()
+        } else {
             NSSound.beep()
             // An unrecognised key almost always means "I forget my map" — show it.
             revealWorkItem?.cancel()
             overlay?.revealMap(animated: true)
             rearmTimeout()
-            return
         }
+    }
 
-        revealWorkItem?.cancel()
-        overlay?.flash(binding)
-        place(binding)
-
+    /// Shared sticky-vs-dismiss tail after a key resolves to a placement or layout.
+    private func finishPlacement() {
         if Defaults.placementPaneSticky.enabled {
             // The user will focus a different window before the next key.
             targetElement = AccessibilityElement.getFrontWindowElement()
@@ -266,6 +276,27 @@ final class PlacementModeController {
             windowElement: targetElement,
             windowId: targetWindowId
         )
+    }
+
+    /// Place every window of a multi-window layout, on the pane's screen.
+    private func applyLayout(_ layout: WindowLayout) {
+        guard let screen = baseScreen else { return }
+        let map = currentKeymap
+        let visible = screen.adjustedVisibleFrame()
+        for slot in layout.slots {
+            guard !slot.appBundleId.isEmpty,
+                  let element = AccessibilityElement(slot.appBundleId)?.windowElements?.first
+            else { continue }
+            let rect = slot.placement.resolve(in: visible,
+                                              grid: map.grid,
+                                              outerMargin: map.outerMargin,
+                                              innerGap: map.innerGap)
+            WindowAction.specified.postPlacement(rect: rect,
+                                                 screen: screen,
+                                                 windowElement: element,
+                                                 windowId: element.getWindowId())
+            element.bringToFront()
+        }
     }
 
     private func resolveScreen(for placement: GridPlacement, base: NSScreen) -> NSScreen {
