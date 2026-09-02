@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#586A7E"/>
+      <stop offset="1" stop-color="#2E3440"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5AA6FF"/>
+      <stop offset="1" stop-color="#1E6FE6"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF95A6"/>
+      <stop offset="1" stop-color="#F2637E"/>
+    </linearGradient>
+    <clipPath id="tile">
+      <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#tile)">
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#bg)"/>
+
+    <!-- placed "window": left two columns of a 4x4 grid -->
+    <rect x="156" y="156" width="350" height="712" rx="22" ry="22" fill="url(#blue)"/>
+    <rect x="156" y="156" width="350" height="712" rx="22" ry="22" fill="none"
+          stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="3"/>
+
+    <!-- a second region: one cell, a nod to Divvy's coloured grid -->
+    <rect x="699" y="156" width="169" height="169" rx="16" ry="16" fill="url(#coral)"/>
+
+    <!-- 4x4 grid lines over everything -->
+    <g stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4" stroke-linecap="round">
+      <line x1="150" y1="150" x2="150" y2="874"/>
+      <line x1="331" y1="150" x2="331" y2="874"/>
+      <line x1="512" y1="150" x2="512" y2="874"/>
+      <line x1="693" y1="150" x2="693" y2="874"/>
+      <line x1="874" y1="150" x2="874" y2="874"/>
+      <line x1="150" y1="150" x2="874" y2="150"/>
+      <line x1="150" y1="331" x2="874" y2="331"/>
+      <line x1="150" y1="512" x2="874" y2="512"/>
+      <line x1="150" y1="693" x2="874" y2="693"/>
+      <line x1="150" y1="874" x2="874" y2="874"/>
+    </g>
+
+    <!-- top sheen + rim -->
+    <rect x="0" y="0" width="1024" height="512" fill="#FFFFFF" fill-opacity="0.04"/>
+    <rect x="4" y="4" width="1016" height="1016" rx="228" ry="228" fill="none"
+          stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="3"/>
+  </g>
+</svg>
