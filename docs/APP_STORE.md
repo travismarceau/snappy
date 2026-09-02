@@ -1,71 +1,103 @@
-# Snappy — Mac App Store submission
+# Snappy — release checklist
 
-## What's already done in the codebase
+Snappy is a keyboard-first window placement app derived from **Rectangle**
+(MIT). See `NOTICE.md` / `LICENSE` for attribution.
 
-- **Rebranded** to Snappy: bundle id `com.travismarceau.snappy`, display
-  name, URL scheme `snappy://`, support dir `~/…/Application Support/Snappy`,
-  config file `SnappyConfig.json`, all user-facing strings and the whole
-  `Main.xcstrings` catalog, the app icon (`SnappyIcon`), the login-helper
-  bundle id (`com.travismarceau.snappy.Launcher`). Internal Swift module stays
-  `Rectangle` (via `PRODUCT_MODULE_NAME`) — invisible to users, avoids a risky refactor.
-- **Attribution kept** for MIT compliance: `LICENSE` (Ryan Hanson / Spectacle /
-  Eric Czarny) is unchanged, `NOTICE.md` added, the About panel credits Rectangle
-  + Spectacle, `NSHumanReadableCopyright` names them.
-- **Welcome / recommended-settings pop-up removed.** First run now just applies
-  the recommended defaults directly (`alternateDefaultShortcuts` on,
-  `subsequentExecutionMode = acrossMonitor`).
-- **Sparkle removed entirely** (SPM package, code, Info.plist `SU*` keys, the
-  "Check for Updates" menu item and settings controls). Updates go through the
-  App Store.
-- **Release config = the MAS build**: `Snappy.app`, App Sandbox
-  (`com.apple.security.app-sandbox` + `files.user-selected.read-write`), hardened
-  runtime, `ITSAppUsesNonExemptEncryption = false`, `MARKETING_VERSION = 1.0`,
-  `CURRENT_PROJECT_VERSION = 1`, team `P78K4VHEL3`, automatic signing.
-- Debug config is the local dev build (ad-hoc, unsandboxed, `Snappy.app`).
-- `xcodebuild -configuration Release build` and `… test` both pass (328 tests).
+## Done in the codebase
 
-## Must verify before you submit (cannot be checked from the build alone)
+**Identity & compliance**
+- Bundle id `com.travismarceau.snappy`, display name "Snappy", URL scheme
+  `snappy://`, support dir `~/Library/Application Support/Snappy`, config file
+  `SnappyConfig.json`, icon `SnappyIcon`, login helper
+  `com.travismarceau.snappy.Launcher`. Swift module stays `Rectangle`
+  internally (`PRODUCT_MODULE_NAME`).
+- `LICENSE` kept verbatim; `NOTICE.md` added; the About panel and
+  `NSHumanReadableCopyright` credit Rectangle + Spectacle.
 
-1. **Sandboxed window management actually works.** The free Rectangle is *not*
-   on the App Store; Rectangle Pro (a separate sandboxed codebase) is. Sandboxed
-   apps *can* drive the Accessibility API to move other apps' windows once the
-   user grants Accessibility (Magnet, Rectangle Pro, Swish, Moom all do it), but
-   **you must run the signed, provisioned Release build and confirm every feature
-   still works** — snapping, drag-to-edge, Todo mode, multi-display, the
-   placement overlay. If something is blocked, you may need
+**De-Rectangle-ification (4.1 copycat mitigation)**
+- The whole **Shortcuts settings tab is gone**, along with all ~130 preset
+  global chord shortcuts (they no longer bind) and the "Left Half / Maximize /
+  First Third / …" list in the status menu. Window placement is entirely the
+  leader-key grid overlay. Settings tabs: **Snap Areas · Placement · General**.
+- The Placement tab has a **Placements | Layouts** switch. **Multi-window
+  layouts** (one key arranges several apps' windows at once) is a feature
+  Rectangle has no equivalent for.
+- Welcome / recommended-settings modal removed. Sparkle removed entirely.
+
+**Build config**
+- **Release** = the Mac App Store build: `Snappy.app`, App Sandbox
+  (`app-sandbox` + `files.user-selected.read-write`), hardened runtime,
+  `ITSAppUsesNonExemptEncryption=false`, v1.0 (1), team `P78K4VHEL3`,
+  automatic signing. `xcodebuild -configuration Release archive
+  -allowProvisioningUpdates` succeeds.
+- **Debug** = local dev build (ad-hoc, unsandboxed).
+- Direct-download build via `scripts/build-direct.sh` (Developer ID + notarize).
+
+## Two channels
+
+### Mac App Store (Release)
+1. App Store Connect: create the app record — bundle id
+   `com.travismarceau.snappy`, category Productivity.
+2. Xcode ▸ Rectangle target ▸ Signing & Capabilities: automatic signing, your
+   team. First Archive creates the Mac App Store provisioning profile.
+3. Product ▸ Archive ▸ Organizer ▸ Distribute App ▸ App Store Connect. Or
+   `xcodebuild -exportArchive … -exportOptionsPlist ExportOptions-AppStore.plist`
+   (needs an Apple ID in Xcode ▸ Settings ▸ Accounts, or an ASC API key).
+
+### Direct download (notarized Developer ID)
+1. Create a **Developer ID Application** certificate (Xcode ▸ Settings ▸
+   Accounts ▸ Manage Certificates ▸ +, or Organizer ▸ Distribute ▸ Developer
+   ID once). *You don't have one yet — `security find-identity` shows only
+   "Apple Development".*
+2. `xcrun notarytool store-credentials snappy-notary --apple-id … --team-id
+   P78K4VHEL3 --password <app-specific-password>`.
+3. `./scripts/build-direct.sh` → notarized, stapled `build/Snappy.zip`.
+   - It reuses the Release config (sandboxed) but signs Developer ID. If
+     on-device testing shows the sandbox blocks a feature, add a dedicated
+     `Direct` build configuration pointing `CODE_SIGN_ENTITLEMENTS` at
+     `Rectangle/RectangleDirect.entitlements` (no sandbox) — that file is
+     already in the repo for this.
+
+## Must verify on-device before submitting
+
+1. **The sandboxed Release build actually manages windows** — snapping,
+   drag-to-edge, Todo, multi-display, the placement overlay, **and multi-window
+   layouts** (`AccessibilityElement(bundleId:)` reaching other apps under the
+   sandbox). Sandboxed AX window control works for Magnet / Rectangle Pro /
+   Swish, but confirm it here. If blocked: add
    `com.apple.security.automation.apple-events` + `NSAppleEventsUsageDescription`,
-   or to drop a feature.
-2. **App Review Guideline 4.1 (Copycats).** Snappy is a rebranded fork of
-   Rectangle, whose author ships apps on the same store. The placement feature
-   differentiates it, but rejection is a real possibility — be ready to explain
-   what's original.
-3. `~/Library/Application Support/Snappy` under the sandbox resolves to the
-   app *container*, not the real path. `loadFromSupportDir()` still works but the
-   drop-in-a-config-file workflow changes. Test import/export via the panels.
-4. The `WelcomeViewController` storyboard scene is now orphaned (never shown) —
-   harmless, but you can delete it for tidiness.
+   or ship direct-only non-sandboxed.
+2. **4.1 Copycats** is still a judgement call. Mitigations in place: own name,
+   own icon, the Shortcuts pane / preset chords / action menu are gone, the
+   primary UI is the grid overlay + layout editor, and multi-window layouts is
+   original. Keep "based on Rectangle" out of the store description (it's in
+   About + LICENSE). The direct channel is the hedge.
+3. Import/export config via the panels under the sandbox (paths resolve to the
+   app container).
 
-## Human steps (portal / Xcode, not code)
+## Metadata (App Store Connect)
 
-1. **App Store Connect**: create the app record with bundle id
-   `com.travismarceau.snappy`, name "Snappy", primary category
-   Productivity, set up pricing.
-2. **Certificates / profiles**: in Xcode → the Rectangle target → Signing &
-   Capabilities, "Automatically manage signing", Team = your team. Xcode creates
-   the "Mac App Store" provisioning profile on first Archive.
-3. **Archive & upload**: Product → Archive (Release), then Organizer →
-   Distribute App → App Store Connect → Upload. Or:
-   `xcodebuild -scheme Rectangle -configuration Release archive -archivePath build/Snappy.xcarchive`
-   then `xcodebuild -exportArchive -archivePath build/Snappy.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export`
-   with `ExportOptions.plist` method `app-store`.
-4. **Metadata**: description, keywords, support URL, marketing URL, **privacy
-   policy URL** (required), screenshots (1280×800 or 1440×900, at least one),
-   an App Preview optional.
-5. **App Privacy**: Snappy collects no data — fill in "Data Not Collected".
-6. **Export compliance**: `ITSAppUsesNonExemptEncryption` is already `false` in
-   Info.plist, so no extra questionnaire.
-7. **Accessibility usage**: the app needs the user to grant Accessibility; make
-   sure your review notes explain this and how to test (System Settings →
-   Privacy & Security → Accessibility → enable Snappy).
-8. Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` for every subsequent
-   upload.
+- Description, keywords, support URL, marketing URL, **privacy policy URL**
+  (required). Screenshots ≥ 1 (1280×800 or 1440×900).
+- App Privacy: "Data Not Collected".
+- Review notes: explain the Accessibility permission and how to grant it
+  (System Settings ▸ Privacy & Security ▸ Accessibility ▸ Snappy).
+- Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` per upload.
+
+## Known issue
+
+`RectangleTests/ShortcutRecordingObserverTests` (upstream Todo-mode shortcut
+tests) is **flaky in the full-suite run** on machines where `⌘⌃⌥⇧`+letter
+combos are already grabbed (Karabiner, other window tools). The tests race on
+`MASShortcutMonitor.isShortcutRegistered` and were previously "warmed" by the
+window-chord bindings we removed. They pass reliably **in isolation**
+(`xcodebuild … -only-testing:RectangleTests/ShortcutRecordingObserverTests`)
+and on a clean machine. All other suites, including the 23 placement/layout
+tests, are deterministic and green.
+
+## Follow-up cleanup (not blocking)
+
+- `Rectangle/PrefsWindow/PrefsViewController.swift` and the
+  `WelcomeViewController` storyboard scene are dead (never instantiated) — safe
+  to delete.
+- `WindowAction.alternateDefault` / `spectacleDefault` tables are unused.
