@@ -75,6 +75,24 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 3. Import/export config via the panels under the sandbox (paths resolve to the
    app container).
 
+## Support / privacy site — live
+
+`store/site.html` is deployed at **https://www.getsnappy.fyi/** (valid cert,
+serving today). The bare apex `getsnappy.fyi` is *not* working — Porkbun's ALIAS
+flattening returns Porkbun parking IPs instead of the DO target; fixing it
+requires switching the domain to DigitalOcean nameservers. `www.` is sufficient
+for the App Store listing. Stack:
+
+- GitHub repo `travismarceau/getsnappy-site` (public) → `index.html` mirrors
+  `store/site.html`.
+- DigitalOcean App Platform static site, app `getsnappy`
+  (`3229cad9-40e1-4641-8910-8c768902710d`), free tier, NYC. Redeploys on push
+  to `main`.
+- DNS at Porkbun: `www` CNAME + apex ALIAS → `getsnappy-gztct.ondigitalocean.app`.
+
+Listing URLs (in `store/listing.md`): support `https://www.getsnappy.fyi/#support`,
+marketing `https://www.getsnappy.fyi/`, privacy `https://www.getsnappy.fyi/#privacy`.
+
 ## Metadata (App Store Connect)
 
 - Description, keywords, support URL, marketing URL, **privacy policy URL**

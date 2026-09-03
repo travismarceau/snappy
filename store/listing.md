@@ -69,20 +69,27 @@ window,manager,snap,tiling,layout,keyboard,shortcut,resize,arrange,grid,producti
 ## Support URL  *(required)*
 
 ```
-https://<your-host>/snappy/#support
+https://www.getsnappy.fyi/#support
 ```
 
 ## Marketing URL  *(optional)*
 
 ```
-https://<your-host>/snappy/
+https://www.getsnappy.fyi/
 ```
 
 ## Privacy Policy URL  *(required)*
 
 ```
-https://<your-host>/snappy/#privacy
+https://www.getsnappy.fyi/#privacy
 ```
+
+> Use the `www.` host — it has a valid certificate and serves the page today.
+> The bare apex `getsnappy.fyi` has a Porkbun ALIAS record pointing at the same
+> target, but Porkbun's ALIAS flattening is not resolving it (it still returns
+> Porkbun's parking IPs). Fixing the apex means pointing the domain's
+> nameservers at DigitalOcean (`ns1/ns2/ns3.digitalocean.com`) so DO manages the
+> apex directly — optional; `www.` is enough for the listing.
 
 ## Copyright
 
@@ -132,16 +139,19 @@ No account, no network activity, no data collection.
 
 ---
 
-## Hosting the Support / Privacy page
+## Hosting the Support / Privacy page — DONE
 
-`store/site.html` is one self-contained file. Host it anywhere with HTTPS and
-put the resulting URL in the three fields above. Fastest options:
+`store/site.html` is live at **https://www.getsnappy.fyi/** (and, once DNS
+finishes propagating, `https://getsnappy.fyi/`).
 
-- **GitHub Pages**: drop `site.html` as `index.html` in a repo's `docs/`
-  folder (or a `gh-pages` branch), enable Pages → `https://<user>.github.io/<repo>/`.
-- **Cloudflare Pages / Netlify**: drag the file in.
+Setup, for the record:
 
-A preview is published at:
-https://claude.ai/code/artifact/7d194742-f0cd-4953-b6fa-f2458a38f52e
-— open it and use the page's Share menu to get a public link if you want to
-use that directly, but a URL on your own domain is better for the listing.
+- Source: GitHub repo `travismarceau/getsnappy-site` (public), `index.html` is a
+  copy of `store/site.html`. Push to `main` to redeploy.
+- Host: DigitalOcean App Platform static site, app `getsnappy`
+  (ID `3229cad9-40e1-4641-8910-8c768902710d`), free tier, region NYC. Default
+  ingress `https://getsnappy-gztct.ondigitalocean.app`.
+- DNS: Porkbun. `www` → CNAME → `getsnappy-gztct.ondigitalocean.app` (live, valid
+  cert). Apex `getsnappy.fyi` → ALIAS → same target (propagating).
+- To edit the page: change `store/site.html`, copy it to the site repo's
+  `index.html`, commit and push both.
