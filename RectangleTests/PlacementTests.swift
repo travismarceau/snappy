@@ -65,10 +65,22 @@ final class GridPlacementGeometryTests: XCTestCase {
     }
 
     func testRegionDescription() {
+        // Recognisable fractions get a name.
         XCTAssertEqual(GridPlacement(col: 0, row: 0, colSpan: 3, rowSpan: 6).regionDescription(in: grid),
-                       "cols 1–3 / rows 1–6")
+                       "Left half")
+        XCTAssertEqual(GridPlacement(col: 3, row: 0, colSpan: 3, rowSpan: 6).regionDescription(in: grid),
+                       "Right half")
+        XCTAssertEqual(GridPlacement(col: 0, row: 0, colSpan: 6, rowSpan: 6).regionDescription(in: grid),
+                       "Full screen")
+        XCTAssertEqual(GridPlacement(col: 3, row: 3, colSpan: 3, rowSpan: 3).regionDescription(in: grid),
+                       "Bottom-right quarter")
+        XCTAssertEqual(GridPlacement(col: 4, row: 0, colSpan: 2, rowSpan: 6).regionDescription(in: grid),
+                       "Right third")
+        // Anything else falls back to a compact range.
+        XCTAssertEqual(GridPlacement(col: 0, row: 0, colSpan: 2, rowSpan: 5).regionDescription(in: grid),
+                       "cols 1–2, rows 1–5")
         XCTAssertEqual(GridPlacement(col: 2, row: 2, colSpan: 1, rowSpan: 1).regionDescription(in: grid),
-                       "col 3 / row 3")
+                       "col 3, row 3")
     }
 }
 

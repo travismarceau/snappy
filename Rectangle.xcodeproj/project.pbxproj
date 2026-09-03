@@ -201,6 +201,7 @@
 		F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000103 /* PlacementOverlay.swift */; };
 		F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */; };
 		F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000105 /* PlacementConfigViews.swift */; };
+		F1AC0DE00000000000000207 /* PlacementConfigUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000107 /* PlacementConfigUI.swift */; };
 		F1AC0DE00000000000000206 /* PlacementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000106 /* PlacementTests.swift */; };
 		F4EED30B47FB6C55EA937254 /* TopRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8357E928530D10A806F3CD /* TopRightTwelfthCalculation.swift */; };
 		F51A7467767F8EAF97321A00 /* TopRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD222258713B13274FB651B0 /* TopRightSixteenthCalculation.swift */; };
@@ -436,6 +437,7 @@
 		F1AC0DE00000000000000103 /* PlacementOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementOverlay.swift; sourceTree = "<group>"; };
 		F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigWindow.swift; sourceTree = "<group>"; };
 		F1AC0DE00000000000000105 /* PlacementConfigViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigViews.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000107 /* PlacementConfigUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementConfigUI.swift; sourceTree = "<group>"; };
 		F1AC0DE00000000000000106 /* PlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementTests.swift; sourceTree = "<group>"; };
 		F3592F8E85CE82B8FA662A31 /* TwelfthsRepeated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelfthsRepeated.swift; sourceTree = "<group>"; };
 		FA34D0FE2F7E896E00EEBEF1 /* SpecificDisplayCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecificDisplayCalculation.swift; sourceTree = "<group>"; };
@@ -778,6 +780,7 @@
 				98C97FFC25893B040061F01F /* Config.swift */,
 				F1AC0DE00000000000000104 /* PlacementConfigWindow.swift */,
 				F1AC0DE00000000000000105 /* PlacementConfigViews.swift */,
+				F1AC0DE00000000000000107 /* PlacementConfigUI.swift */,
 			);
 			path = PrefsWindow;
 			sourceTree = "<group>";
@@ -1041,6 +1044,7 @@
 				F1AC0DE00000000000000203 /* PlacementOverlay.swift in Sources */,
 				F1AC0DE00000000000000204 /* PlacementConfigWindow.swift in Sources */,
 				F1AC0DE00000000000000205 /* PlacementConfigViews.swift in Sources */,
+				F1AC0DE00000000000000207 /* PlacementConfigUI.swift in Sources */,
 				98A009B32512536900CFBF0C /* LastFourthCalculation.swift in Sources */,
 				98A009BB2512539900CFBF0C /* BottomLeftSixthCalculation.swift in Sources */,
 				9821402322B3886100ABFB3F /* CenterCalculation.swift in Sources */,

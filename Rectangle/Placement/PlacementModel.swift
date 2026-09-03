@@ -157,14 +157,65 @@ struct GridPlacement: Codable, Equatable {
         )
     }
 
-    /// e.g. "cols 1–3 / rows 1–6" (1-based, inclusive) for the editor table.
+    /// A short human label for the editor tables: a name for the recognisable
+    /// fractions of the grid ("Left half", "Top-right quarter", "Full screen"),
+    /// otherwise a compact "cols 1–3, rows 1–6" (1-based, inclusive).
     func regionDescription(in grid: PlacementGrid) -> String {
         let p = normalized(in: grid)
+        let cols = grid.cols, rows = grid.rows
+        let fullW = p.colSpan == cols, fullH = p.rowSpan == rows
+
+        if fullW && fullH { return "Full screen" }
+
+        // Vertical bands (full height).
+        if fullH {
+            if p.colSpan * 2 == cols {
+                return p.col == 0 ? "Left half" : "Right half"
+            }
+            if p.colSpan * 3 == cols {
+                switch p.col {
+                case 0: return "Left third"
+                case cols / 3: return "Center third"
+                case 2 * cols / 3: return "Right third"
+                default: break
+                }
+            }
+        }
+
+        // Horizontal bands (full width).
+        if fullW {
+            if p.rowSpan * 2 == rows {
+                return p.row == 0 ? "Top half" : "Bottom half"
+            }
+            if p.rowSpan * 3 == rows {
+                switch p.row {
+                case 0: return "Top third"
+                case rows / 3: return "Middle third"
+                case 2 * rows / 3: return "Bottom third"
+                default: break
+                }
+            }
+        }
+
+        // Quarters.
+        if p.colSpan * 2 == cols, p.rowSpan * 2 == rows {
+            let left = p.col == 0, top = p.row == 0
+            let right = p.col == cols / 2, bottom = p.row == rows / 2
+            switch (left, right, top, bottom) {
+            case (true, _, true, _):  return "Top-left quarter"
+            case (_, true, true, _):  return "Top-right quarter"
+            case (true, _, _, true):  return "Bottom-left quarter"
+            case (_, true, _, true):  return "Bottom-right quarter"
+            default: break
+            }
+        }
+
+        // Fallback: compact range.
         let c1 = p.col + 1, c2 = p.col + p.colSpan
         let r1 = p.row + 1, r2 = p.row + p.rowSpan
         let cPart = c1 == c2 ? "col \(c1)" : "cols \(c1)–\(c2)"
         let rPart = r1 == r2 ? "row \(r1)" : "rows \(r1)–\(r2)"
-        return "\(cPart) / \(rPart)"
+        return "\(cPart), \(rPart)"
     }
 }
 

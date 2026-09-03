@@ -30,13 +30,18 @@ final class PlacementConfigViewController: NSViewController {
     private let innerGapField = NSTextField()
 
     private let tableView = NSTableView()
-    private let addRemoveControl = NSSegmentedControl()
+    private lazy var addRemoveControl = makeAddRemove(target: self, action: #selector(addRemoveChanged))
     private let picker = PlacementGridPickerView()
     private let keyCaptureButton = KeyCaptureButton()
     private let clearKeyButton = NSButton()
     private let labelField = NSTextField()
     private let displayPopup = NSPopUpButton()
     private let conflictLabel = NSTextField(labelWithString: "")
+
+    private var generalGrid: NSGridView?
+    private let revealDelayRowIndex = 4
+    private let placementsEmptyLabel = emptyStateLabel(
+        NSLocalizedString("No placements yet — click + to add one.", tableName: "Main", value: "No placements yet — click + to add one.", comment: ""))
 
     private let revealAlwaysTag = 0, revealDelayTag = 1, revealNeverTag = 2
     private let displayCurrentTag = -100, displayNextTag = -1
@@ -57,7 +62,7 @@ final class PlacementConfigViewController: NSViewController {
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 850, height: 720))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 760, height: 560))
         view.wantsLayer = true
         buildLayout()
     }
@@ -90,11 +95,16 @@ final class PlacementConfigViewController: NSViewController {
         modeControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(modeControl)
 
+        let hairline = NSBox()
+        hairline.boxType = .separator
+        hairline.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(hairline)
+
         for root in [placementsRoot, layoutsRoot] {
             root.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(root)
             NSLayoutConstraint.activate([
-                root.topAnchor.constraint(equalTo: modeControl.bottomAnchor, constant: 14),
+                root.topAnchor.constraint(equalTo: hairline.bottomAnchor, constant: 12),
                 root.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 root.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 root.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -103,15 +113,19 @@ final class PlacementConfigViewController: NSViewController {
         layoutsRoot.isHidden = true
 
         NSLayoutConstraint.activate([
-            modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-            modeControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            view.widthAnchor.constraint(equalToConstant: 760),
+            modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 14),
+            modeControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: PlacementUI.outerMargin),
+            hairline.topAnchor.constraint(equalTo: modeControl.bottomAnchor, constant: 10),
+            hairline.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hairline.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
 
         buildPlacementsColumns() // populates placementsLeftColumn / placementsRightColumn
         let general = titledCard(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""), buildGeneralGrid())
         let gridCard = titledCard(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""), buildGridGrid())
-        let placementsCard = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), placementsLeftColumn, fillsHeight: true)
-        let regionCard = titledCard(NSLocalizedString("Region — drag on the grid", tableName: "Main", value: "Region — drag on the grid", comment: ""), placementsRightColumn, fillsHeight: true)
+        let placementsCard = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), placementsLeftColumn)
+        let regionCard = titledCard(NSLocalizedString("Region — drag on the grid", tableName: "Main", value: "Region — drag on the grid", comment: ""), placementsRightColumn)
 
         for v in [general, gridCard, placementsCard, regionCard] {
             v.translatesAutoresizingMaskIntoConstraints = false
@@ -121,24 +135,26 @@ final class PlacementConfigViewController: NSViewController {
         NSLayoutConstraint.activate([
             // Top row: General | Grid, equal widths.
             general.topAnchor.constraint(equalTo: placementsRoot.topAnchor, constant: 4),
-            general.leadingAnchor.constraint(equalTo: placementsRoot.leadingAnchor, constant: 20),
+            general.leadingAnchor.constraint(equalTo: placementsRoot.leadingAnchor, constant: PlacementUI.outerMargin),
 
             gridCard.topAnchor.constraint(equalTo: general.topAnchor),
-            gridCard.leadingAnchor.constraint(equalTo: general.trailingAnchor, constant: 16),
-            gridCard.trailingAnchor.constraint(equalTo: placementsRoot.trailingAnchor, constant: -20),
+            gridCard.leadingAnchor.constraint(equalTo: general.trailingAnchor, constant: PlacementUI.columnGutter),
+            gridCard.trailingAnchor.constraint(equalTo: placementsRoot.trailingAnchor, constant: -PlacementUI.outerMargin),
             gridCard.widthAnchor.constraint(equalTo: general.widthAnchor),
             gridCard.bottomAnchor.constraint(equalTo: general.bottomAnchor),
 
-            // Bottom row: Placements | Region, aligned to the same split.
-            placementsCard.topAnchor.constraint(equalTo: general.bottomAnchor, constant: 16),
+            // Bottom row: Placements | Region, same split. Both cards hug their
+            // content; the taller one sets the row height.
+            placementsCard.topAnchor.constraint(equalTo: general.bottomAnchor, constant: PlacementUI.cardRowGap),
             placementsCard.leadingAnchor.constraint(equalTo: general.leadingAnchor),
             placementsCard.trailingAnchor.constraint(equalTo: general.trailingAnchor),
-            placementsCard.bottomAnchor.constraint(equalTo: placementsRoot.bottomAnchor, constant: -18),
 
             regionCard.topAnchor.constraint(equalTo: placementsCard.topAnchor),
             regionCard.leadingAnchor.constraint(equalTo: gridCard.leadingAnchor),
             regionCard.trailingAnchor.constraint(equalTo: gridCard.trailingAnchor),
-            regionCard.bottomAnchor.constraint(equalTo: placementsCard.bottomAnchor),
+
+            placementsRoot.bottomAnchor.constraint(greaterThanOrEqualTo: placementsCard.bottomAnchor, constant: 18),
+            placementsRoot.bottomAnchor.constraint(greaterThanOrEqualTo: regionCard.bottomAnchor, constant: 18),
         ])
     }
 
@@ -147,52 +163,6 @@ final class PlacementConfigViewController: NSViewController {
         placementsRoot.isHidden = layouts
         layoutsRoot.isHidden = !layouts
         if layouts { layoutsRoot.reload() }
-    }
-
-    /// A section header above a rounded, bordered card that wraps `content` with
-    /// interior padding. Everything pinned with explicit constraints. When
-    /// `fillsHeight` is false the card hugs its content (but can be stretched by
-    /// an outside constraint); when true the content is pinned to fill the card.
-    private func titledCard(_ title: String, _ content: NSView, fillsHeight: Bool = false) -> NSView {
-        let container = NSView()
-
-        let header = NSTextField(labelWithString: title)
-        header.font = .systemFont(ofSize: 13, weight: .semibold)
-        header.textColor = .secondaryLabelColor
-        header.translatesAutoresizingMaskIntoConstraints = false
-
-        let card = NSView()
-        card.wantsLayer = true
-        card.layer?.cornerRadius = 8
-        card.layer?.borderWidth = 1
-        card.layer?.borderColor = NSColor.separatorColor.cgColor
-        card.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
-        card.translatesAutoresizingMaskIntoConstraints = false
-
-        content.translatesAutoresizingMaskIntoConstraints = false
-        card.addSubview(content)
-        let contentBottom = content.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -14)
-        contentBottom.priority = fillsHeight ? .required : .defaultHigh
-        NSLayoutConstraint.activate([
-            content.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
-            content.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
-            content.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
-            contentBottom,
-            card.bottomAnchor.constraint(greaterThanOrEqualTo: content.bottomAnchor, constant: 14),
-        ])
-
-        container.addSubview(header)
-        container.addSubview(card)
-        NSLayoutConstraint.activate([
-            header.topAnchor.constraint(equalTo: container.topAnchor),
-            header.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 2),
-            header.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor),
-            card.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 6),
-            card.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            card.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            card.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-        ])
-        return container
     }
 
     private func buildGeneralGrid() -> NSView {
@@ -214,13 +184,14 @@ final class PlacementConfigViewController: NSViewController {
         let delayRow = pair(revealDelayField, caption: NSLocalizedString("seconds", tableName: "Main", value: "seconds", comment: ""))
 
         let grid = formGrid([
-            [label(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leading(enableSwitch)],
-            [label(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
+            [rightLabel(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leadingWrap(enableSwitch)],
+            [rightLabel(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
              captioned(stickySwitch, NSLocalizedString("until Esc", tableName: "Main", value: "until Esc", comment: ""))],
-            [label(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
-            [label(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leading(revealPopup)],
-            [label(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
+            [rightLabel(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
+            [rightLabel(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leadingWrap(revealPopup)],
+            [rightLabel(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
         ])
+        generalGrid = grid
         return grid
     }
 
@@ -233,57 +204,30 @@ final class PlacementConfigViewController: NSViewController {
         configureNumberField(innerGapField, width: 56, action: #selector(marginsChanged))
 
         return formGrid([
-            [label(NSLocalizedString("Columns", tableName: "Main", value: "Columns", comment: "")), stepperRow(colsField, colsStepper)],
-            [label(NSLocalizedString("Rows", tableName: "Main", value: "Rows", comment: "")), stepperRow(rowsField, rowsStepper)],
-            [label(NSLocalizedString("Outer margin", tableName: "Main", value: "Outer margin", comment: "")), pair(outerMarginField, caption: "px")],
-            [label(NSLocalizedString("Inner gap", tableName: "Main", value: "Inner gap", comment: "")), pair(innerGapField, caption: "px")],
+            [rightLabel(NSLocalizedString("Columns", tableName: "Main", value: "Columns", comment: "")), stepperRow(colsField, colsStepper)],
+            [rightLabel(NSLocalizedString("Rows", tableName: "Main", value: "Rows", comment: "")), stepperRow(rowsField, rowsStepper)],
+            [rightLabel(NSLocalizedString("Outer margin", tableName: "Main", value: "Outer margin", comment: "")), pair(outerMarginField, caption: "px")],
+            [rightLabel(NSLocalizedString("Inner gap", tableName: "Main", value: "Inner gap", comment: "")), pair(innerGapField, caption: "px")],
         ])
     }
 
     private func buildPlacementsColumns() {
-        // Left: table + add/remove
-        let keyCol = NSTableColumn(identifier: .init("key"))
-        keyCol.title = NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")
-        keyCol.width = 56
-        let labelCol = NSTableColumn(identifier: .init("label"))
-        labelCol.title = NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")
-        labelCol.width = 80
-        let regionCol = NSTableColumn(identifier: .init("region"))
-        regionCol.title = NSLocalizedString("Region", tableName: "Main", value: "Region", comment: "")
-        regionCol.width = 120
-        for c in [keyCol, labelCol, regionCol] { tableView.addTableColumn(c) }
+        // Left column: table + add/remove + import/export.
+        let scroll = styledScroll(wrapping: tableView, columns: [
+            ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 56),
+            ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 90),
+            ("region", NSLocalizedString("Region", tableName: "Main", value: "Region", comment: ""), 150),
+        ])
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.rowHeight = 24
-        tableView.usesAlternatingRowBackgroundColors = false
         tableView.doubleAction = #selector(focusPicker)
-        if #available(macOS 11, *) { tableView.style = .inset }
 
-        let scroll = NSScrollView()
-        scroll.documentView = tableView
-        scroll.hasVerticalScroller = true
-        scroll.borderType = .lineBorder
-        scroll.drawsBackground = true
-        scroll.translatesAutoresizingMaskIntoConstraints = false
+        let importButton = smallButton(NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), target: self, action: #selector(importKeymap))
+        let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), target: self, action: #selector(exportKeymap))
 
-        addRemoveControl.segmentStyle = .separated
-        addRemoveControl.trackingMode = .momentary
-        addRemoveControl.segmentCount = 2
-        addRemoveControl.setImage(NSImage(named: NSImage.addTemplateName), forSegment: 0)
-        addRemoveControl.setImage(NSImage(named: NSImage.removeTemplateName), forSegment: 1)
-        addRemoveControl.setWidth(30, forSegment: 0)
-        addRemoveControl.setWidth(30, forSegment: 1)
-        addRemoveControl.target = self
-        addRemoveControl.action = #selector(addRemoveChanged)
-        addRemoveControl.translatesAutoresizingMaskIntoConstraints = false
-
-        let importButton = smallButton(NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), #selector(importKeymap))
-        let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), #selector(exportKeymap))
-
-        // Left column: table filling the height, add/remove + import/export below.
         let left = placementsLeftColumn
         left.translatesAutoresizingMaskIntoConstraints = false
-        for v in [scroll, addRemoveControl, importButton, exportButton] {
+        for v in [scroll, placementsEmptyLabel, addRemoveControl, importButton, exportButton] {
             v.translatesAutoresizingMaskIntoConstraints = false
             left.addSubview(v)
         }
@@ -291,7 +235,10 @@ final class PlacementConfigViewController: NSViewController {
             scroll.topAnchor.constraint(equalTo: left.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: left.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: left.trailingAnchor),
-            scroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 160),
+            scroll.heightAnchor.constraint(equalToConstant: 220),
+            placementsEmptyLabel.centerXAnchor.constraint(equalTo: scroll.centerXAnchor),
+            placementsEmptyLabel.centerYAnchor.constraint(equalTo: scroll.centerYAnchor),
+            placementsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: scroll.widthAnchor, constant: -24),
             addRemoveControl.topAnchor.constraint(equalTo: scroll.bottomAnchor, constant: 6),
             addRemoveControl.leadingAnchor.constraint(equalTo: left.leadingAnchor),
             addRemoveControl.bottomAnchor.constraint(equalTo: left.bottomAnchor),
@@ -301,8 +248,10 @@ final class PlacementConfigViewController: NSViewController {
             importButton.trailingAnchor.constraint(equalTo: exportButton.leadingAnchor, constant: -6),
         ])
 
-        // Right column: region picker + detail fields, sized to content.
+        // Right column: the grid picker is the centrepiece, centred; the
+        // Key / Label / Display form sits below it. Card hugs this content.
         picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.maxSize = NSSize(width: 320, height: 200)
         picker.onChange = { [weak self] p in self?.pickerChanged(p) }
 
         keyCaptureButton.onCapture = { [weak self] keyCode, mods in self?.keyCaptured(keyCode: keyCode, modifierFlags: mods) }
@@ -322,35 +271,33 @@ final class PlacementConfigViewController: NSViewController {
 
         conflictLabel.font = .systemFont(ofSize: 11)
         conflictLabel.textColor = .systemRed
+        conflictLabel.lineBreakMode = .byWordWrapping
+        conflictLabel.maximumNumberOfLines = 2
 
         let keyRow = hStack([keyCaptureButton, clearKeyButton], spacing: 6)
         let detailGrid = formGrid([
-            [label(NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")), keyRow],
-            [label(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), fill(labelField)],
-            [label(NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")), leading(displayPopup)],
+            [rightLabel(NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")), keyRow],
+            [NSView(), conflictLabel],
+            [rightLabel(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), fillWrap(labelField)],
+            [rightLabel(NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")), leadingWrap(displayPopup)],
         ])
+        detailGrid.setContentHuggingPriority(.required, for: .vertical)
 
-        // Right column: grid picker at the top, the Key/Label/Display fields
-        // pinned to the bottom so the Display row lines up with the Import /
-        // Export buttons in the Placements card. The conflict warning sits just
-        // under the picker.
         let right = placementsRightColumn
         right.translatesAutoresizingMaskIntoConstraints = false
-        for v in [picker, detailGrid, conflictLabel] {
+        for v in [picker, detailGrid] {
             v.translatesAutoresizingMaskIntoConstraints = false
             right.addSubview(v)
         }
         NSLayoutConstraint.activate([
             picker.topAnchor.constraint(equalTo: right.topAnchor),
-            picker.leadingAnchor.constraint(equalTo: right.leadingAnchor),
-            picker.trailingAnchor.constraint(equalTo: right.trailingAnchor),
-            picker.heightAnchor.constraint(equalToConstant: 160),
+            picker.centerXAnchor.constraint(equalTo: right.centerXAnchor),
+            picker.leadingAnchor.constraint(greaterThanOrEqualTo: right.leadingAnchor),
+            picker.trailingAnchor.constraint(lessThanOrEqualTo: right.trailingAnchor),
+            picker.widthAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.width),
+            picker.heightAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.height),
 
-            conflictLabel.topAnchor.constraint(equalTo: picker.bottomAnchor, constant: 8),
-            conflictLabel.leadingAnchor.constraint(equalTo: right.leadingAnchor),
-            conflictLabel.trailingAnchor.constraint(equalTo: right.trailingAnchor),
-
-            detailGrid.topAnchor.constraint(greaterThanOrEqualTo: conflictLabel.bottomAnchor, constant: 8),
+            detailGrid.topAnchor.constraint(equalTo: picker.bottomAnchor, constant: 14),
             detailGrid.leadingAnchor.constraint(equalTo: right.leadingAnchor),
             detailGrid.trailingAnchor.constraint(lessThanOrEqualTo: right.trailingAnchor),
             detailGrid.bottomAnchor.constraint(equalTo: right.bottomAnchor),
@@ -359,72 +306,6 @@ final class PlacementConfigViewController: NSViewController {
 
     // MARK: Form helpers
 
-    private func formGrid(_ rows: [[NSView]]) -> NSGridView {
-        for row in rows { for v in row { v.translatesAutoresizingMaskIntoConstraints = false } }
-        let grid = NSGridView(views: rows)
-        grid.rowSpacing = 10
-        grid.columnSpacing = 10
-        grid.translatesAutoresizingMaskIntoConstraints = false
-        if grid.numberOfColumns > 0 { grid.column(at: 0).xPlacement = .trailing }
-        if grid.numberOfColumns > 1 { grid.column(at: 1).xPlacement = .leading }
-        for i in 0..<grid.numberOfRows { grid.row(at: i).yPlacement = .center }
-        return grid
-    }
-
-    private func label(_ s: String) -> NSTextField {
-        let tf = NSTextField(labelWithString: s)
-        tf.alignment = .right
-        tf.textColor = .labelColor
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.setContentHuggingPriority(.required, for: .horizontal)
-        return tf
-    }
-    private func hStack(_ views: [NSView], spacing: CGFloat = 8, align: NSLayoutConstraint.Attribute = .centerY) -> NSStackView {
-        let s = NSStackView(views: views)
-        s.orientation = .horizontal
-        s.alignment = align
-        s.spacing = spacing
-        s.translatesAutoresizingMaskIntoConstraints = false
-        return s
-    }
-    private func leading(_ v: NSView) -> NSView { hStack([v, spacer()], spacing: 0) }
-    private func fill(_ v: NSView) -> NSView {
-        let s = hStack([v], spacing: 0)
-        v.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        return s
-    }
-    private func pair(_ field: NSView, caption: String) -> NSView {
-        let cap = NSTextField(labelWithString: caption)
-        cap.textColor = .secondaryLabelColor
-        cap.font = .systemFont(ofSize: 11)
-        return hStack([field, cap, spacer()], spacing: 6)
-    }
-    private func captioned(_ control: NSView, _ caption: String) -> NSView {
-        let cap = NSTextField(labelWithString: caption)
-        cap.textColor = .secondaryLabelColor
-        cap.font = .systemFont(ofSize: 11)
-        cap.lineBreakMode = .byTruncatingTail
-        cap.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        return hStack([control, cap, spacer()], spacing: 8)
-    }
-    private func stepperRow(_ field: NSTextField, _ stepper: NSStepper) -> NSView {
-        hStack([field, stepper, spacer()], spacing: 4)
-    }
-    private func spacer() -> NSView {
-        let v = NSView()
-        v.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        v.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        v.translatesAutoresizingMaskIntoConstraints = false
-        return v
-    }
-    private func smallButton(_ title: String, _ action: Selector) -> NSButton {
-        let b = NSButton(title: title, target: self, action: action)
-        b.bezelStyle = .rounded
-        b.controlSize = .small
-        b.font = .systemFont(ofSize: 11)
-        b.translatesAutoresizingMaskIntoConstraints = false
-        return b
-    }
     private func configureNumberField(_ field: NSTextField, width: CGFloat, action: Selector) {
         field.translatesAutoresizingMaskIntoConstraints = false
         field.alignment = .right
@@ -452,7 +333,7 @@ final class PlacementConfigViewController: NSViewController {
         stickySwitch.state = Defaults.placementPaneSticky.enabled ? .on : .off
         revealPopup.selectItem(withTag: Defaults.placementMapReveal.value.rawValue)
         revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
-        revealDelayField.isEnabled = Defaults.placementMapReveal.value == .afterDelay
+        updateRevealDelayRowVisibility()
 
         colsField.stringValue = String(keymap.grid.cols)
         rowsField.stringValue = String(keymap.grid.rows)
@@ -466,7 +347,16 @@ final class PlacementConfigViewController: NSViewController {
     private func reloadTable() {
         picker.grid = keymap.grid
         tableView.reloadData()
+        placementsEmptyLabel.isHidden = !keymap.bindings.isEmpty
         refreshEditorForSelection()
+    }
+
+    /// "Reveal delay" only matters when the map is shown after a pause — hide
+    /// the row otherwise so the General card stays compact.
+    private func updateRevealDelayRowVisibility() {
+        let show = Defaults.placementMapReveal.value == .afterDelay
+        revealDelayField.isEnabled = show
+        generalGrid?.row(at: revealDelayRowIndex).isHidden = !show
     }
 
     private func selectRow(_ index: Int?) {
@@ -530,7 +420,7 @@ final class PlacementConfigViewController: NSViewController {
     @objc private func revealChanged() {
         let tag = revealPopup.selectedTag()
         Defaults.placementMapReveal.value = PlacementMapReveal(rawValue: tag) ?? .afterDelay
-        revealDelayField.isEnabled = Defaults.placementMapReveal.value == .afterDelay
+        updateRevealDelayRowVisibility()
     }
     @objc private func revealDelayChanged() {
         Defaults.placementMapRevealDelay.value = max(0.05, min(revealDelayField.floatValue, 5))
@@ -653,10 +543,7 @@ extension PlacementConfigViewController: NSTableViewDataSource, NSTableViewDeleg
         let identifier = NSUserInterfaceItemIdentifier("cell_\(id)")
         let cell = (tableView.makeView(withIdentifier: identifier, owner: self) as? NSTableCellView) ?? {
             let c = NSTableCellView()
-            let tf = NSTextField(labelWithString: "")
-            tf.translatesAutoresizingMaskIntoConstraints = false
-            tf.lineBreakMode = .byTruncatingTail
-            tf.font = id == "key" ? .monospacedSystemFont(ofSize: 12, weight: .medium) : .systemFont(ofSize: 12)
+            let tf = tableCellTextField(mono: id == "key")
             c.addSubview(tf)
             c.textField = tf
             c.identifier = identifier

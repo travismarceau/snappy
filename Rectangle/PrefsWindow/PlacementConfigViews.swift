@@ -97,11 +97,19 @@ final class KeyCaptureButton: NSButton {
 
 final class PlacementGridPickerView: NSView {
 
-    var grid = PlacementGrid.default { didSet { needsDisplay = true } }
+    var grid = PlacementGrid.default {
+        didSet { invalidateIntrinsicContentSize(); needsDisplay = true }
+    }
     var placement: GridPlacement? { didSet { needsDisplay = true } }
     var otherPlacements: [GridPlacement] = [] { didSet { needsDisplay = true } }
     var isEditable = true { didSet { needsDisplay = true } }
     var onChange: ((GridPlacement) -> Void)?
+
+    /// The largest box the picker will grow to. Callers pin `width/height`
+    /// `<=` these and centre the view; the intrinsic size keeps cells square.
+    var maxSize = NSSize(width: 320, height: 240) {
+        didSet { invalidateIntrinsicContentSize() }
+    }
 
     private var anchorCell: (col: Int, row: Int)?
     private var hoverCell: (col: Int, row: Int)?
@@ -115,10 +123,21 @@ final class PlacementGridPickerView: NSView {
         layer?.masksToBounds = true
         layer?.borderWidth = 1
         layer?.borderColor = NSColor.separatorColor.cgColor
+        setContentHuggingPriority(.required, for: .horizontal)
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    override var intrinsicContentSize: NSSize { NSSize(width: 260, height: 168) }
+    /// Largest box within `maxSize` whose aspect ratio matches the grid, so
+    /// cells stay square regardless of columns:rows.
+    override var intrinsicContentSize: NSSize {
+        let cols = CGFloat(max(grid.cols, 1)), rows = CGFloat(max(grid.rows, 1))
+        let byWidth = NSSize(width: maxSize.width, height: maxSize.width * rows / cols)
+        let byHeight = NSSize(width: maxSize.height * cols / rows, height: maxSize.height)
+        return byWidth.height <= maxSize.height ? byWidth : byHeight
+    }
 
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
@@ -244,14 +263,22 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     }
 
     private let layoutsTable = NSTableView()
-    private let layoutAddRemove = NSSegmentedControl()
+    private lazy var layoutAddRemove = makeAddRemove(target: self, action: #selector(layoutAddRemoveChanged))
     private let keyButton = KeyCaptureButton()
     private let labelField = NSTextField()
     private let slotsTable = NSTableView()
-    private let slotAddRemove = NSSegmentedControl()
+    private lazy var slotAddRemove = makeAddRemove(target: self, action: #selector(slotAddRemoveChanged))
     private let appPopup = NSPopUpButton()
     private let picker = PlacementGridPickerView()
-    private let hint = NSTextField(labelWithString: "")
+
+    private let layoutsEmptyLabel = emptyStateLabel(
+        NSLocalizedString("No layouts yet — click + to create one.", tableName: "Main", value: "No layouts yet — click + to create one.", comment: ""))
+    private let slotsEmptyLabel = emptyStateLabel(
+        NSLocalizedString("Add a window for each app this layout arranges.", tableName: "Main", value: "Add a window for each app this layout arranges.", comment: ""))
+    private let slotHintLabel = emptyStateLabel(
+        NSLocalizedString("Select a window above, or click + to add one.", tableName: "Main", value: "Select a window above, or click + to add one.", comment: ""))
+    /// The tinted block that groups the app picker + grid for the selected slot.
+    private let slotEditorBox = NSView()
 
     /// bundleId per popup item index (parallel to `appPopup` menu items).
     private var appItemBundleIds: [String?] = []
@@ -272,7 +299,8 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     // MARK: build
 
     private func build() {
-        let layScroll = tableInScroll(layoutsTable, columns: [
+        // ---- Left card: the list of layouts --------------------------------
+        let layScroll = styledScroll(wrapping: layoutsTable, columns: [
             ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 56),
             ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 110),
             ("count", NSLocalizedString("Windows", tableName: "Main", value: "Windows", comment: ""), 70),
@@ -280,60 +308,133 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         layoutsTable.dataSource = self
         layoutsTable.delegate = self
 
-        segmentedAddRemove(layoutAddRemove, action: #selector(layoutAddRemoveChanged))
+        let leftContent = NSView()
+        leftContent.translatesAutoresizingMaskIntoConstraints = false
+        for v in [layScroll, layoutsEmptyLabel, layoutAddRemove] {
+            v.translatesAutoresizingMaskIntoConstraints = false
+            leftContent.addSubview(v)
+        }
+        NSLayoutConstraint.activate([
+            layScroll.topAnchor.constraint(equalTo: leftContent.topAnchor),
+            layScroll.leadingAnchor.constraint(equalTo: leftContent.leadingAnchor),
+            layScroll.trailingAnchor.constraint(equalTo: leftContent.trailingAnchor),
+            layScroll.heightAnchor.constraint(equalToConstant: 220),
+            layoutsEmptyLabel.centerXAnchor.constraint(equalTo: layScroll.centerXAnchor),
+            layoutsEmptyLabel.centerYAnchor.constraint(equalTo: layScroll.centerYAnchor),
+            layoutsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: layScroll.widthAnchor, constant: -24),
+            layoutAddRemove.topAnchor.constraint(equalTo: layScroll.bottomAnchor, constant: 6),
+            layoutAddRemove.leadingAnchor.constraint(equalTo: leftContent.leadingAnchor),
+            layoutAddRemove.bottomAnchor.constraint(equalTo: leftContent.bottomAnchor),
+        ])
 
-        let left = column([layScroll, row([layoutAddRemove, spacerV()])], width: 244)
-
-        // Right column
+        // ---- Right card: the selected layout ------------------------------
         keyButton.onCapture = { [weak self] code, mods in self?.keyCaptured(code, mods) }
         labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
         labelField.target = self; labelField.action = #selector(labelChanged)
         labelField.translatesAutoresizingMaskIntoConstraints = false
+        labelField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-        let slotScroll = tableInScroll(slotsTable, columns: [
-            ("app", NSLocalizedString("App", tableName: "Main", value: "App", comment: ""), 150),
-            ("region", NSLocalizedString("Region", tableName: "Main", value: "Region", comment: ""), 120),
+        let slotScroll = styledScroll(wrapping: slotsTable, columns: [
+            ("app", NSLocalizedString("App", tableName: "Main", value: "App", comment: ""), 160),
+            ("region", NSLocalizedString("Region", tableName: "Main", value: "Region", comment: ""), 150),
         ])
         slotsTable.dataSource = self
         slotsTable.delegate = self
-        segmentedAddRemove(slotAddRemove, action: #selector(slotAddRemoveChanged))
 
         appPopup.target = self; appPopup.action = #selector(appChanged)
         appPopup.translatesAutoresizingMaskIntoConstraints = false
         picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.maxSize = NSSize(width: 240, height: 180)
         picker.onChange = { [weak self] p in self?.pickerChanged(p) }
 
-        hint.font = .systemFont(ofSize: 11)
-        hint.textColor = .secondaryLabelColor
-        hint.stringValue = NSLocalizedString("Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", tableName: "Main", value: "Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", comment: "")
-        hint.translatesAutoresizingMaskIntoConstraints = false
-
-        let keyRow = row([label(NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")), keyButton,
-                          label(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), labelField])
-        let slotButtons = row([slotAddRemove, spacerV()])
-        let slotDetail = row([label(NSLocalizedString("App", tableName: "Main", value: "App", comment: "")), appPopup])
-        let right = NSStackView(views: [keyRow, slotScroll, slotButtons, slotDetail, picker, hint])
-        right.orientation = .vertical
-        right.alignment = .leading
-        right.spacing = 8
-        right.translatesAutoresizingMaskIntoConstraints = false
+        // The tinted "Selected window" block.
+        slotEditorBox.wantsLayer = true
+        slotEditorBox.layer?.cornerRadius = 6
+        slotEditorBox.layer?.backgroundColor = NSColor.quaternaryLabelColor.withAlphaComponent(0.4).cgColor
+        slotEditorBox.translatesAutoresizingMaskIntoConstraints = false
+        let appRow = hStack([rightLabel(NSLocalizedString("App", tableName: "Main", value: "App", comment: "")), appPopup, uiSpacer()])
+        for v in [appRow, picker, slotHintLabel] {
+            v.translatesAutoresizingMaskIntoConstraints = false
+            slotEditorBox.addSubview(v)
+        }
         NSLayoutConstraint.activate([
-            slotScroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 96),
-            slotScroll.widthAnchor.constraint(equalTo: right.widthAnchor),
-            picker.heightAnchor.constraint(equalToConstant: 150),
-            picker.widthAnchor.constraint(lessThanOrEqualToConstant: 320),
-            labelField.widthAnchor.constraint(greaterThanOrEqualToConstant: 140),
+            appRow.topAnchor.constraint(equalTo: slotEditorBox.topAnchor, constant: 10),
+            appRow.leadingAnchor.constraint(equalTo: slotEditorBox.leadingAnchor, constant: 10),
+            appRow.trailingAnchor.constraint(equalTo: slotEditorBox.trailingAnchor, constant: -10),
+            picker.topAnchor.constraint(equalTo: appRow.bottomAnchor, constant: 8),
+            picker.centerXAnchor.constraint(equalTo: slotEditorBox.centerXAnchor),
+            picker.leadingAnchor.constraint(greaterThanOrEqualTo: slotEditorBox.leadingAnchor, constant: 10),
+            picker.widthAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.width),
+            picker.heightAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.height),
+            picker.bottomAnchor.constraint(equalTo: slotEditorBox.bottomAnchor, constant: -10),
+            slotHintLabel.centerXAnchor.constraint(equalTo: slotEditorBox.centerXAnchor),
+            slotHintLabel.centerYAnchor.constraint(equalTo: slotEditorBox.centerYAnchor),
+            slotHintLabel.widthAnchor.constraint(lessThanOrEqualTo: slotEditorBox.widthAnchor, constant: -24),
         ])
 
-        addSubview(left); addSubview(right)
+        let keyRow = hStack([
+            rightLabel(NSLocalizedString("Key", tableName: "Main", value: "Key", comment: "")), keyButton,
+            rightLabel(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), labelField,
+        ], spacing: 8)
+
+        let windowsHeader = NSTextField(labelWithString: NSLocalizedString("Windows", tableName: "Main", value: "Windows", comment: ""))
+        windowsHeader.font = .systemFont(ofSize: 11, weight: .semibold)
+        windowsHeader.textColor = .secondaryLabelColor
+        windowsHeader.translatesAutoresizingMaskIntoConstraints = false
+
+        let rightContent = NSView()
+        rightContent.translatesAutoresizingMaskIntoConstraints = false
+        for v in [keyRow, windowsHeader, slotScroll, slotsEmptyLabel, slotAddRemove, slotEditorBox] {
+            v.translatesAutoresizingMaskIntoConstraints = false
+            rightContent.addSubview(v)
+        }
         NSLayoutConstraint.activate([
-            left.topAnchor.constraint(equalTo: topAnchor, constant: 4),
-            left.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            left.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -18),
-            right.topAnchor.constraint(equalTo: topAnchor, constant: 4),
-            right.leadingAnchor.constraint(equalTo: left.trailingAnchor, constant: 20),
-            right.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            right.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -18),
+            keyRow.topAnchor.constraint(equalTo: rightContent.topAnchor),
+            keyRow.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+            keyRow.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+
+            windowsHeader.topAnchor.constraint(equalTo: keyRow.bottomAnchor, constant: 14),
+            windowsHeader.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+
+            slotScroll.topAnchor.constraint(equalTo: windowsHeader.bottomAnchor, constant: 4),
+            slotScroll.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+            slotScroll.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+            slotScroll.heightAnchor.constraint(equalToConstant: 110),
+            slotsEmptyLabel.centerXAnchor.constraint(equalTo: slotScroll.centerXAnchor),
+            slotsEmptyLabel.centerYAnchor.constraint(equalTo: slotScroll.centerYAnchor),
+            slotsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: slotScroll.widthAnchor, constant: -24),
+
+            slotAddRemove.topAnchor.constraint(equalTo: slotScroll.bottomAnchor, constant: 6),
+            slotAddRemove.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+
+            slotEditorBox.topAnchor.constraint(equalTo: slotAddRemove.bottomAnchor, constant: 10),
+            slotEditorBox.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+            slotEditorBox.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+            slotEditorBox.bottomAnchor.constraint(equalTo: rightContent.bottomAnchor),
+        ])
+
+        // ---- Cards --------------------------------------------------------
+        let leftCard = titledCard(NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""), leftContent)
+        let rightCard = titledCard(
+            NSLocalizedString("Layout", tableName: "Main", value: "Layout", comment: ""),
+            rightContent,
+            footnote: NSLocalizedString("Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", tableName: "Main", value: "Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", comment: ""))
+
+        for v in [leftCard, rightCard] {
+            v.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(v)
+        }
+        NSLayoutConstraint.activate([
+            leftCard.topAnchor.constraint(equalTo: topAnchor, constant: 4),
+            leftCard.leadingAnchor.constraint(equalTo: leadingAnchor, constant: PlacementUI.outerMargin),
+            leftContent.widthAnchor.constraint(equalToConstant: 244),
+
+            rightCard.topAnchor.constraint(equalTo: leftCard.topAnchor),
+            rightCard.leadingAnchor.constraint(equalTo: leftCard.trailingAnchor, constant: PlacementUI.columnGutter),
+            rightCard.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -PlacementUI.outerMargin),
+
+            bottomAnchor.constraint(greaterThanOrEqualTo: leftCard.bottomAnchor, constant: 18),
+            bottomAnchor.constraint(greaterThanOrEqualTo: rightCard.bottomAnchor, constant: 18),
         ])
     }
 
@@ -344,6 +445,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         picker.grid = keymap.grid
         rebuildAppPopup()
         layoutsTable.reloadData()
+        layoutsEmptyLabel.isHidden = !keymap.layouts.isEmpty
         if selLayoutIndex == nil, !keymap.layouts.isEmpty {
             layoutsTable.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
         }
@@ -356,17 +458,22 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         keyButton.isEnabled = on
         labelField.isEnabled = on
         slotAddRemove.setEnabled(on, forSegment: 0)
+        slotAddRemove.setEnabled(selSlotIndex != nil, forSegment: 1)
         layoutAddRemove.setEnabled(selLayoutIndex != nil, forSegment: 1)
 
         keyButton.setKey(keyCode: layout?.keyCode ?? PlacementBinding.unassignedKeyCode,
                          modifierFlags: layout?.modifierFlags ?? 0)
         labelField.stringValue = layout?.label ?? ""
         slotsTable.reloadData()
+        slotsEmptyLabel.isHidden = !(on && (layout?.slots.isEmpty ?? true))
 
         let slot = currentSlot
         appPopup.isEnabled = slot != nil
         picker.isEditable = slot != nil
         picker.placement = slot?.placement
+        slotHintLabel.isHidden = slot != nil
+        appPopup.isHidden = slot == nil
+        picker.isHidden = slot == nil
         if let bid = slot?.appBundleId, let idx = appItemBundleIds.firstIndex(of: bid) {
             appPopup.selectItem(at: idx)
         }
@@ -500,10 +607,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         let ident = NSUserInterfaceItemIdentifier("c_\(id)")
         let cell = (tableView.makeView(withIdentifier: ident, owner: self) as? NSTableCellView) ?? {
             let c = NSTableCellView()
-            let tf = NSTextField(labelWithString: "")
-            tf.translatesAutoresizingMaskIntoConstraints = false
-            tf.lineBreakMode = .byTruncatingTail
-            tf.font = id == "key" ? .monospacedSystemFont(ofSize: 12, weight: .medium) : .systemFont(ofSize: 12)
+            let tf = tableCellTextField(mono: id == "key")
             c.addSubview(tf); c.textField = tf; c.identifier = ident
             NSLayoutConstraint.activate([
                 tf.leadingAnchor.constraint(equalTo: c.leadingAnchor, constant: 2),
@@ -513,6 +617,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             return c
         }()
         cell.textField?.stringValue = text
+        cell.textField?.textColor = (id == "region") ? .secondaryLabelColor : .labelColor
         return cell
     }
 
@@ -528,49 +633,6 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     private func keyCapString(_ code: Int, _ mods: UInt) -> String {
         let s = MASShortcut(keyCode: code, modifierFlags: NSEvent.ModifierFlags(rawValue: mods))
         return [s.modifierFlagsString, s.keyCodeString].compactMap { $0 }.joined()
-    }
-    private func label(_ s: String) -> NSTextField {
-        let tf = NSTextField(labelWithString: s)
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.setContentHuggingPriority(.required, for: .horizontal)
-        return tf
-    }
-    private func row(_ views: [NSView]) -> NSStackView {
-        let s = NSStackView(views: views); s.orientation = .horizontal; s.spacing = 8; s.alignment = .centerY
-        s.translatesAutoresizingMaskIntoConstraints = false; return s
-    }
-    private func column(_ views: [NSView], width: CGFloat) -> NSView {
-        let s = NSStackView(views: views); s.orientation = .vertical; s.spacing = 6; s.alignment = .leading
-        s.translatesAutoresizingMaskIntoConstraints = false
-        s.widthAnchor.constraint(equalToConstant: width).isActive = true
-        return s
-    }
-    private func spacerV() -> NSView {
-        let v = NSView(); v.translatesAutoresizingMaskIntoConstraints = false
-        v.setContentHuggingPriority(.defaultLow, for: .horizontal); return v
-    }
-    private func segmentedAddRemove(_ c: NSSegmentedControl, action: Selector) {
-        c.segmentStyle = .separated; c.trackingMode = .momentary; c.segmentCount = 2
-        c.setImage(NSImage(named: NSImage.addTemplateName), forSegment: 0)
-        c.setImage(NSImage(named: NSImage.removeTemplateName), forSegment: 1)
-        c.setWidth(30, forSegment: 0); c.setWidth(30, forSegment: 1)
-        c.target = self; c.action = action
-        c.translatesAutoresizingMaskIntoConstraints = false
-    }
-    private func tableInScroll(_ table: NSTableView, columns: [(String, String, CGFloat)]) -> NSScrollView {
-        for (id, title, w) in columns {
-            let col = NSTableColumn(identifier: .init(id)); col.title = title; col.width = w
-            table.addTableColumn(col)
-        }
-        table.rowHeight = 22
-        table.usesAlternatingRowBackgroundColors = false
-        if #available(macOS 11, *) { table.style = .inset }
-        let sv = NSScrollView()
-        sv.documentView = table
-        sv.hasVerticalScroller = true
-        sv.borderType = .lineBorder
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        return sv
     }
 }
 
