@@ -1,23 +1,8 @@
 {
   "images" : [
-    {
-      "filename" : "RectangleStatusTemplate22.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "RectangleStatusTemplate44.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "RectangleStatusTemplate.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-    }
+    { "filename" : "SnappyStatusTemplate22.png", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "SnappyStatusTemplate44.png", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "SnappyStatusTemplate.png", "idiom" : "universal", "scale" : "3x" }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
-  }
+  "info" : { "author" : "xcode", "version" : 1 }
 }

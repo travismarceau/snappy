@@ -90,11 +90,13 @@ sizes = {
     "mac256pts1x.png": 256, "mac256pts2x.png": 512,
     "mac512pts1x.png": 512, "mac512pts2x.png": 1024,
 }
-setdir = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets", "SnappyIcon.appiconset")
-if not os.path.isdir(setdir):
-    setdir = os.path.join(out, "SnappyIcon.appiconset")
+assets = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets")
+setdirs = [os.path.join(assets, "SnappyIcon.appiconset"),
+           os.path.join(assets, "AppIcon.appiconset")]
+setdirs = [d for d in setdirs if os.path.isdir(d)] or [os.path.join(out, "SnappyIcon.appiconset")]
+for setdir in setdirs:
     os.makedirs(setdir, exist_ok=True)
-for name, n in sizes.items():
-    src = master if n == U else icon.resize((n, n), Image.LANCZOS)
-    src.save(os.path.join(setdir, name))
-print("wrote", setdir)
+    for name, n in sizes.items():
+        src = master if n == U else icon.resize((n, n), Image.LANCZOS)
+        src.save(os.path.join(setdir, name))
+    print("wrote", setdir)
