@@ -69,27 +69,23 @@ window,manager,snap,tiling,layout,keyboard,shortcut,resize,arrange,grid,producti
 ## Support URL  *(required)*
 
 ```
-https://www.getsnappy.fyi/#support
+https://getsnappy.fyi/#support
 ```
 
 ## Marketing URL  *(optional)*
 
 ```
-https://www.getsnappy.fyi/
+https://getsnappy.fyi/
 ```
 
 ## Privacy Policy URL  *(required)*
 
 ```
-https://www.getsnappy.fyi/#privacy
+https://getsnappy.fyi/#privacy
 ```
 
-> Use the `www.` host — it has a valid certificate and serves the page today.
-> The bare apex `getsnappy.fyi` has a Porkbun ALIAS record pointing at the same
-> target, but Porkbun's ALIAS flattening is not resolving it (it still returns
-> Porkbun's parking IPs). Fixing the apex means pointing the domain's
-> nameservers at DigitalOcean (`ns1/ns2/ns3.digitalocean.com`) so DO manages the
-> apex directly — optional; `www.` is enough for the listing.
+> Both `getsnappy.fyi` and `www.getsnappy.fyi` serve the page over HTTPS with
+> valid certs.
 
 ## Copyright
 
@@ -141,8 +137,8 @@ No account, no network activity, no data collection.
 
 ## Hosting the Support / Privacy page — DONE
 
-`store/site.html` is live at **https://www.getsnappy.fyi/** (and, once DNS
-finishes propagating, `https://getsnappy.fyi/`).
+`store/site.html` is live at **https://getsnappy.fyi/** and
+**https://www.getsnappy.fyi/**, both over HTTPS with valid certs.
 
 Setup, for the record:
 
@@ -151,7 +147,9 @@ Setup, for the record:
 - Host: DigitalOcean App Platform static site, app `getsnappy`
   (ID `3229cad9-40e1-4641-8910-8c768902710d`), free tier, region NYC. Default
   ingress `https://getsnappy-gztct.ondigitalocean.app`.
-- DNS: Porkbun. `www` → CNAME → `getsnappy-gztct.ondigitalocean.app` (live, valid
-  cert). Apex `getsnappy.fyi` → ALIAS → same target (propagating).
+- DNS: Porkbun (nameservers stay at Porkbun). Both the apex `ALIAS` and the
+  `www` `CNAME` point to `getsnappy-gztct.ondigitalocean.app`. The apex's
+  default `ALIAS → pixie.porkbun.com` (Porkbun parking) had to be repointed —
+  that was the cause of the earlier parking page.
 - To edit the page: change `store/site.html`, copy it to the site repo's
   `index.html`, commit and push both.
