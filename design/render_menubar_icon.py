@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw
 
 SS = 8            # supersample factor
 U = 40.0          # design units (same proportions as the website mark)
+FILL = 0.74       # fraction of the canvas the artwork occupies (leaves menu-bar padding)
 
 FRAME = (0, 0, 0, 255)
 WINDOW = (0, 0, 0, 255)
@@ -18,15 +19,18 @@ LINE = (0, 0, 0, 70)
 
 def render(size):
     S = size * SS
-    k = S / U
+    k = S * FILL / U
+    off = (S - U * k) / 2          # centre the artwork in the canvas
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
     def rr(x, y, w, h, r, **kw):
-        d.rounded_rectangle([x * k, y * k, (x + w) * k, (y + h) * k], radius=r * k, **kw)
+        d.rounded_rectangle([off + x * k, off + y * k, off + (x + w) * k, off + (y + h) * k],
+                            radius=r * k, **kw)
 
     def line(x1, y1, x2, y2, colour):
-        d.line([(x1 * k, y1 * k), (x2 * k, y2 * k)], width=max(1, round(1.2 * k)), fill=colour)
+        d.line([(off + x1 * k, off + y1 * k), (off + x2 * k, off + y2 * k)],
+               width=max(1, round(1.2 * k)), fill=colour)
 
     # the two regions
     rr(7, 7, 12.5, 26, 2.5, fill=WINDOW)          # left window
