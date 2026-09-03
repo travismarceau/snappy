@@ -297,6 +297,13 @@ final class PlacementConfigViewController: NSViewController {
             [rightLabel(NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")), leadingWrap(displayPopup)],
         ])
         detailGrid.setContentHuggingPriority(.required, for: .vertical)
+        // Without this the row can be squeezed to fit the Placements card's
+        // minimum height, which squashes the popup and eats the card's bottom
+        // padding. Resisting compression makes this column set the row height.
+        detailGrid.setContentCompressionResistancePriority(.required, for: .vertical)
+        for c in [keyCaptureButton, clearKeyButton, labelField, displayPopup] as [NSControl] {
+            c.setContentCompressionResistancePriority(.required, for: .vertical)
+        }
         detailGrid.row(at: conflictRowIndex).isHidden = true // shown only on conflict
         self.detailGrid = detailGrid
 

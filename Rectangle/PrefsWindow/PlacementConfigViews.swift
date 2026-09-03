@@ -402,9 +402,14 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         windowsHeader.textColor = .secondaryLabelColor
         windowsHeader.translatesAutoresizingMaskIntoConstraints = false
 
+        let hint = NSTextField(wrappingLabelWithString: NSLocalizedString("Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", tableName: "Main", value: "Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", comment: ""))
+        hint.font = .systemFont(ofSize: 11)
+        hint.textColor = .secondaryLabelColor
+        hint.translatesAutoresizingMaskIntoConstraints = false
+
         let rightContent = NSView()
         rightContent.translatesAutoresizingMaskIntoConstraints = false
-        for v in [keyRow, windowsHeader, slotScroll, slotsEmptyLabel, slotAddRemove, slotEditorBox] {
+        for v in [keyRow, windowsHeader, slotScroll, slotsEmptyLabel, slotAddRemove, slotEditorBox, hint] {
             v.translatesAutoresizingMaskIntoConstraints = false
             rightContent.addSubview(v)
         }
@@ -430,7 +435,11 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             slotEditorBox.topAnchor.constraint(equalTo: slotAddRemove.bottomAnchor, constant: 10),
             slotEditorBox.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
             slotEditorBox.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
-            slotEditorBox.bottomAnchor.constraint(equalTo: rightContent.bottomAnchor),
+
+            hint.topAnchor.constraint(equalTo: slotEditorBox.bottomAnchor, constant: 10),
+            hint.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+            hint.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+            hint.bottomAnchor.constraint(equalTo: rightContent.bottomAnchor),
         ])
 
         // ---- Cards --------------------------------------------------------
@@ -438,11 +447,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         // the two and sets the window size), so the tables absorb the slack
         // instead of leaving a blank band under the cards.
         let leftCard = titledCard(NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""), leftContent, fillsHeight: true)
-        let rightCard = titledCard(
-            NSLocalizedString("Layout", tableName: "Main", value: "Layout", comment: ""),
-            rightContent,
-            fillsHeight: true,
-            footnote: NSLocalizedString("Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", tableName: "Main", value: "Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", comment: ""))
+        let rightCard = titledCard(NSLocalizedString("Layout", tableName: "Main", value: "Layout", comment: ""), rightContent, fillsHeight: true)
 
         for v in [leftCard, rightCard] {
             v.translatesAutoresizingMaskIntoConstraints = false

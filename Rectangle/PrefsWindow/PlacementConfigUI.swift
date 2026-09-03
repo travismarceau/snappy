@@ -19,14 +19,13 @@ enum PlacementUI {
 // MARK: - Titled card
 
 /// A section header above a rounded, bordered card wrapping `content` with
-/// interior padding. Optional `subtitle` sits under the header; optional
-/// `footnote` sits under the card. When `fillsHeight` is false the card hugs
-/// its content; when true the content is pinned to fill the card.
+/// interior padding. Optional `subtitle` sits under the header. When
+/// `fillsHeight` is false the card hugs its content; when true the content is
+/// pinned to fill the card.
 func titledCard(_ title: String,
                 _ content: NSView,
                 fillsHeight: Bool = false,
-                subtitle: String? = nil,
-                footnote: String? = nil) -> NSView {
+                subtitle: String? = nil) -> NSView {
     let container = NSView()
 
     let header = NSTextField(labelWithString: title)
@@ -72,21 +71,6 @@ func titledCard(_ title: String,
         top = sub.bottomAnchor
     }
 
-    var bottom: NSLayoutYAxisAnchor = card.bottomAnchor
-    if let footnote {
-        let note = NSTextField(wrappingLabelWithString: footnote)
-        note.font = .systemFont(ofSize: 11)
-        note.textColor = .secondaryLabelColor
-        note.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(note)
-        NSLayoutConstraint.activate([
-            note.topAnchor.constraint(equalTo: card.bottomAnchor, constant: 6),
-            note.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 2),
-            note.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -2),
-        ])
-        bottom = note.bottomAnchor
-    }
-
     NSLayoutConstraint.activate([
         header.topAnchor.constraint(equalTo: container.topAnchor),
         header.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 2),
@@ -94,7 +78,7 @@ func titledCard(_ title: String,
         card.topAnchor.constraint(equalTo: top, constant: 6),
         card.leadingAnchor.constraint(equalTo: container.leadingAnchor),
         card.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-        bottom.constraint(equalTo: container.bottomAnchor),
+        card.bottomAnchor.constraint(equalTo: container.bottomAnchor),
     ])
     return container
 }
