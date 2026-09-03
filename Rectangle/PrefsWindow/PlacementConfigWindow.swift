@@ -137,7 +137,9 @@ final class PlacementConfigViewController: NSViewController {
         buildPlacementsColumns() // populates placementsLeftColumn / placementsRightColumn
         let general = titledCard(NSLocalizedString("General", tableName: "Main", value: "General", comment: ""), buildGeneralGrid())
         let gridCard = titledCard(NSLocalizedString("Grid", tableName: "Main", value: "Grid", comment: ""), buildGridGrid())
-        let placementsCard = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), placementsLeftColumn)
+        // Region hugs its content and sets the row height; Placements fills to
+        // match so the two cards line up top and bottom.
+        let placementsCard = titledCard(NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""), placementsLeftColumn, fillsHeight: true)
         let regionCard = titledCard(NSLocalizedString("Region — drag on the grid", tableName: "Main", value: "Region — drag on the grid", comment: ""), placementsRightColumn)
 
         for v in [general, gridCard, placementsCard, regionCard] {
@@ -156,8 +158,7 @@ final class PlacementConfigViewController: NSViewController {
             gridCard.widthAnchor.constraint(equalTo: general.widthAnchor),
             gridCard.bottomAnchor.constraint(equalTo: general.bottomAnchor),
 
-            // Bottom row: Placements | Region, same split. Both cards hug their
-            // content; the taller one sets the row height.
+            // Bottom row: Placements | Region, same split, bottoms aligned.
             placementsCard.topAnchor.constraint(equalTo: general.bottomAnchor, constant: PlacementUI.cardRowGap),
             placementsCard.leadingAnchor.constraint(equalTo: general.leadingAnchor),
             placementsCard.trailingAnchor.constraint(equalTo: general.trailingAnchor),
@@ -165,9 +166,9 @@ final class PlacementConfigViewController: NSViewController {
             regionCard.topAnchor.constraint(equalTo: placementsCard.topAnchor),
             regionCard.leadingAnchor.constraint(equalTo: gridCard.leadingAnchor),
             regionCard.trailingAnchor.constraint(equalTo: gridCard.trailingAnchor),
+            regionCard.bottomAnchor.constraint(equalTo: placementsCard.bottomAnchor),
 
-            placementsRoot.bottomAnchor.constraint(greaterThanOrEqualTo: placementsCard.bottomAnchor, constant: 18),
-            placementsRoot.bottomAnchor.constraint(greaterThanOrEqualTo: regionCard.bottomAnchor, constant: 18),
+            placementsRoot.bottomAnchor.constraint(equalTo: placementsCard.bottomAnchor, constant: 18),
         ])
     }
 
@@ -249,7 +250,7 @@ final class PlacementConfigViewController: NSViewController {
             scroll.topAnchor.constraint(equalTo: left.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: left.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: left.trailingAnchor),
-            scroll.heightAnchor.constraint(equalToConstant: 220),
+            scroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 220),
             placementsEmptyLabel.centerXAnchor.constraint(equalTo: scroll.centerXAnchor),
             placementsEmptyLabel.centerYAnchor.constraint(equalTo: scroll.centerYAnchor),
             placementsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: scroll.widthAnchor, constant: -24),
@@ -265,7 +266,6 @@ final class PlacementConfigViewController: NSViewController {
         // Right column: the grid picker is the centrepiece, centred; the
         // Key / Label / Display form sits below it. Card hugs this content.
         picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.maxSize = NSSize(width: 320, height: 200)
         picker.onChange = { [weak self] p in self?.pickerChanged(p) }
 
         keyCaptureButton.onCapture = { [weak self] keyCode, mods in self?.keyCaptured(keyCode: keyCode, modifierFlags: mods) }
@@ -306,13 +306,13 @@ final class PlacementConfigViewController: NSViewController {
             v.translatesAutoresizingMaskIntoConstraints = false
             right.addSubview(v)
         }
+        // The picker stands in for the screen: it fills the card's width and
+        // takes a 16:9 height, so the grid cells are shaped like real regions.
+        picker.activateScreenAspectConstraint()
         NSLayoutConstraint.activate([
             picker.topAnchor.constraint(equalTo: right.topAnchor),
-            picker.centerXAnchor.constraint(equalTo: right.centerXAnchor),
-            picker.leadingAnchor.constraint(greaterThanOrEqualTo: right.leadingAnchor),
-            picker.trailingAnchor.constraint(lessThanOrEqualTo: right.trailingAnchor),
-            picker.widthAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.width),
-            picker.heightAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.height),
+            picker.leadingAnchor.constraint(equalTo: right.leadingAnchor),
+            picker.trailingAnchor.constraint(equalTo: right.trailingAnchor),
 
             detailGrid.topAnchor.constraint(equalTo: picker.bottomAnchor, constant: 14),
             detailGrid.leadingAnchor.constraint(equalTo: right.leadingAnchor),

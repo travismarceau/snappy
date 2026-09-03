@@ -105,9 +105,12 @@ final class PlacementGridPickerView: NSView {
     var isEditable = true { didSet { needsDisplay = true } }
     var onChange: ((GridPlacement) -> Void)?
 
-    /// The largest box the picker will grow to. Callers pin `width/height`
-    /// `<=` these and centre the view; the intrinsic size keeps cells square.
-    var maxSize = NSSize(width: 320, height: 240) {
+    /// Width:height the picker draws at. It stands in for the screen, so it
+    /// keeps a display-like ratio rather than making the grid cells square.
+    static let screenAspect: CGFloat = 16.0 / 9.0
+
+    /// The largest box the picker will grow to when it has no width to fill.
+    var maxSize = NSSize(width: 320, height: 320 / PlacementGridPickerView.screenAspect) {
         didSet { invalidateIntrinsicContentSize() }
     }
 
@@ -130,13 +133,20 @@ final class PlacementGridPickerView: NSView {
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    /// Largest box within `maxSize` whose aspect ratio matches the grid, so
-    /// cells stay square regardless of columns:rows.
+    /// Largest screen-shaped box that fits inside `maxSize`.
     override var intrinsicContentSize: NSSize {
-        let cols = CGFloat(max(grid.cols, 1)), rows = CGFloat(max(grid.rows, 1))
-        let byWidth = NSSize(width: maxSize.width, height: maxSize.width * rows / cols)
-        let byHeight = NSSize(width: maxSize.height * cols / rows, height: maxSize.height)
-        return byWidth.height <= maxSize.height ? byWidth : byHeight
+        let a = PlacementGridPickerView.screenAspect
+        let byWidth = NSSize(width: maxSize.width, height: maxSize.width / a)
+        return byWidth.height <= maxSize.height
+            ? byWidth
+            : NSSize(width: maxSize.height * a, height: maxSize.height)
+    }
+
+    /// Pin this view to a 16:9 box. Use with leading/trailing constraints so the
+    /// picker fills the width it is given and derives its height.
+    func activateScreenAspectConstraint() {
+        heightAnchor.constraint(equalTo: widthAnchor,
+                                multiplier: 1 / PlacementGridPickerView.screenAspect).isActive = true
     }
 
     override func updateTrackingAreas() {
@@ -346,8 +356,8 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         appPopup.target = self; appPopup.action = #selector(appChanged)
         appPopup.translatesAutoresizingMaskIntoConstraints = false
         picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.maxSize = NSSize(width: 240, height: 180)
         picker.onChange = { [weak self] p in self?.pickerChanged(p) }
+        picker.activateScreenAspectConstraint()
 
         // The tinted "Selected window" block. Its contents live in a stack view
         // so hiding them (nothing selected) collapses the block instead of
@@ -374,8 +384,8 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             slotEditorStack.bottomAnchor.constraint(equalTo: slotEditorBox.bottomAnchor, constant: -10),
             appRow.leadingAnchor.constraint(equalTo: slotEditorStack.leadingAnchor),
             appRow.trailingAnchor.constraint(equalTo: slotEditorStack.trailingAnchor),
-            picker.widthAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.width),
-            picker.heightAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.height),
+            picker.leadingAnchor.constraint(equalTo: slotEditorStack.leadingAnchor),
+            picker.trailingAnchor.constraint(equalTo: slotEditorStack.trailingAnchor),
             slotEditorBox.heightAnchor.constraint(greaterThanOrEqualToConstant: 74),
             slotHintLabel.centerXAnchor.constraint(equalTo: slotEditorBox.centerXAnchor),
             slotHintLabel.centerYAnchor.constraint(equalTo: slotEditorBox.centerYAnchor),
