@@ -1085,6 +1085,10 @@ class SettingsViewController: NSViewController {
         checkForUpdatesAutomaticallyCheckbox.isHidden = true
         checkForUpdatesButton.isHidden = true
 
+        // Snappy drops Rectangle's repeated-command cycling, Todo Mode, the Stage
+        // Manager sizing slider, and the Extras popover — hide those rows.
+        hideRemovedSettings()
+
         let appVersionString: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
         let buildString: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
 
@@ -1135,6 +1139,41 @@ class SettingsViewController: NSViewController {
         
     }
 
+    /// Hides settings rows for Rectangle features Snappy doesn't ship. The parent
+    /// stack view uses `detachesHiddenViews`, so hidden rows collapse with no gap.
+    private func hideRemovedSettings() {
+        guard let repeatedRow = subsequentExecutionPopUpButton.superview,
+              let content = repeatedRow.superview as? NSStackView else { return }
+        let rows = content.arrangedSubviews
+
+        func hidePreceding(_ view: NSView?) {
+            guard let view, let i = rows.firstIndex(of: view), i > 0 else { return }
+            rows[i - 1].isHidden = true
+        }
+        func hideFollowing(_ view: NSView?) {
+            guard let view, let i = rows.firstIndex(of: view), i + 1 < rows.count else { return }
+            rows[i + 1].isHidden = true
+        }
+
+        // "Repeated commands" popup + cycle-size options, and the separator above.
+        hidePreceding(repeatedRow)
+        repeatedRow.isHidden = true
+        cycleSizesView.isHidden = true
+
+        // "Show Todo Mode in menu" row, its caption, the collapsible Todo settings,
+        // the separator between Todo and Stage, and the Stage Manager slider.
+        if let todoRow = todoCheckbox.superview {
+            todoRow.isHidden = true
+            hideFollowing(todoRow)
+        }
+        todoView.isHidden = true
+        hidePreceding(stageView)
+        stageView.isHidden = true
+
+        // "Extras" popover button.
+        extraSettingsButton.superview?.isHidden = true
+    }
+
     func initializeTodoModeSettings() {
         todoCheckbox.state = Defaults.todo.userEnabled ? .on : .off
         todoAppWidthField.stringValue = String(Defaults.todoSidebarWidth.value)
@@ -1155,7 +1194,8 @@ class SettingsViewController: NSViewController {
     }
     
     private func showHideTodoModeSettings(animated: Bool) {
-        setVisibility(shown: Defaults.todo.userEnabled, ofView: todoView, withConstraint: todoViewHeightConstraint, animated: animated)
+        // Todo Mode is not exposed in Snappy — keep its settings collapsed.
+        setVisibility(shown: false, ofView: todoView, withConstraint: todoViewHeightConstraint, animated: animated)
     }
     
     func initializeToggles() {
@@ -1203,15 +1243,9 @@ class SettingsViewController: NSViewController {
     }
     
     private func initializeCycleSizesView(animated: Bool = false) {
-        let showOptionsView = Defaults.subsequentExecutionMode.resizes
-        
-        if showOptionsView {
-            setToggleStatesForCycleSizeCheckboxes()
-            setToggleStatesForCornerCycleExpansionAxisButtons()
-            setToggleStateForCooperativeCornerResizeCheckbox()
-        }
-        
-        setVisibility(shown: showOptionsView, ofView: cycleSizesView, withConstraint: cycleSizesViewHeightConstraint, animated: animated)
+        // The "Repeated commands" row is hidden in Snappy, so its cycle-size
+        // options stay collapsed regardless of the stored execution mode.
+        setVisibility(shown: false, ofView: cycleSizesView, withConstraint: cycleSizesViewHeightConstraint, animated: animated)
     }
     
     private func initializeCombinedDisplayCheckbox() {
