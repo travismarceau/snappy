@@ -229,6 +229,27 @@ func tableCellTextField(mono: Bool) -> NSTextField {
     return tf
 }
 
+// MARK: - Grouped sub-area
+
+/// A rounded, faintly tinted container for grouping controls inside a card.
+/// Re-resolves its colours on appearance change — a `layer.backgroundColor` set
+/// once would freeze whatever the dynamic colour happened to be at build time.
+final class TintedGroupView: NSView {
+    override var wantsUpdateLayer: Bool { true }
+
+    override func updateLayer() {
+        layer?.cornerRadius = 6
+        layer?.borderWidth = 1
+        layer?.backgroundColor = NSColor.labelColor.withAlphaComponent(0.05).cgColor
+        layer?.borderColor = NSColor.separatorColor.cgColor
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+}
+
 // MARK: - Empty state
 
 /// A dimmed, centred hint to overlay an empty table's scroll view. Pin it to

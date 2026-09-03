@@ -278,7 +278,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     private let slotHintLabel = emptyStateLabel(
         NSLocalizedString("Select a window above, or click + to add one.", tableName: "Main", value: "Select a window above, or click + to add one.", comment: ""))
     /// The tinted block that groups the app picker + grid for the selected slot.
-    private let slotEditorBox = NSView()
+    private let slotEditorBox = TintedGroupView()
+    /// Stack inside `slotEditorBox`; collapses when its arranged views hide.
+    private let slotEditorStack = NSStackView()
 
     /// bundleId per popup item index (parallel to `appPopup` menu items).
     private var appItemBundleIds: [String?] = []
@@ -301,9 +303,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     private func build() {
         // ---- Left card: the list of layouts --------------------------------
         let layScroll = styledScroll(wrapping: layoutsTable, columns: [
-            ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 56),
-            ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 110),
-            ("count", NSLocalizedString("Windows", tableName: "Main", value: "Windows", comment: ""), 70),
+            ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 50),
+            ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 96),
+            ("count", NSLocalizedString("Windows", tableName: "Main", value: "Windows", comment: ""), 66),
         ])
         layoutsTable.dataSource = self
         layoutsTable.delegate = self
@@ -318,7 +320,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             layScroll.topAnchor.constraint(equalTo: leftContent.topAnchor),
             layScroll.leadingAnchor.constraint(equalTo: leftContent.leadingAnchor),
             layScroll.trailingAnchor.constraint(equalTo: leftContent.trailingAnchor),
-            layScroll.heightAnchor.constraint(equalToConstant: 220),
+            layScroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 220),
             layoutsEmptyLabel.centerXAnchor.constraint(equalTo: layScroll.centerXAnchor),
             layoutsEmptyLabel.centerYAnchor.constraint(equalTo: layScroll.centerYAnchor),
             layoutsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: layScroll.widthAnchor, constant: -24),
@@ -347,26 +349,34 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         picker.maxSize = NSSize(width: 240, height: 180)
         picker.onChange = { [weak self] p in self?.pickerChanged(p) }
 
-        // The tinted "Selected window" block.
+        // The tinted "Selected window" block. Its contents live in a stack view
+        // so hiding them (nothing selected) collapses the block instead of
+        // leaving a tall empty slab.
         slotEditorBox.wantsLayer = true
-        slotEditorBox.layer?.cornerRadius = 6
-        slotEditorBox.layer?.backgroundColor = NSColor.quaternaryLabelColor.withAlphaComponent(0.4).cgColor
         slotEditorBox.translatesAutoresizingMaskIntoConstraints = false
         let appRow = hStack([rightLabel(NSLocalizedString("App", tableName: "Main", value: "App", comment: "")), appPopup, uiSpacer()])
-        for v in [appRow, picker, slotHintLabel] {
+        slotEditorStack.orientation = .vertical
+        slotEditorStack.alignment = .centerX
+        slotEditorStack.spacing = 8
+        slotEditorStack.detachesHiddenViews = true
+        slotEditorStack.translatesAutoresizingMaskIntoConstraints = false
+        slotEditorStack.addArrangedSubview(appRow)
+        slotEditorStack.addArrangedSubview(picker)
+
+        for v in [slotEditorStack, slotHintLabel] {
             v.translatesAutoresizingMaskIntoConstraints = false
             slotEditorBox.addSubview(v)
         }
         NSLayoutConstraint.activate([
-            appRow.topAnchor.constraint(equalTo: slotEditorBox.topAnchor, constant: 10),
-            appRow.leadingAnchor.constraint(equalTo: slotEditorBox.leadingAnchor, constant: 10),
-            appRow.trailingAnchor.constraint(equalTo: slotEditorBox.trailingAnchor, constant: -10),
-            picker.topAnchor.constraint(equalTo: appRow.bottomAnchor, constant: 8),
-            picker.centerXAnchor.constraint(equalTo: slotEditorBox.centerXAnchor),
-            picker.leadingAnchor.constraint(greaterThanOrEqualTo: slotEditorBox.leadingAnchor, constant: 10),
+            slotEditorStack.topAnchor.constraint(equalTo: slotEditorBox.topAnchor, constant: 10),
+            slotEditorStack.leadingAnchor.constraint(equalTo: slotEditorBox.leadingAnchor, constant: 10),
+            slotEditorStack.trailingAnchor.constraint(equalTo: slotEditorBox.trailingAnchor, constant: -10),
+            slotEditorStack.bottomAnchor.constraint(equalTo: slotEditorBox.bottomAnchor, constant: -10),
+            appRow.leadingAnchor.constraint(equalTo: slotEditorStack.leadingAnchor),
+            appRow.trailingAnchor.constraint(equalTo: slotEditorStack.trailingAnchor),
             picker.widthAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.width),
             picker.heightAnchor.constraint(lessThanOrEqualToConstant: picker.maxSize.height),
-            picker.bottomAnchor.constraint(equalTo: slotEditorBox.bottomAnchor, constant: -10),
+            slotEditorBox.heightAnchor.constraint(greaterThanOrEqualToConstant: 74),
             slotHintLabel.centerXAnchor.constraint(equalTo: slotEditorBox.centerXAnchor),
             slotHintLabel.centerYAnchor.constraint(equalTo: slotEditorBox.centerYAnchor),
             slotHintLabel.widthAnchor.constraint(lessThanOrEqualTo: slotEditorBox.widthAnchor, constant: -24),
@@ -399,7 +409,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             slotScroll.topAnchor.constraint(equalTo: windowsHeader.bottomAnchor, constant: 4),
             slotScroll.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
             slotScroll.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
-            slotScroll.heightAnchor.constraint(equalToConstant: 110),
+            slotScroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 110),
             slotsEmptyLabel.centerXAnchor.constraint(equalTo: slotScroll.centerXAnchor),
             slotsEmptyLabel.centerYAnchor.constraint(equalTo: slotScroll.centerYAnchor),
             slotsEmptyLabel.widthAnchor.constraint(lessThanOrEqualTo: slotScroll.widthAnchor, constant: -24),
@@ -414,27 +424,33 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         ])
 
         // ---- Cards --------------------------------------------------------
-        let leftCard = titledCard(NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""), leftContent)
+        // Both fill the pane height (the Placements sub-pane is the taller of
+        // the two and sets the window size), so the tables absorb the slack
+        // instead of leaving a blank band under the cards.
+        let leftCard = titledCard(NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""), leftContent, fillsHeight: true)
         let rightCard = titledCard(
             NSLocalizedString("Layout", tableName: "Main", value: "Layout", comment: ""),
             rightContent,
+            fillsHeight: true,
             footnote: NSLocalizedString("Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", tableName: "Main", value: "Bind a key, then add a window per app. Pressing the key in the overlay arranges them all.", comment: ""))
 
         for v in [leftCard, rightCard] {
             v.translatesAutoresizingMaskIntoConstraints = false
             addSubview(v)
         }
+        // Same 50/50 split as the Placements sub-pane so the columns don't move
+        // when you toggle between them.
         NSLayoutConstraint.activate([
             leftCard.topAnchor.constraint(equalTo: topAnchor, constant: 4),
             leftCard.leadingAnchor.constraint(equalTo: leadingAnchor, constant: PlacementUI.outerMargin),
-            leftContent.widthAnchor.constraint(equalToConstant: 244),
 
             rightCard.topAnchor.constraint(equalTo: leftCard.topAnchor),
             rightCard.leadingAnchor.constraint(equalTo: leftCard.trailingAnchor, constant: PlacementUI.columnGutter),
             rightCard.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -PlacementUI.outerMargin),
+            rightCard.widthAnchor.constraint(equalTo: leftCard.widthAnchor),
 
-            bottomAnchor.constraint(greaterThanOrEqualTo: leftCard.bottomAnchor, constant: 18),
-            bottomAnchor.constraint(greaterThanOrEqualTo: rightCard.bottomAnchor, constant: 18),
+            leftCard.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -18),
+            rightCard.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -18),
         ])
     }
 
@@ -465,15 +481,15 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
                          modifierFlags: layout?.modifierFlags ?? 0)
         labelField.stringValue = layout?.label ?? ""
         slotsTable.reloadData()
-        slotsEmptyLabel.isHidden = !(on && (layout?.slots.isEmpty ?? true))
+        slotsEmptyLabel.isHidden = !(layout?.slots.isEmpty ?? true)
 
         let slot = currentSlot
         appPopup.isEnabled = slot != nil
         picker.isEditable = slot != nil
         picker.placement = slot?.placement
+        // Collapse the whole block to its hint when nothing is selected.
         slotHintLabel.isHidden = slot != nil
-        appPopup.isHidden = slot == nil
-        picker.isHidden = slot == nil
+        slotEditorStack.arrangedSubviews.forEach { $0.isHidden = slot == nil }
         if let bid = slot?.appBundleId, let idx = appItemBundleIds.firstIndex(of: bid) {
             appPopup.selectItem(at: idx)
         }

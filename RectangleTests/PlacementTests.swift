@@ -76,11 +76,11 @@ final class GridPlacementGeometryTests: XCTestCase {
                        "Bottom-right quarter")
         XCTAssertEqual(GridPlacement(col: 4, row: 0, colSpan: 2, rowSpan: 6).regionDescription(in: grid),
                        "Right third")
-        // Anything else falls back to a compact range.
+        // Anything else falls back to a compact range that fits a narrow column.
         XCTAssertEqual(GridPlacement(col: 0, row: 0, colSpan: 2, rowSpan: 5).regionDescription(in: grid),
-                       "cols 1–2, rows 1–5")
+                       "C1–2 · R1–5")
         XCTAssertEqual(GridPlacement(col: 2, row: 2, colSpan: 1, rowSpan: 1).regionDescription(in: grid),
-                       "col 3, row 3")
+                       "C3 · R3")
     }
 }
 

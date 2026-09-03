@@ -210,12 +210,12 @@ struct GridPlacement: Codable, Equatable {
             }
         }
 
-        // Fallback: compact range.
+        // Fallback: a compact range that fits a narrow table column.
         let c1 = p.col + 1, c2 = p.col + p.colSpan
         let r1 = p.row + 1, r2 = p.row + p.rowSpan
-        let cPart = c1 == c2 ? "col \(c1)" : "cols \(c1)–\(c2)"
-        let rPart = r1 == r2 ? "row \(r1)" : "rows \(r1)–\(r2)"
-        return "\(cPart), \(rPart)"
+        let cPart = c1 == c2 ? "C\(c1)" : "C\(c1)–\(c2)"
+        let rPart = r1 == r2 ? "R\(r1)" : "R\(r1)–\(r2)"
+        return "\(cPart) · \(rPart)"
     }
 }
 

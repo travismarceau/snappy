@@ -40,6 +40,8 @@ final class PlacementConfigViewController: NSViewController {
 
     private var generalGrid: NSGridView?
     private let revealDelayRowIndex = 4
+    private var detailGrid: NSGridView?
+    private let conflictRowIndex = 1
     private let placementsEmptyLabel = emptyStateLabel(
         NSLocalizedString("No placements yet — click + to add one.", tableName: "Main", value: "No placements yet — click + to add one.", comment: ""))
 
@@ -84,6 +86,17 @@ final class PlacementConfigViewController: NSViewController {
             selectRow(keymap.bindings.isEmpty ? nil : 0)
         }
         if !layoutsRoot.isHidden { layoutsRoot.reload() }
+        updatePreferredSize()
+    }
+
+    /// Tell the enclosing tab controller exactly how tall the visible sub-pane
+    /// wants to be, so nothing gets vertically compressed to fit a stale frame.
+    private func updatePreferredSize() {
+        view.layoutSubtreeIfNeeded()
+        let fit = view.fittingSize
+        if abs(preferredContentSize.height - fit.height) > 0.5 || abs(preferredContentSize.width - fit.width) > 0.5 {
+            preferredContentSize = fit
+        }
     }
 
     // MARK: Layout
@@ -163,6 +176,7 @@ final class PlacementConfigViewController: NSViewController {
         placementsRoot.isHidden = layouts
         layoutsRoot.isHidden = !layouts
         if layouts { layoutsRoot.reload() }
+        updatePreferredSize()
     }
 
     private func buildGeneralGrid() -> NSView {
@@ -214,9 +228,9 @@ final class PlacementConfigViewController: NSViewController {
     private func buildPlacementsColumns() {
         // Left column: table + add/remove + import/export.
         let scroll = styledScroll(wrapping: tableView, columns: [
-            ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 56),
-            ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 90),
-            ("region", NSLocalizedString("Region", tableName: "Main", value: "Region", comment: ""), 150),
+            ("key", NSLocalizedString("Key", tableName: "Main", value: "Key", comment: ""), 50),
+            ("label", NSLocalizedString("Label", tableName: "Main", value: "Label", comment: ""), 84),
+            ("region", NSLocalizedString("Region", tableName: "Main", value: "Region", comment: ""), 130),
         ])
         tableView.dataSource = self
         tableView.delegate = self
@@ -264,6 +278,7 @@ final class PlacementConfigViewController: NSViewController {
         labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
         labelField.target = self
         labelField.action = #selector(labelChanged)
+        labelField.setContentCompressionResistancePriority(.required, for: .vertical)
 
         displayPopup.target = self
         displayPopup.action = #selector(displayChanged)
@@ -282,6 +297,8 @@ final class PlacementConfigViewController: NSViewController {
             [rightLabel(NSLocalizedString("Display", tableName: "Main", value: "Display", comment: "")), leadingWrap(displayPopup)],
         ])
         detailGrid.setContentHuggingPriority(.required, for: .vertical)
+        detailGrid.row(at: conflictRowIndex).isHidden = true // shown only on conflict
+        self.detailGrid = detailGrid
 
         let right = placementsRightColumn
         right.translatesAutoresizingMaskIntoConstraints = false
@@ -391,9 +408,11 @@ final class PlacementConfigViewController: NSViewController {
         guard let i = selectedIndex, let b = keymap.bindings[safe: i], b.isAssigned,
               keymap.hasConflict(keyCode: b.keyCode, modifierFlags: b.modifierFlags, excluding: b.id) else {
             conflictLabel.stringValue = ""
+            detailGrid?.row(at: conflictRowIndex).isHidden = true
             return
         }
         conflictLabel.stringValue = NSLocalizedString("That key is already used by another placement.", tableName: "Main", value: "That key is already used by another placement.", comment: "")
+        detailGrid?.row(at: conflictRowIndex).isHidden = false
     }
 
     private func mutateSelected(_ transform: (inout PlacementBinding) -> Void) {
