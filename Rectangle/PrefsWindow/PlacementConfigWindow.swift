@@ -267,6 +267,7 @@ final class PlacementConfigViewController: NSViewController {
         labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
         labelField.target = self
         labelField.action = #selector(labelChanged)
+        commitOnEndEditing(labelField)
         labelField.setContentCompressionResistancePriority(.required, for: .vertical)
 
         displayPopup.target = self
@@ -324,6 +325,7 @@ final class PlacementConfigViewController: NSViewController {
         field.alignment = .right
         field.target = self
         field.action = action
+        commitOnEndEditing(field)
         field.widthAnchor.constraint(equalToConstant: width).isActive = true
     }
     private func configureStepper(_ stepper: NSStepper, action: Selector) {

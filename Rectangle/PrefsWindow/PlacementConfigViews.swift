@@ -364,6 +364,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         keyButton.onCapture = { [weak self] code, mods in self?.keyCaptured(code, mods) }
         labelField.placeholderString = NSLocalizedString("optional name", tableName: "Main", value: "optional name", comment: "")
         labelField.target = self; labelField.action = #selector(labelChanged)
+        commitOnEndEditing(labelField)
         labelField.translatesAutoresizingMaskIntoConstraints = false
         labelField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 

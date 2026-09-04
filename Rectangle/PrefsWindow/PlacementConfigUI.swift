@@ -208,6 +208,14 @@ func styledScroll(wrapping table: NSTableView,
     return scroll
 }
 
+/// An NSTextField sends its action on Return only. Everywhere in these panes
+/// the value is committed the moment you leave the field, so typing a grid size
+/// or a label and then tabbing away - or clicking anything else - silently
+/// discarded the edit.
+func commitOnEndEditing(_ field: NSTextField) {
+    field.cell?.sendsActionOnEndEditing = true
+}
+
 /// The chord as it reads on a key cap: "⌃K", "F".
 func placementKeyString(keyCode: Int, modifierFlags: UInt) -> String {
     let s = MASShortcut(keyCode: keyCode, modifierFlags: NSEvent.ModifierFlags(rawValue: modifierFlags))
