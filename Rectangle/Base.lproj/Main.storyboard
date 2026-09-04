@@ -313,7 +313,7 @@
             <objects>
                 <tabViewController selectedTabViewItemIndex="0" tabStyle="toolbar" id="5pc-CV-2b9" customClass="SettingsTabViewController" customModule="Rectangle" customModuleProvider="target" sceneMemberID="viewController">
                     <tabViewItems>
-                        <tabViewItem label="Placements" image="keyboardToolbarTemplate" id="Plc-Cf-tb1"/>
+                        <tabViewItem label="Placements" image="placementsTemplate" id="Plc-Cf-tb1"/>
                         <tabViewItem label="Layouts" image="layoutsTemplate" id="Lay-Cf-tb1"/>
                         <tabViewItem label="Snap Areas" image="snapAreaTemplate" id="Fap-R2-Aj6"/>
                         <tabViewItem label="General" image="toolbarSettingsTemplate" id="gtf-PD-IHm"/>
@@ -2210,6 +2210,7 @@ DQ
     <resources>
         <image name="layoutsTemplate" width="48" height="44"/>
         <image name="NSApplicationIcon" width="32" height="32"/>
+        <image name="placementsTemplate" width="48" height="44"/>
         <image name="StatusTemplate" width="22" height="22"/>
         <image name="almostMaximizeTemplate" width="30" height="20"/>
         <image name="bottomCenterSixthTemplate" width="30" height="20"/>
@@ -2229,7 +2230,6 @@ DQ
         <image name="firstThreeFourthsTemplate" width="30" height="20"/>
         <image name="firstTwoThirdsTemplate" width="30" height="20"/>
         <image name="halfWidthCenterTemplate" width="30" height="20"/>
-        <image name="keyboardToolbarTemplate" width="72" height="72"/>
         <image name="lastThirdTemplate" width="30" height="20"/>
         <image name="lastThreeFourthsTemplate" width="30" height="20"/>
         <image name="lastTwoThirdsTemplate" width="30" height="20"/>

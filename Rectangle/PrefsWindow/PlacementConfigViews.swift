@@ -51,6 +51,13 @@ final class KeyCaptureButton: NSButton {
         contentTintColor = nil
     }
 
+    /// Take focus and start listening, without the user having to click. Used
+    /// right after a binding is created or its region drawn, so the next key
+    /// pressed is the one being bound.
+    func armCapture() {
+        beginCapture()
+    }
+
     @objc private func beginCapture() {
         guard isEnabled else { return }
         capturing = true
@@ -292,6 +299,10 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     /// Stack inside `slotEditorBox`; collapses when its arranged views hide.
     private let slotEditorStack = NSStackView()
 
+    /// Set when a new layout has just been added: its key should be captured as
+    /// soon as the editor has finished rebuilding.
+    private var armKeyAfterRefresh = false
+
     /// bundleId per popup item index (parallel to `appPopup` menu items).
     private var appItemBundleIds: [String?] = []
 
@@ -319,6 +330,8 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         ])
         layoutsTable.dataSource = self
         layoutsTable.delegate = self
+        layoutsTable.target = self
+        layoutsTable.doubleAction = #selector(captureKeyForSelectedLayout)
 
         let leftContent = NSView()
         leftContent.translatesAutoresizingMaskIntoConstraints = false
@@ -574,7 +587,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             keymap.layouts.append(WindowLayout(label: ""))
             layoutsTable.reloadData()
             layoutsTable.selectRowIndexes(IndexSet(integer: keymap.layouts.count - 1), byExtendingSelection: false)
-            window?.makeFirstResponder(keyButton)
+            armKeyAfterRefresh = true
         } else if let li = selLayoutIndex {
             keymap.layouts.remove(at: li)
             layoutsTable.reloadData()
@@ -586,6 +599,11 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             slotsTable.reloadData()
         }
         refreshDetail()
+        // refreshDetail resets the button, so arm it only once that has run.
+        if armKeyAfterRefresh {
+            armKeyAfterRefresh = false
+            keyButton.armCapture()
+        }
     }
     @objc private func slotAddRemoveChanged() {
         if slotAddRemove.selectedSegment == 0 {
@@ -603,6 +621,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         }
         refreshDetail()
     }
+    /// Matches the Placements table: double-clicking a layout sets its key.
+    @objc private func captureKeyForSelectedLayout() { keyButton.armCapture() }
+
     private func keyCaptured(_ code: Int, _ mods: UInt) {
         mutateLayout { $0.keyCode = code; $0.modifierFlags = mods & placementModifierMask }
         keyButton.setKey(keyCode: code, modifierFlags: mods)

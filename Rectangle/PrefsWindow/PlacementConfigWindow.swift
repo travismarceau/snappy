@@ -206,7 +206,8 @@ final class PlacementConfigViewController: NSViewController {
         ])
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.doubleAction = #selector(focusPicker)
+        tableView.target = self
+        tableView.doubleAction = #selector(captureKeyForSelection)
 
         let importButton = smallButton(NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), target: self, action: #selector(importKeymap))
         let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), target: self, action: #selector(exportKeymap))
@@ -449,7 +450,9 @@ final class PlacementConfigViewController: NSViewController {
         keymap.bindings.append(PlacementBinding(label: "", placement: p))
         reloadTable()
         selectRow(keymap.bindings.count - 1)
-        view.window?.makeFirstResponder(keyCaptureButton)
+        // Listening straight away, so a new placement can be keyed without a
+        // trip to the Set Key button.
+        keyCaptureButton.armCapture()
     }
     private func removeBinding() {
         guard let index = selectedIndex else { return }
@@ -457,7 +460,10 @@ final class PlacementConfigViewController: NSViewController {
         reloadTable()
         selectRow(keymap.bindings.isEmpty ? nil : min(index, keymap.bindings.count - 1))
     }
-    @objc private func focusPicker() { view.window?.makeFirstResponder(picker) }
+    /// Double-clicking a row used to focus the grid picker, which does not take
+    /// first responder and has no keyboard editing — so it did nothing. Setting
+    /// the key is what a double-click on a row is reaching for.
+    @objc private func captureKeyForSelection() { keyCaptureButton.armCapture() }
     @objc private func clearKey() {
         mutateSelected { $0.keyCode = PlacementBinding.unassignedKeyCode; $0.modifierFlags = 0 }
         refreshEditorForSelection()
@@ -476,6 +482,13 @@ final class PlacementConfigViewController: NSViewController {
         mutateSelected {
             $0.placement.col = p.col; $0.placement.row = p.row
             $0.placement.colSpan = p.colSpan; $0.placement.rowSpan = p.rowSpan
+        }
+        // Drawing a region on a placement that has no key yet is always
+        // followed by choosing one, so listen for it rather than making the
+        // user go and click Set Key. An existing key is left alone: dragging to
+        // adjust a bound region must not swallow the next keystroke.
+        if selectedIndex.flatMap({ keymap.bindings[safe: $0] })?.isAssigned == false {
+            keyCaptureButton.armCapture()
         }
     }
 
