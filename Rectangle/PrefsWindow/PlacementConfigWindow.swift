@@ -30,7 +30,7 @@ final class PlacementConfigViewController: NSViewController {
     private let outerMarginField = NSTextField()
     private let innerGapField = NSTextField()
 
-    private let tableView = NSTableView()
+    private let tableView = DeletableTableView()
     private lazy var addRemoveControl = makeAddRemove(target: self, action: #selector(addRemoveChanged))
     private let picker = PlacementGridPickerView()
     private let keyCaptureButton = KeyCaptureButton()
@@ -208,6 +208,7 @@ final class PlacementConfigViewController: NSViewController {
         tableView.delegate = self
         tableView.target = self
         tableView.doubleAction = #selector(captureKeyForSelection)
+        tableView.onDelete = { [weak self] in self?.removeBinding() }
 
         let importButton = smallButton(NSLocalizedString("Import…", tableName: "Main", value: "Import…", comment: ""), target: self, action: #selector(importKeymap))
         let exportButton = smallButton(NSLocalizedString("Export…", tableName: "Main", value: "Export…", comment: ""), target: self, action: #selector(exportKeymap))

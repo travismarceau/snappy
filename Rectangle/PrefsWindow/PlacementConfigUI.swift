@@ -6,6 +6,7 @@
 /// form grids, tables, add/remove control, and empty-state labels.
 
 import Cocoa
+import Carbon.HIToolbox
 
 enum PlacementUI {
     static let outerMargin: CGFloat = 20
@@ -204,6 +205,23 @@ func styledScroll(wrapping table: NSTableView,
     scroll.drawsBackground = true
     scroll.translatesAutoresizingMaskIntoConstraints = false
     return scroll
+}
+
+/// A table that removes the selected row on Delete, so the lists can be edited
+/// from the keyboard and not only through the - segment beneath them.
+final class DeletableTableView: NSTableView {
+
+    var onDelete: (() -> Void)?
+
+    override func keyDown(with event: NSEvent) {
+        guard Int(event.keyCode) == kVK_Delete || Int(event.keyCode) == kVK_ForwardDelete,
+              selectedRow >= 0, let onDelete
+        else {
+            super.keyDown(with: event)
+            return
+        }
+        onDelete()
+    }
 }
 
 /// A cell text field configured the shared way; `mono` for the Key column.

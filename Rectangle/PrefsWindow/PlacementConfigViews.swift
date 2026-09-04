@@ -279,11 +279,11 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         didSet { Defaults.placementKeymap.typedValue = keymap }
     }
 
-    private let layoutsTable = NSTableView()
+    private let layoutsTable = DeletableTableView()
     private lazy var layoutAddRemove = makeAddRemove(target: self, action: #selector(layoutAddRemoveChanged))
     private let keyButton = KeyCaptureButton()
     private let labelField = NSTextField()
-    private let slotsTable = NSTableView()
+    private let slotsTable = DeletableTableView()
     private lazy var slotAddRemove = makeAddRemove(target: self, action: #selector(slotAddRemoveChanged))
     private let appPopup = NSPopUpButton()
     private let picker = PlacementGridPickerView()
@@ -332,6 +332,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         layoutsTable.delegate = self
         layoutsTable.target = self
         layoutsTable.doubleAction = #selector(captureKeyForSelectedLayout)
+        layoutsTable.onDelete = { [weak self] in self?.removeSelectedLayout() }
 
         let leftContent = NSView()
         leftContent.translatesAutoresizingMaskIntoConstraints = false
@@ -365,6 +366,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         ])
         slotsTable.dataSource = self
         slotsTable.delegate = self
+        slotsTable.onDelete = { [weak self] in self?.removeSelectedSlot() }
 
         appPopup.target = self; appPopup.action = #selector(appChanged)
         appPopup.translatesAutoresizingMaskIntoConstraints = false
@@ -588,15 +590,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             layoutsTable.reloadData()
             layoutsTable.selectRowIndexes(IndexSet(integer: keymap.layouts.count - 1), byExtendingSelection: false)
             armKeyAfterRefresh = true
-        } else if let li = selLayoutIndex {
-            keymap.layouts.remove(at: li)
-            layoutsTable.reloadData()
-            if !keymap.layouts.isEmpty {
-                layoutsTable.selectRowIndexes(IndexSet(integer: min(li, keymap.layouts.count - 1)), byExtendingSelection: false)
-            }
-            // Removing the last layout selects nothing, so no selection change
-            // fires to rebuild the slots table - clear it here.
-            slotsTable.reloadData()
+        } else {
+            removeSelectedLayout()
+            return
         }
         refreshDetail()
         // refreshDetail resets the button, so arm it only once that has run.
@@ -605,19 +601,39 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             keyButton.armCapture()
         }
     }
+
+    private func removeSelectedLayout() {
+        guard let li = selLayoutIndex else { return }
+        keymap.layouts.remove(at: li)
+        layoutsTable.reloadData()
+        if !keymap.layouts.isEmpty {
+            layoutsTable.selectRowIndexes(IndexSet(integer: min(li, keymap.layouts.count - 1)), byExtendingSelection: false)
+        }
+        // Removing the last layout selects nothing, so no selection change
+        // fires to rebuild the slots table - clear it here.
+        slotsTable.reloadData()
+        refreshDetail()
+    }
     @objc private func slotAddRemoveChanged() {
         if slotAddRemove.selectedSegment == 0 {
             let g = keymap.grid
             mutateLayout { $0.slots.append(LayoutSlot(placement: GridPlacement(col: 0, row: 0, colSpan: g.cols, rowSpan: g.rows))) }
             slotsTable.selectRowIndexes(IndexSet(integer: (selLayout?.slots.count ?? 1) - 1), byExtendingSelection: false)
-        } else if let si = selSlotIndex {
-            mutateLayout { if $0.slots.indices.contains(si) { $0.slots.remove(at: si) } }
-            // The removed row's index is gone; keep a neighbour selected so the
-            // editor stays open on something rather than collapsing.
-            let remaining = selLayout?.slots.count ?? 0
-            if remaining > 0 {
-                slotsTable.selectRowIndexes(IndexSet(integer: min(si, remaining - 1)), byExtendingSelection: false)
-            }
+        } else {
+            removeSelectedSlot()
+            return
+        }
+        refreshDetail()
+    }
+
+    private func removeSelectedSlot() {
+        guard let si = selSlotIndex else { return }
+        mutateLayout { if $0.slots.indices.contains(si) { $0.slots.remove(at: si) } }
+        // The removed row's index is gone; keep a neighbour selected so the
+        // editor stays open on something rather than collapsing.
+        let remaining = selLayout?.slots.count ?? 0
+        if remaining > 0 {
+            slotsTable.selectRowIndexes(IndexSet(integer: min(si, remaining - 1)), byExtendingSelection: false)
         }
         refreshDetail()
     }

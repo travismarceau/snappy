@@ -43,7 +43,6 @@
 		895C73559E1ACEFBBE8DC32D /* UpperMiddleCenterRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3EA35F0C110A170EAD33 /* UpperMiddleCenterRightSixteenthCalculation.swift */; };
 		8B1D14E3A55936EBCCC1E807 /* MiddleRightTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA84AB4DB9E7EEFCE50AA6D8 /* MiddleRightTwelfthCalculation.swift */; };
 		924919761FC491952752A147 /* TopCenterLeftTwelfthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9698D1D9EE0180D7C4468304 /* TopCenterLeftTwelfthCalculation.swift */; };
-		944F25CD2CE5A144004B2FD2 /* PrefsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944F25CC2CE5A144004B2FD2 /* PrefsViewController.swift */; };
 		944F25CF2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944F25CE2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift */; };
 		944F25D12CE5A144004B2FD2 /* ShortcutRecordingObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944F25D02CE5A144004B2FD2 /* ShortcutRecordingObserverTests.swift */; };
 		94E9B08E2C3B8D97004C7F41 /* MacTilingDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E9B08D2C3B8D97004C7F41 /* MacTilingDefaults.swift */; };
@@ -270,7 +269,6 @@
 		8AE08B666CCCD1805CAB08BD /* LowerMiddleCenterRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowerMiddleCenterRightSixteenthCalculation.swift; sourceTree = "<group>"; };
 		8B8CA6901E6FE134E930135B /* UpperMiddleCenterLeftSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpperMiddleCenterLeftSixteenthCalculation.swift; sourceTree = "<group>"; };
 		918F847FF15D524B6DB2E6DA /* TopCenterRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopCenterRightSixteenthCalculation.swift; sourceTree = "<group>"; };
-		944F25CC2CE5A144004B2FD2 /* PrefsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefsViewController.swift; sourceTree = "<group>"; };
 		944F25CE2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecordingObserver.swift; sourceTree = "<group>"; };
 		944F25D02CE5A144004B2FD2 /* ShortcutRecordingObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecordingObserverTests.swift; sourceTree = "<group>"; };
 		94E9B08D2C3B8D97004C7F41 /* MacTilingDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTilingDefaults.swift; sourceTree = "<group>"; };
@@ -775,7 +773,6 @@
 		98910B3C2311304D0066EC23 /* PrefsWindow */ = {
 			isa = PBXGroup;
 			children = (
-				944F25CC2CE5A144004B2FD2 /* PrefsViewController.swift */,
 				944F25CE2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift */,
 				98910B3D231130AF0066EC23 /* SettingsViewController.swift */,
 				983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */,
@@ -1187,7 +1184,6 @@
 				98987AA52391890400BE72C4 /* LogViewer.swift in Sources */,
 				9824704C22B189250037B409 /* WindowMover.swift in Sources */,
 				6490B39B27BF980F0056C220 /* TopRightEighthCalculation.swift in Sources */,
-				944F25CD2CE5A144004B2FD2 /* PrefsViewController.swift in Sources */,
 				944F25CF2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift in Sources */,
 				9818E01028B59396004AA524 /* HalvesCompoundCalculation.swift in Sources */,
 				988D066922EB4CCB004EABD7 /* LastThirdCalculation.swift in Sources */,
