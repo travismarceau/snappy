@@ -480,7 +480,30 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         if selLayoutIndex == nil, !keymap.layouts.isEmpty {
             layoutsTable.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
         }
+        slotsTable.reloadData()
         refreshDetail()
+    }
+
+    /// Redraw every cell without touching the selection. `reloadData()` drops
+    /// the selection; this does not, so it is what a content-only edit wants.
+    /// Only valid while the row count is unchanged.
+    private func reloadCells(_ table: NSTableView) {
+        let rows = table.numberOfRows, cols = table.numberOfColumns
+        guard rows > 0, cols > 0 else { return }
+        table.reloadData(forRowIndexes: IndexSet(integersIn: 0..<rows),
+                         columnIndexes: IndexSet(integersIn: 0..<cols))
+    }
+
+    /// Full reload for when the row count may have changed, putting the
+    /// selection back afterwards so an edit does not silently deselect.
+    /// Re-selecting posts a selection notification, which is safe for the slots
+    /// table (its handler does not reload) but must never be used on the
+    /// layouts table, whose handler rebuilds the slots table from scratch.
+    private func reloadPreservingSelection(_ table: NSTableView) {
+        let row = table.selectedRow
+        table.reloadData()
+        guard row >= 0, row < table.numberOfRows else { return }
+        table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
     }
 
     private func refreshDetail() {
@@ -495,7 +518,12 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         keyButton.setKey(keyCode: layout?.keyCode ?? PlacementBinding.unassignedKeyCode,
                          modifierFlags: layout?.modifierFlags ?? 0)
         labelField.stringValue = layout?.label ?? ""
-        slotsTable.reloadData()
+        // Deliberately no slotsTable.reloadData() here. refreshDetail() renders
+        // the detail pane from the current selection and is what
+        // tableViewSelectionDidChange calls, so reloading the slots table from
+        // inside it would clear the very selection that triggered it - the
+        // editor could then never open. Reloads live with the data changes
+        // instead: see reloadPreservingSelection and the layout-identity paths.
         slotsEmptyLabel.isHidden = !(layout?.slots.isEmpty ?? true)
 
         let slot = currentSlot
@@ -521,15 +549,22 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     private func mutateLayout(_ f: (inout WindowLayout) -> Void) {
         guard let li = selLayoutIndex, keymap.layouts.indices.contains(li) else { return }
         var l = keymap.layouts[li]; f(&l); keymap.layouts[li] = l
-        layoutsTable.reloadData()
-        slotsTable.reloadData()
+        // The layout count is unchanged, so redraw its cells in place: a full
+        // reload here would re-select and fire the layouts handler, which
+        // rebuilds the slots table and would drop the user's slot selection.
+        reloadCells(layoutsTable)
+        // The slot count may have changed (add/remove), so this one needs a
+        // real reload, with the selection restored when it is still valid.
+        reloadPreservingSelection(slotsTable)
     }
     private func mutateSlot(_ f: (inout LayoutSlot) -> Void) {
         guard let li = selLayoutIndex, let si = selSlotIndex,
               keymap.layouts.indices.contains(li), keymap.layouts[li].slots.indices.contains(si) else { return }
         var l = keymap.layouts[li]; var s = l.slots[si]; f(&s); l.slots[si] = s; keymap.layouts[li] = l
-        slotsTable.reloadData()
-        layoutsTable.reloadData()
+        // Editing a slot changes cell text only - no row counts move - so both
+        // tables can redraw in place and the selection survives untouched.
+        reloadCells(slotsTable)
+        reloadCells(layoutsTable)
     }
 
     // MARK: actions
@@ -546,6 +581,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             if !keymap.layouts.isEmpty {
                 layoutsTable.selectRowIndexes(IndexSet(integer: min(li, keymap.layouts.count - 1)), byExtendingSelection: false)
             }
+            // Removing the last layout selects nothing, so no selection change
+            // fires to rebuild the slots table - clear it here.
+            slotsTable.reloadData()
         }
         refreshDetail()
     }
@@ -556,6 +594,12 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             slotsTable.selectRowIndexes(IndexSet(integer: (selLayout?.slots.count ?? 1) - 1), byExtendingSelection: false)
         } else if let si = selSlotIndex {
             mutateLayout { if $0.slots.indices.contains(si) { $0.slots.remove(at: si) } }
+            // The removed row's index is gone; keep a neighbour selected so the
+            // editor stays open on something rather than collapsing.
+            let remaining = selLayout?.slots.count ?? 0
+            if remaining > 0 {
+                slotsTable.selectRowIndexes(IndexSet(integer: min(si, remaining - 1)), byExtendingSelection: false)
+            }
         }
         refreshDetail()
     }
@@ -652,7 +696,15 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         return cell
     }
 
-    func tableViewSelectionDidChange(_ notification: Notification) { refreshDetail() }
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        // A different layout means a different set of slots, so that is the one
+        // selection change that has to rebuild the slots table. A change in the
+        // slots table itself must not reload it - that is the bug this avoids.
+        if notification.object as? NSTableView === layoutsTable {
+            slotsTable.reloadData()
+        }
+        refreshDetail()
+    }
 
     // MARK: helpers
 
