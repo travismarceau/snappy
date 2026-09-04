@@ -23,6 +23,7 @@ final class PlacementConfigViewController: NSViewController {
     private let stickySwitch = NSSwitch()
     private let revealPopup = NSPopUpButton()
     private let revealDelayField = NSTextField()
+    private let timeoutField = NSTextField()
     private let colsStepper = NSStepper()
     private let rowsStepper = NSStepper()
     private let colsField = NSTextField()
@@ -40,7 +41,10 @@ final class PlacementConfigViewController: NSViewController {
     private let conflictLabel = NSTextField(labelWithString: "")
 
     private var generalGrid: NSGridView?
-    private let revealDelayRowIndex = 4
+    /// Held as the row itself rather than an index: every insertion into the
+    /// General card used to shift a hard-coded position and silently hide the
+    /// wrong control.
+    private var revealDelayRow: NSGridRow?
     private var detailGrid: NSGridView?
     private let conflictRowIndex = 1
     private let placementsEmptyLabel = emptyStateLabel(
@@ -53,6 +57,9 @@ final class PlacementConfigViewController: NSViewController {
     // cards above so the layout reads as two consistent columns top to bottom.
     private var placementsLeftColumn = NSView()
     private var placementsRightColumn = NSView()
+
+    /// The cards that go dim when Placement Mode is switched off.
+    private var governedCards: [NSView] = []
 
     private let placementsRoot = NSView()
 
@@ -125,6 +132,9 @@ final class PlacementConfigViewController: NSViewController {
             v.translatesAutoresizingMaskIntoConstraints = false
             placementsRoot.addSubview(v)
         }
+        // Everything the Placement Mode switch governs. The General card is
+        // deliberately not in here - it holds the switch itself.
+        governedCards = [gridCard, placementsCard, regionCard]
 
         NSLayoutConstraint.activate([
             // Top row: General | Grid, equal widths.
@@ -169,15 +179,21 @@ final class PlacementConfigViewController: NSViewController {
         configureNumberField(revealDelayField, width: 46, action: #selector(revealDelayChanged))
         let delayRow = pair(revealDelayField, caption: NSLocalizedString("seconds", tableName: "Main", value: "seconds", comment: ""))
 
+        configureNumberField(timeoutField, width: 46, action: #selector(timeoutChanged))
+        let timeoutRow = pair(timeoutField, caption: NSLocalizedString("seconds", tableName: "Main", value: "seconds", comment: ""))
+
         let grid = formGrid([
             [rightLabel(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leadingWrap(enableSwitch)],
             [rightLabel(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
              captioned(stickySwitch, NSLocalizedString("until Esc", tableName: "Main", value: "until Esc", comment: ""))],
+            [rightLabel(NSLocalizedString("Close after", tableName: "Main", value: "Close after", comment: "")), timeoutRow],
             [rightLabel(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
             [rightLabel(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leadingWrap(revealPopup)],
             [rightLabel(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
         ])
         generalGrid = grid
+        // Looked up from the view itself, so inserting rows above it is safe.
+        revealDelayRow = grid.cell(for: delayRow)?.row
         return grid
     }
 
@@ -330,7 +346,9 @@ final class PlacementConfigViewController: NSViewController {
         stickySwitch.state = Defaults.placementPaneSticky.enabled ? .on : .off
         revealPopup.selectItem(withTag: Defaults.placementMapReveal.value.rawValue)
         revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
+        timeoutField.stringValue = String(format: "%g", Double(Defaults.placementPaneTimeout.value))
         updateRevealDelayRowVisibility()
+        updateTimeoutFieldEnabled()
 
         colsField.stringValue = String(keymap.grid.cols)
         rowsField.stringValue = String(keymap.grid.rows)
@@ -339,6 +357,7 @@ final class PlacementConfigViewController: NSViewController {
         outerMarginField.stringValue = String(format: "%g", Double(keymap.outerMargin))
         innerGapField.stringValue = String(format: "%g", Double(keymap.innerGap))
         picker.grid = keymap.grid
+        applyEnabledState()
     }
 
     private func reloadTable() {
@@ -350,10 +369,16 @@ final class PlacementConfigViewController: NSViewController {
 
     /// "Reveal delay" only matters when the map is shown after a pause — hide
     /// the row otherwise so the General card stays compact.
+    /// With the pane pinned open until Esc there is no timeout to set, and a
+    /// dimmed field says that better than a footnote would.
+    private func updateTimeoutFieldEnabled() {
+        timeoutField.isEnabled = !Defaults.placementPaneSticky.enabled
+    }
+
     private func updateRevealDelayRowVisibility() {
         let show = Defaults.placementMapReveal.value == .afterDelay
         revealDelayField.isEnabled = show
-        generalGrid?.row(at: revealDelayRowIndex).isHidden = !show
+        revealDelayRow?.isHidden = !show
     }
 
     private func selectRow(_ index: Int?) {
@@ -365,13 +390,38 @@ final class PlacementConfigViewController: NSViewController {
         refreshEditorForSelection()
     }
 
+    /// Enabled state has two independent inputs - whether a row is selected and
+    /// whether placement mode is on - so both go through here. Setting
+    /// `isEnabled` from two places instead would mean last-writer-wins, and
+    /// selecting a row would quietly relight a pane the switch had dimmed.
+    private func applyEnabledState() {
+        let modeOn = Defaults.placementModeEnabled.userEnabled
+        let hasSelection = selectedIndex.flatMap { keymap.bindings[safe: $0] } != nil
+        let editable = modeOn && hasSelection
+
+        for control in [keyCaptureButton, labelField, displayPopup, clearKeyButton] as [NSControl] {
+            control.isEnabled = editable
+        }
+        addRemoveControl.setEnabled(modeOn, forSegment: 0)
+        addRemoveControl.setEnabled(editable, forSegment: 1)
+        picker.isEditable = editable
+
+        for card in governedCards { setControlsEnabled(modeOn, in: card) }
+        tableView.isEnabled = modeOn
+    }
+
+    /// Walks a card so a whole section dims together. Re-applied after, so the
+    /// selection-dependent controls above keep the last word.
+    private func setControlsEnabled(_ enabled: Bool, in view: NSView) {
+        for sub in view.subviews {
+            if let control = sub as? NSControl, !(control is NSTableView) { control.isEnabled = enabled }
+            setControlsEnabled(enabled, in: sub)
+        }
+    }
+
     private func refreshEditorForSelection() {
         let binding = selectedIndex.flatMap { keymap.bindings[safe: $0] }
         let enabled = binding != nil
-        for control in [keyCaptureButton, labelField, displayPopup, clearKeyButton] as [NSControl] {
-            control.isEnabled = enabled
-        }
-        addRemoveControl.setEnabled(enabled, forSegment: 1)
         picker.isEditable = enabled
         picker.placement = binding?.placement
         picker.otherPlacements = keymap.bindings.filter { $0.id != binding?.id }.map { $0.placement }
@@ -382,6 +432,7 @@ final class PlacementConfigViewController: NSViewController {
                                 modifierFlags: binding?.modifierFlags ?? 0)
         displayPopup.selectItem(withTag: binding?.placement.displayIndexRaw ?? displayCurrentTag)
         updateConflictLabel()
+        applyEnabledState()
     }
 
     private func updateConflictLabel() {
@@ -415,9 +466,13 @@ final class PlacementConfigViewController: NSViewController {
     @objc private func toggleEnabled() {
         Defaults.placementModeEnabled.enabled = enableSwitch.state == .on
         PlacementModeManager.registerUnregisterShortcut()
+        // Breaking the shortcut binding doesn't close a pane that is already up.
+        if enableSwitch.state == .off { PlacementModeController.shared.deactivate() }
+        applyEnabledState()
     }
     @objc private func toggleSticky() {
         Defaults.placementPaneSticky.enabled = stickySwitch.state == .on
+        updateTimeoutFieldEnabled()
     }
     @objc private func revealChanged() {
         let tag = revealPopup.selectedTag()
@@ -427,6 +482,10 @@ final class PlacementConfigViewController: NSViewController {
     @objc private func revealDelayChanged() {
         Defaults.placementMapRevealDelay.value = max(0.05, min(revealDelayField.floatValue, 5))
         revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
+    }
+    @objc private func timeoutChanged() {
+        Defaults.placementPaneTimeout.value = max(1, min(timeoutField.floatValue, 30))
+        timeoutField.stringValue = String(format: "%g", Double(Defaults.placementPaneTimeout.value))
     }
     @objc private func gridChanged() {
         applyGrid(cols: colsStepper.integerValue, rows: rowsStepper.integerValue)
