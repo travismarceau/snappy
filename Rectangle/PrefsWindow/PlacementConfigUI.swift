@@ -14,6 +14,8 @@ enum PlacementUI {
     static let formRowSpacing: CGFloat = 8
     static let cardHPadding: CGFloat = 16
     static let cardVPadding: CGFloat = 14
+    /// Space above the first card in a settings pane, under the tab toolbar.
+    static let paneTopInset: CGFloat = 14
 }
 
 // MARK: - Titled card

@@ -2,8 +2,9 @@
 ///
 /// The Divvy-style configuration UI: pick a grid size, then for each key draw a
 /// rectangular region on the grid and assign a single keystroke to it. Hosted as
-/// the "Placement" tab of Rectangle Settings (Main.storyboard). Programmatic
-/// AppKit laid out to feel like a macOS System Settings pane.
+/// the "Placements" tab of Snappy Settings (Main.storyboard); multi-window
+/// Layouts is its own tab, in PlacementConfigViews.swift. Programmatic AppKit
+/// laid out to feel like a macOS System Settings pane.
 
 import Cocoa
 import MASShortcut
@@ -53,13 +54,7 @@ final class PlacementConfigViewController: NSViewController {
     private var placementsLeftColumn = NSView()
     private var placementsRightColumn = NSView()
 
-    // Placements vs. multi-window Layouts, toggled by a segmented control.
-    private let modeControl = NSSegmentedControl(labels: [
-        NSLocalizedString("Placements", tableName: "Main", value: "Placements", comment: ""),
-        NSLocalizedString("Layouts", tableName: "Main", value: "Layouts", comment: ""),
-    ], trackingMode: .selectOne, target: nil, action: nil)
     private let placementsRoot = NSView()
-    private lazy var layoutsRoot = LayoutsPaneView()
 
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
@@ -85,12 +80,11 @@ final class PlacementConfigViewController: NSViewController {
             reloadTable()
             selectRow(keymap.bindings.isEmpty ? nil : 0)
         }
-        if !layoutsRoot.isHidden { layoutsRoot.reload() }
         updatePreferredSize()
     }
 
-    /// Tell the enclosing tab controller exactly how tall the visible sub-pane
-    /// wants to be, so nothing gets vertically compressed to fit a stale frame.
+    /// Tell the enclosing tab controller exactly how tall this pane wants to be,
+    /// so nothing gets vertically compressed to fit a stale frame.
     private func updatePreferredSize() {
         view.layoutSubtreeIfNeeded()
         let fit = view.fittingSize
@@ -102,37 +96,21 @@ final class PlacementConfigViewController: NSViewController {
     // MARK: Layout
 
     private func buildLayout() {
-        modeControl.selectedSegment = 0
-        modeControl.target = self
-        modeControl.action = #selector(modeChanged)
-        modeControl.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(modeControl)
-
-        let hairline = NSBox()
-        hairline.boxType = .separator
-        hairline.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(hairline)
-
-        for root in [placementsRoot, layoutsRoot] {
-            root.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(root)
-            NSLayoutConstraint.activate([
-                root.topAnchor.constraint(equalTo: hairline.bottomAnchor, constant: 12),
-                root.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                root.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                root.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            ])
-        }
-        layoutsRoot.isHidden = true
+        placementsRoot.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(placementsRoot)
 
         // Width is pinned by SettingsTabViewController, which gives every pane
         // the same one so the window does not resize between tabs.
         NSLayoutConstraint.activate([
-            modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 14),
-            modeControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: PlacementUI.outerMargin),
-            hairline.topAnchor.constraint(equalTo: modeControl.bottomAnchor, constant: 10),
-            hairline.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hairline.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            // Setting preferredContentSize replaces the pane view's own width
+            // constraint with AppKit's, so the shared width has to be asserted
+            // by the content instead — otherwise the window shrinks to whatever
+            // these cards happen to need and stops matching the other tabs.
+            placementsRoot.widthAnchor.constraint(greaterThanOrEqualToConstant: SettingsTabViewController.paneWidth),
+            placementsRoot.topAnchor.constraint(equalTo: view.topAnchor, constant: PlacementUI.paneTopInset),
+            placementsRoot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            placementsRoot.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            placementsRoot.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
 
         buildPlacementsColumns() // populates placementsLeftColumn / placementsRightColumn
@@ -171,14 +149,6 @@ final class PlacementConfigViewController: NSViewController {
 
             placementsRoot.bottomAnchor.constraint(equalTo: placementsCard.bottomAnchor, constant: 18),
         ])
-    }
-
-    @objc private func modeChanged() {
-        let layouts = modeControl.selectedSegment == 1
-        placementsRoot.isHidden = layouts
-        layoutsRoot.isHidden = !layouts
-        if layouts { layoutsRoot.reload() }
-        updatePreferredSize()
     }
 
     private func buildGeneralGrid() -> NSView {

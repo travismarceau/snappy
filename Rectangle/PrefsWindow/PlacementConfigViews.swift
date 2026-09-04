@@ -719,6 +719,42 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     }
 }
 
+// MARK: - Layouts tab
+
+/// Hosts `LayoutsPaneView` as the "Layouts" tab of Snappy Settings. Layouts and
+/// Placements are siblings — a layout arranges several windows at once, a
+/// placement moves the front one — so neither is nested under the other.
+final class LayoutsConfigViewController: NSViewController {
+
+    private let pane = LayoutsPaneView()
+
+    override func loadView() {
+        view = NSView(frame: NSRect(x: 0, y: 0, width: SettingsTabViewController.paneWidth, height: 520))
+        pane.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(pane)
+        NSLayoutConstraint.activate([
+            // See PlacementConfigViewController: preferredContentSize drops a
+            // width constraint on the pane view, so the content asserts it.
+            pane.widthAnchor.constraint(greaterThanOrEqualToConstant: SettingsTabViewController.paneWidth),
+            pane.topAnchor.constraint(equalTo: view.topAnchor, constant: PlacementUI.paneTopInset),
+            pane.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            pane.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            pane.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        // Pick up placements/grid edits made on the other tab, or an import.
+        pane.reload()
+        view.layoutSubtreeIfNeeded()
+        let fit = view.fittingSize
+        if abs(preferredContentSize.height - fit.height) > 0.5 || abs(preferredContentSize.width - fit.width) > 0.5 {
+            preferredContentSize = fit
+        }
+    }
+}
+
 private extension Array {
     subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
 }

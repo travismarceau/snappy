@@ -68,7 +68,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
         insertEnterPlacementMenuItem()
-        insertPlacementMenuItem()
 
         Notification.Name.configImported.onPost(using: { _ in
             self.statusItem.refreshVisibility()
@@ -246,32 +245,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     /// action fires, so the overlay's key capture starts on a clean slate.
     @objc func enterPlacementMode(_ sender: Any) {
         PlacementModeController.shared.activate()
-    }
-
-    private func insertPlacementMenuItem() {
-        let item = NSMenuItem(
-            title: NSLocalizedString("Window Placement…", tableName: "Main", value: "Window Placement…", comment: ""),
-            action: #selector(openPlacementConfig(_:)),
-            keyEquivalent: "")
-        item.target = self
-        if #available(macOS 11, *) {
-            item.image = NSImage(systemSymbolName: "square.grid.3x3.square", accessibilityDescription: nil)
-        }
-        if let prefsIndex = mainStatusMenu.items.firstIndex(where: { $0.action == #selector(openPreferences) }) {
-            mainStatusMenu.insertItem(item, at: prefsIndex)
-        } else {
-            mainStatusMenu.addItem(item)
-        }
-    }
-
-    /// Opens Settings and selects the Placement tab.
-    @objc func openPlacementConfig(_ sender: Any) {
-        openPreferences(sender)
-        if let tabVC = prefsWindowController?.window?.contentViewController as? NSTabViewController {
-            if let index = tabVC.tabViewItems.firstIndex(where: { ($0.viewController as? PlacementConfigViewController) != nil }) {
-                tabVC.selectedTabViewItemIndex = index
-            }
-        }
     }
 
     @IBAction func openPreferences(_ sender: Any) {
