@@ -60,13 +60,11 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 
 ## Must verify on-device before submitting
 
-1. **The sandboxed Release build actually manages windows** — snapping,
-   drag-to-edge, Todo, multi-display, the placement overlay, **and multi-window
-   layouts** (`AccessibilityElement(bundleId:)` reaching other apps under the
-   sandbox). Sandboxed AX window control works for Magnet / Rectangle Pro /
-   Swish, but confirm it here. If blocked: add
-   `com.apple.security.automation.apple-events` + `NSAppleEventsUsageDescription`,
-   or ship direct-only non-sandboxed.
+1. **The sandboxed Release build actually manages windows.** Run
+   `./scripts/verify-sandbox.sh` — see *Sandbox verification* below for what it
+   does and why a plain Release build is enough to test it. Record the result in
+   that section. If it fails: add `com.apple.security.automation.apple-events` +
+   `NSAppleEventsUsageDescription`, or ship direct-only non-sandboxed.
 2. **4.1 Copycats** is still a judgement call. Mitigations in place: own name,
    own icon, the Shortcuts pane / preset chords / action menu are gone, the
    primary UI is the grid overlay + layout editor, and multi-window layouts is
@@ -74,6 +72,60 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
    About + LICENSE). The direct channel is the hedge.
 3. Import/export config via the panels under the sandbox (paths resolve to the
    app container).
+
+## Sandbox verification
+
+Every bit of window-management testing up to now has been against the **Debug**
+build, and `Rectangle/Rectangle.entitlements` is an empty dict — no sandbox at
+all. The App Store build is sandboxed via
+`Rectangle/RectangleRelease.entitlements`. Sandbox + Accessibility is known to
+work for Magnet and Rectangle Pro, but that is evidence about their binaries,
+not this one.
+
+**A plain Release build is enough to test it**, with none of the account-side
+export blockers in the way — those gate distribution, not local execution:
+
+```
+CODE_SIGN_ENTITLEMENTS = Rectangle/RectangleRelease.entitlements   ← sandbox: YES
+CODE_SIGN_IDENTITY     = Apple Development                         ← stable, TCC-trustable
+```
+
+`com.apple.security.app-sandbox` needs no provisioning profile, and Apple
+Development signing gives a stable designated requirement, so TCC accepts and
+remembers the Accessibility grant.
+
+```
+./scripts/verify-sandbox.sh                # build, assert, install, then guided tests
+./scripts/verify-sandbox.sh --skip-build   # re-run just the move tests
+```
+
+It builds Release, **asserts the signed binary really carries the sandbox and
+user-selected-file entitlements** (and that the nested `RectangleLauncher.app`
+is sandboxed too — the store requires it of nested code), installs to
+`/Applications`, then walks you through granting Accessibility and pressing the
+placement keys. Before/after window geometry comes from
+`scripts/window-frames.swift`, which reads `CGWindowListCopyWindowInfo` — window
+bounds are not gated by Screen Recording, so the observer needs no permission of
+its own and cannot be fooled by the grant it is testing. It reports every
+non-Snappy window whose frame changed.
+
+### Known sandbox effects (audited, not blockers)
+
+- `checkForProblematicApps` (`AppDelegate.swift:188`) reads other apps' bundles
+  via `Bundle(url:)`. The sandbox denies that, so the MATLAB / Illustrator
+  conflict warning silently won't fire. Cosmetic.
+- `StageUtil.isStageStripVisible` matches `kCGWindowOwnerName == "WindowManager"`.
+  Owner names are *not* redacted without Screen Recording (only `kCGWindowName`,
+  the title, is, and it is never read), so this should work — worth an eyes-on
+  check if you use Stage Manager.
+- Import/Export and the Layouts app picker (`PlacementConfigViews.swift:584`, an
+  `NSOpenPanel` at `/Applications`) rely on
+  `com.apple.security.files.user-selected.read-write`. Exercise both by hand.
+
+### Result
+
+> Not yet run. Record here: date, macOS version, and the before/after frames the
+> script prints.
 
 ## Support / privacy site — live
 
@@ -94,8 +146,17 @@ marketing `https://getsnappy.fyi/`, privacy `https://getsnappy.fyi/#privacy`.
 
 ## Metadata (App Store Connect)
 
-- Description, keywords, support URL, marketing URL, **privacy policy URL**
-  (required). Screenshots ≥ 1 (1280×800 or 1440×900).
+- Every field is written out in `store/listing.md`, ready to paste.
+- **App name is `Snappy Window Manager`, not `Snappy`.** Plain "Snappy" is taken
+  by a live iOS app (Delisa srl), and App Store Connect enforces record-name
+  uniqueness across the whole store, not per-platform. The app on disk is
+  unchanged — only the store record's name differs. Reasoning is recorded under
+  *Name* in `store/listing.md`.
+- **Screenshots**: `./scripts/capture-screenshots.sh` then
+  `uv run design/compose_screenshots.py` → six 2880×1800 frames in
+  `store/screenshots/`. ASC accepts only 1280×800 / 1440×900 / 2560×1600 /
+  2880×1800; this display is 3456×2234, so raw captures are never a valid size
+  and always need composing. Order and captions are in `store/listing.md`.
 - App Privacy: "Data Not Collected".
 - Review notes: explain the Accessibility permission and how to grant it
   (System Settings ▸ Privacy & Security ▸ Accessibility ▸ Snappy).

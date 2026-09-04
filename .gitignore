@@ -34,3 +34,8 @@ build/
 *.dat
 *.dep
 
+## App Store screenshot intermediates. The composed frames in
+## store/screenshots/ are committed; the raw captures they are built from are
+## machine- and desktop-specific and can be regenerated.
+store/screenshots/raw/
+

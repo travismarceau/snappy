@@ -7,15 +7,23 @@ Paste these into the corresponding fields. Character limits noted.
 ## Name  *(30 char max — must be globally unique)*
 
 ```
-Snappy
-```
-
-⚠️ If "Snappy" is taken, use one of:
-
-```
-Snappy: Window Layouts
 Snappy Window Manager
 ```
+
+21 characters. The app itself is still **Snappy** — `CFBundleName`, the Dock and
+menu-bar name, the icon, and getsnappy.fyi are all unchanged. Apple permits a
+store name that extends the bundle name, and the suffix earns two real search
+keywords.
+
+> **Why not just "Snappy"?** It's taken. There is a live iOS app named exactly
+> `Snappy` (Delisa srl). App Store Connect enforces app-record name uniqueness
+> across the *entire* store, not per-platform, so the record can't be created
+> under that name even though the Mac App Store itself is clear — the only near
+> matches there are *Snappy by Povio* and *Snappy - Screenshots*, neither of
+> which is an exact collision.
+>
+> Checked 2026-09-03 via the iTunes Search API. `Snappy Window Manager` and
+> `Snappy: Window Layouts` both came back unused; the first was chosen.
 
 ## Subtitle  *(30 char max)*
 
@@ -86,6 +94,42 @@ https://getsnappy.fyi/#privacy
 
 > Both `getsnappy.fyi` and `www.getsnappy.fyi` serve the page over HTTPS with
 > valid certs.
+
+## Screenshots  *(at least 1, up to 10)*
+
+App Store Connect accepts only **1280×800, 1440×900, 2560×1600 or 2880×1800**
+for macOS — aspect 1.60. The built-in display is 3456×2234 (aspect 1.55), so a
+raw capture is never a submittable size however it is cropped. Every frame is
+therefore composed onto an exact 2880×1800 canvas.
+
+Two steps:
+
+```
+./scripts/capture-screenshots.sh      # guided capture → store/screenshots/raw/
+uv run design/compose_screenshots.py  # compose      → store/screenshots/*.png
+```
+
+Upload in this order — the first is the one that shows in search results:
+
+| # | File | Caption |
+|---|---|---|
+| 1 | `01-overlay.png`    | One key. One region. |
+| 2 | `02-placements.png` | Draw the regions you actually use. |
+| 3 | `03-layouts.png`    | A whole arrangement in one keystroke. |
+| 4 | `04-arranged.png`   | Editor, terminal, notes. One key. |
+| 5 | `05-general.png`    | Grid size, margins, gaps. |
+| 6 | `06-menubar.png`    | Lives in the menu bar. No account, no network. |
+
+The ground is drawn from the app icon's palette (`design/render_icon.py`) — an
+off-white-to-grey gradient ruled with the icon's own grid spacing, graphite
+type. Each frame is the icon at another scale, with the app capture playing the
+part of the placed window.
+
+Before uploading, confirm every file is exactly 2880×1800:
+
+```
+sips -g pixelWidth -g pixelHeight store/screenshots/*.png
+```
 
 ## Copyright
 
