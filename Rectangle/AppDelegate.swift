@@ -28,6 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var prevActiveAppObservation: NSKeyValueObservation?
     private var prevActiveApp: NSRunningApplication?
     private var additionalSizeMenuItems: [NSMenuItem] = []
+    static let enterPlacementMenuItemTag = 7401
     private var dynamicMenuItemCount: Int = 0
 
     @IBOutlet weak var mainStatusMenu: NSMenu!
@@ -66,6 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
+        insertEnterPlacementMenuItem()
         insertPlacementMenuItem()
 
         Notification.Name.configImported.onPost(using: { _ in
@@ -222,6 +224,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
     
+    /// The placement grid was reachable only by its leader shortcut, which is
+    /// undiscoverable and useless if the chord is taken by another app. This
+    /// puts it at the top of the status menu as well.
+    private func insertEnterPlacementMenuItem() {
+        let item = NSMenuItem(
+            title: NSLocalizedString("Enter Placement Mode", tableName: "Main", value: "Enter Placement Mode", comment: ""),
+            action: #selector(enterPlacementMode(_:)),
+            keyEquivalent: "")
+        item.target = self
+        item.tag = AppDelegate.enterPlacementMenuItemTag
+        if #available(macOS 11, *) {
+            item.image = NSImage(systemSymbolName: "square.grid.3x3", accessibilityDescription: nil)
+        }
+        mainStatusMenu.insertItem(item, at: 0)
+        mainStatusMenu.insertItem(NSMenuItem.separator(), at: 1)
+    }
+
+    /// Opens the placement grid over the frontmost window, exactly as the
+    /// leader shortcut does. The status menu has already closed by the time an
+    /// action fires, so the overlay's key capture starts on a clean slate.
+    @objc func enterPlacementMode(_ sender: Any) {
+        PlacementModeController.shared.activate()
+    }
+
     private func insertPlacementMenuItem() {
         let item = NSMenuItem(
             title: NSLocalizedString("Window Placement…", tableName: "Main", value: "Window Placement…", comment: ""),
@@ -335,12 +361,22 @@ extension AppDelegate: NSMenuDelegate {
         
         updateWindowActionMenuItems(menu: menu)
         updateTodoModeMenuItems(menu: menu)
+        updateEnterPlacementMenuItem(menu: menu)
 
         viewLoggingMenuItem.keyEquivalentModifierMask = .option
         quitMenuItem.keyEquivalent = "q"
         quitMenuItem.keyEquivalentModifierMask = .command
     }
     
+    /// Placement mode can be switched off, and it needs at least one region
+    /// bound to have anywhere to send a window. Grey the item out rather than
+    /// letting it beep.
+    private func updateEnterPlacementMenuItem(menu: NSMenu) {
+        guard let item = menu.item(withTag: AppDelegate.enterPlacementMenuItemTag) else { return }
+        let keymap = Defaults.placementKeymap.typedValue ?? .empty
+        item.isEnabled = Defaults.placementModeEnabled.userEnabled && keymap.hasAnyAssignedKey
+    }
+
     private func updateWindowActionMenuItems(menu: NSMenu) {
         let frontmostWindow = AccessibilityElement.getFrontWindowElement()
         let screenCount = NSScreen.screens.count

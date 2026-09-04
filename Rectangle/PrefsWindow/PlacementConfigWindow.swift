@@ -64,7 +64,7 @@ final class PlacementConfigViewController: NSViewController {
     private var selectedIndex: Int? { tableView.selectedRow >= 0 ? tableView.selectedRow : nil }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 760, height: 560))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: SettingsTabViewController.paneWidth, height: 560))
         view.wantsLayer = true
         buildLayout()
     }
@@ -125,8 +125,9 @@ final class PlacementConfigViewController: NSViewController {
         }
         layoutsRoot.isHidden = true
 
+        // Width is pinned by SettingsTabViewController, which gives every pane
+        // the same one so the window does not resize between tabs.
         NSLayoutConstraint.activate([
-            view.widthAnchor.constraint(equalToConstant: 760),
             modeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 14),
             modeControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: PlacementUI.outerMargin),
             hairline.topAnchor.constraint(equalTo: modeControl.bottomAnchor, constant: 10),

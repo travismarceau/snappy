@@ -311,7 +311,7 @@
         <!--Tab View Controller-->
         <scene sceneID="b39-fJ-MZO">
             <objects>
-                <tabViewController selectedTabViewItemIndex="0" tabStyle="toolbar" id="5pc-CV-2b9" sceneMemberID="viewController">
+                <tabViewController selectedTabViewItemIndex="0" tabStyle="toolbar" id="5pc-CV-2b9" customClass="SettingsTabViewController" customModule="Rectangle" customModuleProvider="target" sceneMemberID="viewController">
                     <tabViewItems>
                         <tabViewItem label="Placement" image="keyboardToolbarTemplate" id="Plc-Cf-tb1"/>
                         <tabViewItem label="Snap Areas" image="snapAreaTemplate" id="Fap-R2-Aj6"/>
