@@ -232,8 +232,9 @@ final class PlacementModeController {
             finishPlacement()
         } else if let layout = currentKeymap.layout(forKeyCode: keyCode, modifierFlags: mods) {
             revealWorkItem?.cancel()
-            applyLayout(layout)
-            finishPlacement()
+            let outcome = applyLayout(layout)
+            overlay?.flash(layout: layout, outcome: outcome)
+            finishPlacement(holdingFor: outcome.isComplete ? 0.24 : 1.5)
         } else {
             NSSound.beep()
             // An unrecognised key almost always means "I forget my map" — show it.
@@ -243,8 +244,10 @@ final class PlacementModeController {
         }
     }
 
-    /// Shared sticky-vs-dismiss tail after a key resolves to a placement or layout.
-    private func finishPlacement() {
+    /// Shared sticky-vs-dismiss tail after a key resolves to a placement or
+    /// layout. `holdingFor` is how long the flash stays up before teardown -
+    /// longer when there is a message to read.
+    private func finishPlacement(holdingFor hold: TimeInterval = 0.24) {
         if Defaults.placementPaneSticky.enabled {
             // The user will focus a different window before the next key.
             targetElement = AccessibilityElement.getFrontWindowElement()
@@ -254,7 +257,7 @@ final class PlacementModeController {
             // Let the flash play, then tear down.
             setActive(false)
             setFinishing(true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + hold) { [weak self] in
                 self?.endSession()
             }
         }
@@ -278,15 +281,40 @@ final class PlacementModeController {
         )
     }
 
+    /// What a layout managed to do, so the overlay can draw only the regions it
+    /// actually filled and say why the rest are empty.
+    struct LayoutOutcome {
+        var placed: [GridPlacement] = []
+        /// The app isn't running at all.
+        var notRunning: [String] = []
+        /// The app is running but has no window to place - a very different
+        /// thing to tell someone, and the common case for browsers and editors
+        /// left open with every window closed.
+        var noWindow: [String] = []
+
+        var isComplete: Bool { notRunning.isEmpty && noWindow.isEmpty }
+    }
+
     /// Place every window of a multi-window layout, on the pane's screen.
-    private func applyLayout(_ layout: WindowLayout) {
-        guard let screen = baseScreen else { return }
+    @discardableResult
+    private func applyLayout(_ layout: WindowLayout) -> LayoutOutcome {
+        guard let screen = baseScreen else { return LayoutOutcome() }
         let map = currentKeymap
         let visible = screen.adjustedVisibleFrame()
+        var outcome = LayoutOutcome()
         for slot in layout.slots {
-            guard !slot.appBundleId.isEmpty,
-                  let element = AccessibilityElement(slot.appBundleId)?.windowElements?.first
-            else { continue }
+            guard !slot.appBundleId.isEmpty else { continue }
+            guard let element = AccessibilityElement(slot.appBundleId)?.windowElements?.first else {
+                let name = Self.displayName(forBundleId: slot.appBundleId)
+                let running = !NSRunningApplication.runningApplications(withBundleIdentifier: slot.appBundleId).isEmpty
+                if running {
+                    if !outcome.noWindow.contains(name) { outcome.noWindow.append(name) }
+                } else {
+                    if !outcome.notRunning.contains(name) { outcome.notRunning.append(name) }
+                }
+                continue
+            }
+            outcome.placed.append(slot.placement)
             let rect = slot.placement.resolve(in: visible,
                                               grid: map.grid,
                                               outerMargin: map.outerMargin,
@@ -297,6 +325,17 @@ final class PlacementModeController {
                                                  windowId: element.getWindowId())
             element.bringToFront()
         }
+        return outcome
+    }
+
+    /// An app's name for a message, falling back to its bundle id when the app
+    /// isn't installed.
+    static func displayName(forBundleId bundleId: String) -> String {
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleId) else {
+            return bundleId
+        }
+        return FileManager.default.displayName(atPath: url.path)
+            .replacingOccurrences(of: ".app", with: "")
     }
 
     private func resolveScreen(for placement: GridPlacement, base: NSScreen) -> NSScreen {

@@ -514,13 +514,59 @@ final class PlacementConfigViewController: NSViewController {
         panel.allowedFileTypes = ["json"]
         panel.allowsMultipleSelection = false
         panel.beginSheetModal(for: view.window!) { [weak self] response in
-            guard response == .OK, let url = panel.url, let self,
-                  let data = try? Data(contentsOf: url),
-                  let imported = try? JSONDecoder().decode(PlacementKeymap.self, from: data) else { return }
-            self.keymap = imported
-            self.syncControlsFromModel()
-            self.reloadTable()
-            self.selectRow(imported.bindings.isEmpty ? nil : 0)
+            guard response == .OK, let url = panel.url, let self else { return }
+            // Alerts have to wait for the sheet to finish dismissing; running a
+            // modal on top of a closing sheet leaves the window wedged.
+            DispatchQueue.main.async { self.completeImport(from: url) }
+        }
+    }
+
+    /// Import replaces the whole keymap and there is no undo, so it asks first
+    /// and says so when the file turns out not to be one.
+    private func completeImport(from url: URL) {
+        guard let data = try? Data(contentsOf: url),
+              let imported = try? JSONDecoder().decode(PlacementKeymap.self, from: data)
+        else {
+            AlertUtil.oneButtonAlert(
+                question: NSLocalizedString("That file isn’t a Snappy keymap", tableName: "Main", value: "That file isn’t a Snappy keymap", comment: ""),
+                text: String(format: NSLocalizedString("“%@” couldn’t be read as one. Export a keymap from this pane to see the format Snappy expects.", tableName: "Main", value: "“%@” couldn’t be read as one. Export a keymap from this pane to see the format Snappy expects.", comment: ""),
+                             url.lastPathComponent))
+            return
+        }
+
+        guard confirmReplacingKeymap() else { return }
+
+        keymap = imported
+        syncControlsFromModel()
+        reloadTable()
+        selectRow(imported.bindings.isEmpty ? nil : 0)
+    }
+
+    /// True if the current map is empty, or the user accepted losing it. Offers
+    /// to export first, since that is the only way back.
+    private func confirmReplacingKeymap() -> Bool {
+        let placements = keymap.bindings.count
+        let layouts = keymap.layouts.count
+        guard placements + layouts > 0 else { return true }
+
+        let text = String(format: NSLocalizedString("This replaces %1$d placements and %2$d layouts. You can’t undo it.", tableName: "Main", value: "This replaces %1$d placements and %2$d layouts. You can’t undo it.", comment: ""),
+                          placements, layouts)
+        let response = AlertUtil.threeButtonAlert(
+            question: NSLocalizedString("Replace your placements and layouts?", tableName: "Main", value: "Replace your placements and layouts?", comment: ""),
+            text: text,
+            buttonOneText: NSLocalizedString("Replace", tableName: "Main", value: "Replace", comment: ""),
+            buttonTwoText: NSLocalizedString("Export Current First…", tableName: "Main", value: "Export Current First…", comment: ""),
+            buttonThreeText: NSLocalizedString("Cancel", tableName: "Main", value: "Cancel", comment: ""))
+
+        switch response {
+        case .alertFirstButtonReturn:
+            return true
+        case .alertSecondButtonReturn:
+            // Save the old map, then leave the import to a second, deliberate go.
+            exportKeymap()
+            return false
+        default:
+            return false
         }
     }
 

@@ -59,6 +59,13 @@ final class PlacementOverlayPanel: NSPanel {
     func flash(_ binding: PlacementBinding) {
         overlayView.flash(binding)
     }
+
+    /// The same confirmation for a layout: its chip lights up and every region
+    /// it actually filled is drawn, so you can see where the windows went. Any
+    /// app it couldn't place is named underneath.
+    func flash(layout: WindowLayout, outcome: PlacementModeController.LayoutOutcome) {
+        overlayView.flash(layout: layout, outcome: outcome)
+    }
 }
 
 // MARK: - Content view
@@ -117,6 +124,17 @@ private final class PlacementOverlayContentView: NSView {
             }
         } else {
             apply()
+        }
+    }
+
+    func flash(layout: WindowLayout, outcome: PlacementModeController.LayoutOutcome) {
+        mapView.flash(layout: layout, outcome: outcome)
+        if mapView.alphaValue < 1 {
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.12
+                mapView.animator().alphaValue = 1
+                hud.animator().alphaValue = 0
+            }
         }
     }
 
@@ -213,6 +231,8 @@ final class PlacementGridView: NSView {
 
     private let keymap: PlacementKeymap
     private var flashedBindingID: UUID?
+    private var flashedLayout: WindowLayout?
+    private var flashedOutcome: PlacementModeController.LayoutOutcome?
 
     init(frame frameRect: NSRect, keymap: PlacementKeymap) {
         self.keymap = keymap
@@ -229,6 +249,20 @@ final class PlacementGridView: NSView {
         needsDisplay = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [weak self] in
             self?.flashedBindingID = nil
+            self?.needsDisplay = true
+        }
+    }
+
+    func flash(layout: WindowLayout, outcome: PlacementModeController.LayoutOutcome) {
+        flashedLayout = layout
+        flashedOutcome = outcome
+        needsDisplay = true
+        // Held longer than a placement flash: there is a sentence to read when
+        // an app was missing, and several regions to take in either way.
+        let hold = outcome.isComplete ? 0.35 : 1.4
+        DispatchQueue.main.asyncAfter(deadline: .now() + hold) { [weak self] in
+            self?.flashedLayout = nil
+            self?.flashedOutcome = nil
             self?.needsDisplay = true
         }
     }
@@ -259,7 +293,69 @@ final class PlacementGridView: NSView {
             drawCap(for: binding, in: rect, emphasised: flashed)
         }
 
+        drawFlashedLayout(in: bounds)
         drawLayoutLegend(in: bounds)
+        drawMissingAppsNote(in: bounds)
+    }
+
+    /// The regions a layout actually filled, drawn with the same emphasis a
+    /// flashed placement gets - the answer to "where did my windows go". Slots
+    /// that couldn't be placed are deliberately not drawn; showing them would
+    /// claim a window is somewhere it isn't.
+    private func drawFlashedLayout(in bounds: NSRect) {
+        guard flashedLayout != nil, let outcome = flashedOutcome else { return }
+        let accent = NSColor.controlAccentColor
+
+        for placement in outcome.placed {
+            let rect = placement
+                .resolve(in: bounds,
+                         grid: keymap.grid,
+                         outerMargin: keymap.outerMargin,
+                         innerGap: keymap.innerGap)
+                .insetBy(dx: 3, dy: 3)
+            guard rect.width > 8, rect.height > 8 else { continue }
+
+            let path = NSBezierPath(roundedRect: rect, xRadius: 14, yRadius: 14)
+            accent.withAlphaComponent(0.50).setFill()
+            path.fill()
+            accent.setStroke()
+            path.lineWidth = 3
+            path.stroke()
+        }
+    }
+
+    /// A layout that placed only some of its windows looks broken unless it says
+    /// which app wasn't there - and "not running" and "running with no window"
+    /// call for different things from the reader, so they are named separately.
+    private func drawMissingAppsNote(in bounds: NSRect) {
+        guard let outcome = flashedOutcome, !outcome.isComplete else { return }
+
+        var parts: [String] = []
+        if !outcome.notRunning.isEmpty {
+            let names = outcome.notRunning.joined(separator: ", ")
+            parts.append(outcome.notRunning.count == 1
+                ? String(format: NSLocalizedString("%@ isn’t running", tableName: "Main", value: "%@ isn’t running", comment: ""), names)
+                : String(format: NSLocalizedString("%@ aren’t running", tableName: "Main", value: "%@ aren’t running", comment: ""), names))
+        }
+        if !outcome.noWindow.isEmpty {
+            let names = outcome.noWindow.joined(separator: ", ")
+            parts.append(outcome.noWindow.count == 1
+                ? String(format: NSLocalizedString("%@ has no open window", tableName: "Main", value: "%@ has no open window", comment: ""), names)
+                : String(format: NSLocalizedString("%@ have no open windows", tableName: "Main", value: "%@ have no open windows", comment: ""), names))
+        }
+        let text = parts.joined(separator: "  ·  ")
+
+        let font = NSFont.systemFont(ofSize: 14, weight: .medium)
+        let size = (text as NSString).size(withAttributes: [.font: font])
+        let pad: CGFloat = 14
+        let rect = NSRect(x: bounds.midX - (size.width + pad * 2) / 2,
+                          y: bounds.minY + 88,
+                          width: size.width + pad * 2,
+                          height: 34)
+        NSColor.black.withAlphaComponent(0.55).setFill()
+        NSBezierPath(roundedRect: rect, xRadius: 9, yRadius: 9).fill()
+        (text as NSString).draw(at: NSPoint(x: rect.minX + pad, y: rect.midY - font.pointSize / 2 - 2),
+                                withAttributes: [.font: font, .foregroundColor: NSColor.white])
     }
 
     /// Multi-window layouts can't be drawn as a single region, so list them as
@@ -290,7 +386,9 @@ final class PlacementGridView: NSView {
 
         for (i, chip) in chips.enumerated() {
             let rect = NSRect(x: x, y: y, width: widths[i], height: h)
-            NSColor.black.withAlphaComponent(0.32).setFill()
+            let flashed = layouts[i].id == flashedLayout?.id
+            (flashed ? NSColor.controlAccentColor.withAlphaComponent(0.85)
+                     : NSColor.black.withAlphaComponent(0.32)).setFill()
             NSBezierPath(roundedRect: rect, xRadius: 9, yRadius: 9).fill()
             (chip.key as NSString).draw(
                 at: NSPoint(x: rect.minX + pad, y: rect.midY - keyFont.pointSize / 2 - 2),
