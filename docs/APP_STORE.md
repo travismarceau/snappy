@@ -157,6 +157,22 @@ Removing `com.apple.security.app-sandbox` (i.e. building against
 so an App Store archive still builds, but a sandboxed build must not be shipped
 or installed — it looks healthy and does nothing.
 
+**Switching a build between sandboxed and unsandboxed resets every setting.**
+`CFPreferences` redirects a sandboxed app to
+`~/Library/Containers/com.travismarceau.snappy/Data/Library/Preferences/com.travismarceau.snappy.plist`;
+unsandboxed it reads `~/Library/Preferences/com.travismarceau.snappy.plist`.
+Nothing is lost, but the app reads a different file, so grid bindings, layouts,
+`placementModeEnabled` and the `enterPlacementMode` shortcut all appear to
+revert — the leader key simply stops opening the overlay, because
+`registerUnregisterShortcut()` binds nothing when `placementModeEnabled` is
+absent. Carry them across by hand while the app is quit:
+
+```
+cp ~/Library/Containers/com.travismarceau.snappy/Data/Library/Preferences/com.travismarceau.snappy.plist \
+   ~/Library/Preferences/com.travismarceau.snappy.plist
+killall cfprefsd     # otherwise the old values stay cached
+```
+
 **Still open for the App Store channel.** A sandboxed variant carrying
 `com.apple.security.temporary-exception.mach-lookup.global-name =
 ["com.apple.axserver"]` was launched under a throwaway bundle id. It never
