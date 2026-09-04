@@ -299,6 +299,10 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     /// Stack inside `slotEditorBox`; collapses when its arranged views hide.
     private let slotEditorStack = NSStackView()
 
+    /// Shown when this layout's key is already spoken for. Lives in a stack with
+    /// detachesHiddenViews, so hiding it closes the gap rather than leaving one.
+    private let conflictLabel = NSTextField(labelWithString: "")
+
     /// Set when a new layout has just been added: its key should be captured as
     /// soon as the editor has finished rebuilding.
     private var armKeyAfterRefresh = false
@@ -412,6 +416,18 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             rightLabel(NSLocalizedString("Label", tableName: "Main", value: "Label", comment: "")), labelField,
         ], spacing: 8)
 
+        conflictLabel.font = .systemFont(ofSize: 11)
+        conflictLabel.textColor = .systemRed
+        conflictLabel.lineBreakMode = .byWordWrapping
+        conflictLabel.maximumNumberOfLines = 2
+        conflictLabel.isHidden = true
+
+        let keyBlock = NSStackView(views: [keyRow, conflictLabel])
+        keyBlock.orientation = .vertical
+        keyBlock.alignment = .leading
+        keyBlock.spacing = 6
+        keyBlock.detachesHiddenViews = true
+
         let windowsHeader = NSTextField(labelWithString: NSLocalizedString("Windows", tableName: "Main", value: "Windows", comment: ""))
         windowsHeader.font = .systemFont(ofSize: 11, weight: .semibold)
         windowsHeader.textColor = .secondaryLabelColor
@@ -424,16 +440,17 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
 
         let rightContent = NSView()
         rightContent.translatesAutoresizingMaskIntoConstraints = false
-        for v in [keyRow, windowsHeader, slotScroll, slotsEmptyLabel, slotAddRemove, slotEditorBox, hint] {
+        for v in [keyBlock, windowsHeader, slotScroll, slotsEmptyLabel, slotAddRemove, slotEditorBox, hint] {
             v.translatesAutoresizingMaskIntoConstraints = false
             rightContent.addSubview(v)
         }
         NSLayoutConstraint.activate([
-            keyRow.topAnchor.constraint(equalTo: rightContent.topAnchor),
-            keyRow.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
-            keyRow.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+            keyBlock.topAnchor.constraint(equalTo: rightContent.topAnchor),
+            keyBlock.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
+            keyBlock.trailingAnchor.constraint(equalTo: rightContent.trailingAnchor),
+            conflictLabel.widthAnchor.constraint(lessThanOrEqualTo: keyBlock.widthAnchor),
 
-            windowsHeader.topAnchor.constraint(equalTo: keyRow.bottomAnchor, constant: 14),
+            windowsHeader.topAnchor.constraint(equalTo: keyBlock.bottomAnchor, constant: 14),
             windowsHeader.leadingAnchor.constraint(equalTo: rightContent.leadingAnchor),
 
             slotScroll.topAnchor.constraint(equalTo: windowsHeader.bottomAnchor, constant: 4),
@@ -533,6 +550,7 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         keyButton.setKey(keyCode: layout?.keyCode ?? PlacementBinding.unassignedKeyCode,
                          modifierFlags: layout?.modifierFlags ?? 0)
         labelField.stringValue = layout?.label ?? ""
+        updateConflictLabel()
         // Deliberately no slotsTable.reloadData() here. refreshDetail() renders
         // the detail pane from the current selection and is what
         // tableViewSelectionDidChange calls, so reloading the slots table from
@@ -637,12 +655,30 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         }
         refreshDetail()
     }
+    /// A layout sharing a key with a placement never fires - handleKey resolves
+    /// placements first - so say so where the key is set rather than leaving a
+    /// dead binding in the list.
+    private func updateConflictLabel() {
+        guard let l = selLayout, l.isAssigned,
+              let holder = keymap.holder(ofKeyCode: l.keyCode, modifierFlags: l.modifierFlags, excluding: l.id)
+        else {
+            conflictLabel.stringValue = ""
+            conflictLabel.isHidden = true
+            return
+        }
+        conflictLabel.stringValue = placementConflictMessage(keyCode: l.keyCode,
+                                                             modifierFlags: l.modifierFlags,
+                                                             holder: holder)
+        conflictLabel.isHidden = false
+    }
+
     /// Matches the Placements table: double-clicking a layout sets its key.
     @objc private func captureKeyForSelectedLayout() { keyButton.armCapture() }
 
     private func keyCaptured(_ code: Int, _ mods: UInt) {
         mutateLayout { $0.keyCode = code; $0.modifierFlags = mods & placementModifierMask }
         keyButton.setKey(keyCode: code, modifierFlags: mods)
+        updateConflictLabel()
     }
     @objc private func labelChanged() { mutateLayout { $0.label = labelField.stringValue } }
     @objc private func appChanged() {

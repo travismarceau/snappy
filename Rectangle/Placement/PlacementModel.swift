@@ -364,11 +364,44 @@ struct PlacementKeymap: Codable, Equatable {
         layouts.first { $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
     }
 
+    /// Whatever already answers to a key, so a warning can name it rather than
+    /// guessing at the kind.
+    enum KeyHolder: Equatable {
+        case placement(PlacementBinding)
+        case layout(WindowLayout)
+
+        /// "the layout Coding" / "another placement" — reads inside a sentence.
+        var described: String {
+            switch self {
+            case .placement(let b):
+                return b.label.isEmpty
+                    ? NSLocalizedString("another placement", tableName: "Main", value: "another placement", comment: "")
+                    : String(format: NSLocalizedString("the placement “%@”", tableName: "Main", value: "the placement “%@”", comment: ""), b.label)
+            case .layout(let l):
+                return l.label.isEmpty
+                    ? NSLocalizedString("another layout", tableName: "Main", value: "another layout", comment: "")
+                    : String(format: NSLocalizedString("the layout “%@”", tableName: "Main", value: "the layout “%@”", comment: ""), l.label)
+            }
+        }
+    }
+
+    /// The placement or layout already bound to `keyCode`+`mods`, ignoring the
+    /// one being edited. Placements are checked first, matching the order
+    /// `PlacementModeController.handleKey` resolves in — so the holder named
+    /// here is the one that would actually win the keystroke.
+    func holder(ofKeyCode keyCode: Int, modifierFlags: UInt, excluding id: UUID) -> KeyHolder? {
+        guard keyCode >= 0 else { return nil }
+        if let b = bindings.first(where: { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }) {
+            return .placement(b)
+        }
+        if let l = layouts.first(where: { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }) {
+            return .layout(l)
+        }
+        return nil
+    }
+
     /// True if `keyCode`+`mods` is already taken by a different placement or layout.
     func hasConflict(keyCode: Int, modifierFlags: UInt, excluding id: UUID) -> Bool {
-        guard keyCode >= 0 else { return false }
-        let takenByBinding = bindings.contains { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
-        let takenByLayout = layouts.contains { $0.id != id && $0.isAssigned && Self.matches(keyCode: keyCode, modifierFlags: modifierFlags, target: $0.keyCode, targetMods: $0.modifierFlags) }
-        return takenByBinding || takenByLayout
+        holder(ofKeyCode: keyCode, modifierFlags: modifierFlags, excluding: id) != nil
     }
 }

@@ -386,12 +386,15 @@ final class PlacementConfigViewController: NSViewController {
 
     private func updateConflictLabel() {
         guard let i = selectedIndex, let b = keymap.bindings[safe: i], b.isAssigned,
-              keymap.hasConflict(keyCode: b.keyCode, modifierFlags: b.modifierFlags, excluding: b.id) else {
+              let holder = keymap.holder(ofKeyCode: b.keyCode, modifierFlags: b.modifierFlags, excluding: b.id)
+        else {
             conflictLabel.stringValue = ""
             detailGrid?.row(at: conflictRowIndex).isHidden = true
             return
         }
-        conflictLabel.stringValue = NSLocalizedString("That key is already used by another placement.", tableName: "Main", value: "That key is already used by another placement.", comment: "")
+        conflictLabel.stringValue = placementConflictMessage(keyCode: b.keyCode,
+                                                             modifierFlags: b.modifierFlags,
+                                                             holder: holder)
         detailGrid?.row(at: conflictRowIndex).isHidden = false
     }
 

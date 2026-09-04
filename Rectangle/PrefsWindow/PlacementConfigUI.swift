@@ -7,6 +7,7 @@
 
 import Cocoa
 import Carbon.HIToolbox
+import MASShortcut
 
 enum PlacementUI {
     static let outerMargin: CGFloat = 20
@@ -205,6 +206,22 @@ func styledScroll(wrapping table: NSTableView,
     scroll.drawsBackground = true
     scroll.translatesAutoresizingMaskIntoConstraints = false
     return scroll
+}
+
+/// The chord as it reads on a key cap: "⌃K", "F".
+func placementKeyString(keyCode: Int, modifierFlags: UInt) -> String {
+    let s = MASShortcut(keyCode: keyCode, modifierFlags: NSEvent.ModifierFlags(rawValue: modifierFlags))
+    return [s.modifierFlagsString, s.keyCodeString].compactMap { $0 }.joined()
+}
+
+/// The warning shown when a key is already spoken for, naming the holder so the
+/// reader knows which list to go looking in.
+func placementConflictMessage(keyCode: Int,
+                              modifierFlags: UInt,
+                              holder: PlacementKeymap.KeyHolder) -> String {
+    String(format: NSLocalizedString("%1$@ is already used by %2$@.", tableName: "Main", value: "%1$@ is already used by %2$@.", comment: ""),
+           placementKeyString(keyCode: keyCode, modifierFlags: modifierFlags),
+           holder.described)
 }
 
 /// A table that removes the selected row on Delete, so the lists can be edited
