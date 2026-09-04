@@ -496,6 +496,14 @@ final class PlacementConfigViewController: NSViewController {
     private func applyGrid(cols: Int, rows: Int) {
         keymap.grid = PlacementGrid(rows: rows == 0 ? 6 : rows, cols: cols == 0 ? 6 : cols)
         keymap.bindings = keymap.bindings.map { var b = $0; b.placement = b.placement.normalized(in: keymap.grid); return b }
+        // Layout slots live on the same grid. resolve() clamps them at apply
+        // time so windows still land right, but an exported keymap would carry
+        // regions that don't fit its own grid.
+        keymap.layouts = keymap.layouts.map { layout in
+            var l = layout
+            l.slots = l.slots.map { var s = $0; s.placement = s.placement.normalized(in: keymap.grid); return s }
+            return l
+        }
         colsField.stringValue = String(keymap.grid.cols); rowsField.stringValue = String(keymap.grid.rows)
         colsStepper.integerValue = keymap.grid.cols; rowsStepper.integerValue = keymap.grid.rows
         reloadTable()
@@ -583,7 +591,16 @@ final class PlacementConfigViewController: NSViewController {
     /// Import replaces the whole keymap and there is no undo, so it asks first
     /// and says so when the file turns out not to be one.
     private func completeImport(from url: URL) {
-        guard let data = try? Data(contentsOf: url),
+        // PlacementKeymap decodes every field with a default, so any JSON object
+        // at all decodes into an empty keymap. Require the file to actually
+        // carry one of the keys a keymap has, or a stray .json would import as
+        // "no placements, no layouts" and read as a successful wipe.
+        let looksLikeKeymap = (try? Data(contentsOf: url))
+            .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+            .map { $0.keys.contains { ["bindings", "layouts", "grid"].contains($0) } } ?? false
+
+        guard looksLikeKeymap,
+              let data = try? Data(contentsOf: url),
               let imported = try? JSONDecoder().decode(PlacementKeymap.self, from: data)
         else {
             AlertUtil.oneButtonAlert(

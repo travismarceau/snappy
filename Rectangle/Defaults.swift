@@ -116,6 +116,10 @@ class Defaults {
     static let placementMapReveal = IntEnumDefault<PlacementMapReveal>(key: "placementMapReveal", defaultValue: .afterDelay)
     static let placementMapRevealDelay = FloatDefault(key: "placementMapRevealDelay", defaultValue: 0.4)
     static let placementKeymap = JSONDefault<PlacementKeymap>(key: "placementKeymap")
+    /// Which settings tab was last open. Deliberately absent from `array`
+    /// below: that list is the config export manifest, and where you last
+    /// looked is not configuration.
+    static let settingsSelectedTab = IntDefault(key: "settingsSelectedTab", defaultValue: 0)
     static var array: [Default] = [
         launchOnLogin,
         disabledApps,

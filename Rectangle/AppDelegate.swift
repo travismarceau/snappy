@@ -323,7 +323,10 @@ extension AppDelegate: NSMenuDelegate {
             return
         }
         
-        if let frontAppName = ApplicationToggle.frontAppName {
+        // Offering to ignore Snappy is meaningless and still writes the bundle
+        // id to disabledApps, so hide the row the way it hides with no front app.
+        let frontIsSelf = ApplicationToggle.frontAppId == Bundle.main.bundleIdentifier
+        if let frontAppName = ApplicationToggle.frontAppName, !frontIsSelf {
             let ignoreString = NSLocalizedString("D99-0O-MB6.title", tableName: "Main", value: "Ignore frontmost.app", comment: "")
             ignoreMenuItem.title = ignoreString.replacingOccurrences(of: "frontmost.app", with: frontAppName)
             ignoreMenuItem.state = ApplicationToggle.shortcutsDisabled ? .on : .off
@@ -577,7 +580,10 @@ extension AppDelegate {
             return
         }
 
-        if let frontAppName = ApplicationToggle.frontAppName {
+        // Offering to ignore Snappy is meaningless and still writes the bundle
+        // id to disabledApps, so hide the row the way it hides with no front app.
+        let frontIsSelf = ApplicationToggle.frontAppId == Bundle.main.bundleIdentifier
+        if let frontAppName = ApplicationToggle.frontAppName, !frontIsSelf {
             let appString = NSLocalizedString("Use frontmost.app as Todo App", tableName: "Main", value: "", comment: "")
             todoAppMenuItem.title = appString.replacingOccurrences(
                 of: "frontmost.app", with: frontAppName)

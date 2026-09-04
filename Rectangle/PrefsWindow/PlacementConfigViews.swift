@@ -307,6 +307,9 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
     /// soon as the editor has finished rebuilding.
     private var armKeyAfterRefresh = false
 
+    /// Same idea for a new window slot, whose one required value is the app.
+    private var focusAppAfterRefresh = false
+
     /// bundleId per popup item index (parallel to `appPopup` menu items).
     private var appItemBundleIds: [String?] = []
 
@@ -637,11 +640,17 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
             let g = keymap.grid
             mutateLayout { $0.slots.append(LayoutSlot(placement: GridPlacement(col: 0, row: 0, colSpan: g.cols, rowSpan: g.rows))) }
             slotsTable.selectRowIndexes(IndexSet(integer: (selLayout?.slots.count ?? 1) - 1), byExtendingSelection: false)
+            focusAppAfterRefresh = true
         } else {
             removeSelectedSlot()
             return
         }
         refreshDetail()
+        // refreshDetail re-enables the popup, so take focus only once it has run.
+        if focusAppAfterRefresh {
+            focusAppAfterRefresh = false
+            window?.makeFirstResponder(appPopup)
+        }
     }
 
     private func removeSelectedSlot() {
@@ -715,9 +724,11 @@ final class LayoutsPaneView: NSView, NSTableViewDataSource, NSTableViewDelegate 
         var pairs: [(String, String)] = NSWorkspace.shared.runningApplications
             .filter { $0.activationPolicy == .regular }
             .compactMap { app in app.bundleIdentifier.map { ($0, app.localizedName ?? $0) } }
-        // include any app referenced by an existing slot even if not running
+        // Include any app a slot already references even if it isn't running,
+        // resolved to its real name - a layout built around a closed app read
+        // as "com.apple.dt.Xcode" before.
         for l in keymap.layouts { for s in l.slots where !s.appBundleId.isEmpty && !pairs.contains(where: { $0.0 == s.appBundleId }) {
-            pairs.append((s.appBundleId, s.appBundleId))
+            pairs.append((s.appBundleId, PlacementModeController.displayName(forBundleId: s.appBundleId)))
         } }
         pairs = Array(Set(pairs.map { $0.0 })).compactMap { bid in pairs.first { $0.0 == bid } }
             .sorted { $0.1.localizedCaseInsensitiveCompare($1.1) == .orderedAscending }

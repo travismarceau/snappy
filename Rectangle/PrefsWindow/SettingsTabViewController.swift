@@ -31,6 +31,20 @@ class SettingsTabViewController: NSTabViewController {
         for item in tabViewItems {
             pinWidth(of: item.viewController?.view)
         }
+
+        let saved = Defaults.settingsSelectedTab.value
+        if tabViewItems.indices.contains(saved) {
+            selectedTabViewItemIndex = saved
+        }
+    }
+
+    /// Reopen on the pane you left, the way System Settings does. Someone
+    /// tuning a layout across several sittings lands back where they were.
+    override func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
+        super.tabView(tabView, didSelect: tabViewItem)
+        if tabViewItems.indices.contains(selectedTabViewItemIndex) {
+            Defaults.settingsSelectedTab.value = selectedTabViewItemIndex
+        }
     }
 
     /// Constrains a pane that lets the tab controller size it. A pane that sets
