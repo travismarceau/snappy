@@ -52,19 +52,18 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 2. `xcrun notarytool store-credentials snappy-notary --apple-id … --team-id
    P78K4VHEL3 --password <app-specific-password>`.
 3. `./scripts/build-direct.sh` → notarized, stapled `build/Snappy.zip`.
-   - It reuses the Release config (sandboxed) but signs Developer ID. If
-     on-device testing shows the sandbox blocks a feature, add a dedicated
-     `Direct` build configuration pointing `CODE_SIGN_ENTITLEMENTS` at
-     `Rectangle/RectangleDirect.entitlements` (no sandbox) — that file is
-     already in the repo for this.
+   - It reuses the Release config but overrides `CODE_SIGN_ENTITLEMENTS` to
+     `Rectangle/RectangleDirect.entitlements` (no sandbox), because the sandbox
+     blocks the Accessibility API outright — see *Sandbox verification ▸ Result*.
+     The override needs an absolute path: xcodebuild applies command-line build
+     settings to every target, and the MASShortcut package resolves a relative
+     one against its own checkout and fails.
 
 ## Must verify on-device before submitting
 
-1. **The sandboxed Release build actually manages windows.** Run
-   `./scripts/verify-sandbox.sh` — see *Sandbox verification* below for what it
-   does and why a plain Release build is enough to test it. Record the result in
-   that section. If it fails: add `com.apple.security.automation.apple-events` +
-   `NSAppleEventsUsageDescription`, or ship direct-only non-sandboxed.
+1. ~~**The sandboxed Release build actually manages windows.**~~ **Answered:
+   it does not.** See *Sandbox verification ▸ Result* below — the sandbox denies
+   the mach lookup of `com.apple.axserver`, so ship direct-only, non-sandboxed.
 2. **4.1 Copycats** is still a judgement call. Mitigations in place: own name,
    own icon, the Shortcuts pane / preset chords / action menu are gone, the
    primary UI is the grid overlay + layout editor, and multi-window layouts is
@@ -122,10 +121,56 @@ non-Snappy window whose frame changed.
   `NSOpenPanel` at `/Applications`) rely on
   `com.apple.security.files.user-selected.read-write`. Exercise both by hand.
 
-### Result
+### Result — FAILED (2026-09-03, macOS 26.6.2 / 25G83, arm64)
 
-> Not yet run. Record here: date, macOS version, and the before/after frames the
-> script prints.
+**The sandboxed build cannot manage windows at all.** The Accessibility API is
+not reachable from inside the sandbox, independently of the TCC grant. From the
+unified log, with `kTCCServiceAccessibility com.travismarceau.snappy` set to
+`full`:
+
+```
+launchd: denied lookup: name = com.apple.axserver, handle = 69586, flags = 0x3,
+         requestor = Snappy[73507], error = 159: Sandbox restriction
+sandboxd: Sandbox: Snappy(73507) deny(1) mach-lookup com.apple.axserver (per-pid)
+```
+
+Every `AXUIElement*` call against another app goes through a per-pid mach lookup
+of `com.apple.axserver`; the sandbox denies it. The denials appear both before
+and after the Accessibility grant, so TCC is not the variable. This is exactly
+the failure the grant-prompt fix (`AccessibilityAuthorization.swift`) could not
+explain: `AXIsProcessTrusted()` returns **true**, the app reports "accessibility
+granted", and then every window move silently no-ops.
+
+Reproduce it against any build with:
+
+```
+log show --last 30m --predicate 'eventMessage CONTAINS "axserver"' --style compact \
+  | grep -i snappy
+```
+
+Removing `com.apple.security.app-sandbox` (i.e. building against
+`Rectangle/RectangleDirect.entitlements`) makes the denials stop.
+
+**Consequence: the direct-download channel is the shipping channel.**
+`scripts/build-direct.sh` now overrides `CODE_SIGN_ENTITLEMENTS` to
+`Rectangle/RectangleDirect.entitlements`. The Release config keeps the sandbox
+so an App Store archive still builds, but a sandboxed build must not be shipped
+or installed — it looks healthy and does nothing.
+
+**Still open for the App Store channel.** A sandboxed variant carrying
+`com.apple.security.temporary-exception.mach-lookup.global-name =
+["com.apple.axserver"]` was launched under a throwaway bundle id. It never
+reached an `axserver` lookup, because the sandbox denied the *prompt* first:
+
+```
+launchd: denied lookup: name = com.apple.universalaccessAuthWarn,
+         requestor = Snappy[3298], error = 159: Sandbox restriction
+```
+
+So the exception is untested, not disproven — testing it properly needs the
+variant TCC-granted by hand. Given that Apple grants `temporary-exception.*`
+entitlements case-by-case and has been retiring them, treat MAS as blocked until
+someone does that experiment.
 
 ## Support / privacy site — live
 

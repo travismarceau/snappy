@@ -10,11 +10,12 @@
 #          --apple-id "you@example.com" --team-id P78K4VHEL3 \
 #          --password "abcd-efgh-ijkl-mnop"   # an app-specific password
 #
-# This reuses the Release config (App Sandbox + hardened runtime) but signs with
-# Developer ID instead of Apple Development. If on-device testing shows the
-# sandbox blocks a feature, switch CODE_SIGN_ENTITLEMENTS to
-# Rectangle/RectangleDirect.entitlements (no sandbox) via a dedicated build
-# configuration — see docs/APP_STORE.md.
+# This reuses the Release config (hardened runtime, Developer ID signing) but
+# overrides its entitlements: the App Sandbox blocks the Accessibility API, so a
+# sandboxed build cannot move windows at all. See "Sandbox verification" in
+# docs/APP_STORE.md for the evidence. The override must be an ABSOLUTE path --
+# xcodebuild applies command-line settings to every target, including the
+# MASShortcut package, which resolves a relative path against its own checkout.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -27,6 +28,7 @@ rm -rf "$ARCHIVE" "$EXPORT" "$ZIP"
 
 xcodebuild -project Rectangle.xcodeproj -scheme Rectangle -configuration Release \
   -archivePath "$ARCHIVE" archive \
+  CODE_SIGN_ENTITLEMENTS="$PWD/Rectangle/RectangleDirect.entitlements" \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="Developer ID Application" \
   PROVISIONING_PROFILE_SPECIFIER="" \
