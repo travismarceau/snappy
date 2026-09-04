@@ -8,10 +8,19 @@ class AccessibilityAuthorization {
     private var accessibilityWindowController: NSWindowController?
     
     public func checkAccessibility(completion: @escaping () -> Void) -> Bool {
-        if !AXIsProcessTrusted() {
-            
+        // Ask with the prompt option rather than a bare AXIsProcessTrusted().
+        // The bare check only reads the current answer; it is the prompting
+        // variant that makes macOS register the app in System Settings ▸
+        // Privacy & Security ▸ Accessibility. Without it the list stays empty,
+        // and a first-time user has to find the + button and navigate to the
+        // bundle themselves - which also means a grant can end up bound to
+        // some other copy of the app, leaving AXIsProcessTrusted() true while
+        // every real AX call is denied.
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        if !AXIsProcessTrustedWithOptions(options as CFDictionary) {
+
             accessibilityWindowController = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "AccessibilityWindowController") as? NSWindowController
-            
+
             NSApp.activate(ignoringOtherApps: true)
             accessibilityWindowController?.showWindow(self)
             pollAccessibility(completion: completion)
