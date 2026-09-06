@@ -90,7 +90,7 @@ sizes = {
     "mac256pts1x.png": 256, "mac256pts2x.png": 512,
     "mac512pts1x.png": 512, "mac512pts2x.png": 1024,
 }
-assets = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets")
+assets = os.path.join(os.path.dirname(out), "Snappy", "Assets.xcassets")
 setdirs = [os.path.join(assets, "SnappyIcon.appiconset"),
            os.path.join(assets, "AppIcon.appiconset")]
 setdirs = [d for d in setdirs if os.path.isdir(d)] or [os.path.join(out, "SnappyIcon.appiconset")]

@@ -3,8 +3,8 @@
 # verify-sandbox.sh — prove the *sandboxed* Snappy actually moves windows.
 #
 # Every bit of window management testing so far has been against the Debug
-# build, whose Rectangle/Rectangle.entitlements is an empty dict — no sandbox
-# at all. The App Store build is sandboxed (Rectangle/RectangleRelease.ent-
+# build, whose Snappy/Snappy.entitlements is an empty dict — no sandbox
+# at all. The App Store build is sandboxed (Snappy/SnappyRelease.ent-
 # itlements). Sandbox + Accessibility is known to work for Magnet and Rectangle
 # Pro, but "known to work for someone else" is not evidence about this binary.
 #
@@ -62,7 +62,7 @@ confirm() {
 
 if [[ "$SKIP_BUILD" == 0 ]]; then
   step "1. Building Release (sandboxed, Apple Development signed)"
-  xcodebuild -project Rectangle.xcodeproj -scheme Rectangle \
+  xcodebuild -project Snappy.xcodeproj -scheme Snappy \
     -configuration Release \
     CONFIGURATION_BUILD_DIR="$ROOT/build/Release" \
     build > "$WORK/build.log" 2>&1 || {
@@ -290,7 +290,7 @@ if [[ "$FAILURES" == 0 ]]; then
 else
   fail "$FAILURES check(s) failed"
   info "If the AX moves are what failed, the fallback is documented:"
-  info "point the Release config at Rectangle/RectangleDirect.entitlements"
+  info "point the Release config at Snappy/SnappyDirect.entitlements"
   info "and ship direct-download instead of the App Store."
   exit 1
 fi

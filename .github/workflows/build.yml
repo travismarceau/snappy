@@ -5,15 +5,15 @@ on: [push, pull_request]
 permissions: read-all
 
 env:
-  XCODE_PROJECT: "Rectangle.xcodeproj"
-  XCODE_SCHEME: "Rectangle"
+  XCODE_PROJECT: "Snappy.xcodeproj"
+  XCODE_SCHEME: "Snappy"
   CODE_SIGN_IDENTITY: "-"
   BUILD_DIR: "build"
-  XCODE_ARCHIVE: "Rectangle.xcarchive"
-  APP_NAME: "Rectangle.app"
+  XCODE_ARCHIVE: "Snappy.xcarchive"
+  APP_NAME: "Snappy.app"
   EXPORT_OPTIONS_PLIST: "exportOptions.plist"
-  DMG_NAME: "Rectangle"
-  DMG_FILE_NAME: "Rectangle.dmg"
+  DMG_NAME: "Snappy"
+  DMG_FILE_NAME: "Snappy.dmg"
 
 jobs:
   build:

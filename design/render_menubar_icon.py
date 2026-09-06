@@ -47,7 +47,7 @@ def render(size):
 
 
 out = os.path.dirname(os.path.abspath(__file__))
-setdir = os.path.join(os.path.dirname(out), "Rectangle", "Assets.xcassets", "StatusTemplate.imageset")
+setdir = os.path.join(os.path.dirname(out), "Snappy", "Assets.xcassets", "StatusTemplate.imageset")
 os.makedirs(setdir, exist_ok=True)
 
 for name, n in {"SnappyStatusTemplate22.png": 22,

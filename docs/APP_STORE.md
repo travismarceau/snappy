@@ -9,7 +9,7 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 - Bundle id `com.travismarceau.snappy`, display name "Snappy", URL scheme
   `snappy://`, support dir `~/Library/Application Support/Snappy`, config file
   `SnappyConfig.json`, icon `SnappyIcon`, login helper
-  `com.travismarceau.snappy.Launcher`. Swift module stays `Rectangle`
+  `com.travismarceau.snappy.Launcher`. Swift module is `Snappy`
   internally (`PRODUCT_MODULE_NAME`).
 - `LICENSE` kept verbatim; `NOTICE.md` added; the About panel and
   `NSHumanReadableCopyright` credit Rectangle + Spectacle.
@@ -38,7 +38,7 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 ### Mac App Store (Release)
 1. App Store Connect: create the app record — bundle id
    `com.travismarceau.snappy`, category Productivity.
-2. Xcode ▸ Rectangle target ▸ Signing & Capabilities: automatic signing, your
+2. Xcode ▸ Snappy target ▸ Signing & Capabilities: automatic signing, your
    team. First Archive creates the Mac App Store provisioning profile.
 3. Product ▸ Archive ▸ Organizer ▸ Distribute App ▸ App Store Connect. Or
    `xcodebuild -exportArchive … -exportOptionsPlist ExportOptions-AppStore.plist`
@@ -53,7 +53,7 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
    P78K4VHEL3 --password <app-specific-password>`.
 3. `./scripts/build-direct.sh` → notarized, stapled `build/Snappy.zip`.
    - It reuses the Release config but overrides `CODE_SIGN_ENTITLEMENTS` to
-     `Rectangle/RectangleDirect.entitlements` (no sandbox), because the sandbox
+     `Snappy/SnappyDirect.entitlements` (no sandbox), because the sandbox
      blocks the Accessibility API outright — see *Sandbox verification ▸ Result*.
      The override needs an absolute path: xcodebuild applies command-line build
      settings to every target, and the MASShortcut package resolves a relative
@@ -75,9 +75,9 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 ## Sandbox verification
 
 Every bit of window-management testing up to now has been against the **Debug**
-build, and `Rectangle/Rectangle.entitlements` is an empty dict — no sandbox at
+build, and `Snappy/Snappy.entitlements` is an empty dict — no sandbox at
 all. The App Store build is sandboxed via
-`Rectangle/RectangleRelease.entitlements`. Sandbox + Accessibility is known to
+`Snappy/SnappyRelease.entitlements`. Sandbox + Accessibility is known to
 work for Magnet and Rectangle Pro, but that is evidence about their binaries,
 not this one.
 
@@ -85,7 +85,7 @@ not this one.
 export blockers in the way — those gate distribution, not local execution:
 
 ```
-CODE_SIGN_ENTITLEMENTS = Rectangle/RectangleRelease.entitlements   ← sandbox: YES
+CODE_SIGN_ENTITLEMENTS = Snappy/SnappyRelease.entitlements   ← sandbox: YES
 CODE_SIGN_IDENTITY     = Apple Development                         ← stable, TCC-trustable
 ```
 
@@ -99,7 +99,7 @@ remembers the Accessibility grant.
 ```
 
 It builds Release, **asserts the signed binary really carries the sandbox and
-user-selected-file entitlements** (and that the nested `RectangleLauncher.app`
+user-selected-file entitlements** (and that the nested `SnappyLauncher.app`
 is sandboxed too — the store requires it of nested code), installs to
 `/Applications`, then walks you through granting Accessibility and pressing the
 placement keys. Before/after window geometry comes from
@@ -149,11 +149,11 @@ log show --last 30m --predicate 'eventMessage CONTAINS "axserver"' --style compa
 ```
 
 Removing `com.apple.security.app-sandbox` (i.e. building against
-`Rectangle/RectangleDirect.entitlements`) makes the denials stop.
+`Snappy/SnappyDirect.entitlements`) makes the denials stop.
 
 **Consequence: the direct-download channel is the shipping channel.**
 `scripts/build-direct.sh` now overrides `CODE_SIGN_ENTITLEMENTS` to
-`Rectangle/RectangleDirect.entitlements`. The Release config keeps the sandbox
+`Snappy/SnappyDirect.entitlements`. The Release config keeps the sandbox
 so an App Store archive still builds, but a sandboxed build must not be shipped
 or installed — it looks healthy and does nothing.
 
@@ -225,18 +225,18 @@ marketing `https://getsnappy.fyi/`, privacy `https://getsnappy.fyi/#privacy`.
 
 ## Known issue
 
-`RectangleTests/ShortcutRecordingObserverTests` (upstream Todo-mode shortcut
+`SnappyTests/ShortcutRecordingObserverTests` (upstream Todo-mode shortcut
 tests) is **flaky in the full-suite run** on machines where `⌘⌃⌥⇧`+letter
 combos are already grabbed (Karabiner, other window tools). The tests race on
 `MASShortcutMonitor.isShortcutRegistered` and were previously "warmed" by the
 window-chord bindings we removed. They pass reliably **in isolation**
-(`xcodebuild … -only-testing:RectangleTests/ShortcutRecordingObserverTests`)
+(`xcodebuild … -only-testing:SnappyTests/ShortcutRecordingObserverTests`)
 and on a clean machine. All other suites, including the 23 placement/layout
 tests, are deterministic and green.
 
 ## Follow-up cleanup (not blocking)
 
-- `Rectangle/PrefsWindow/PrefsViewController.swift` and the
+- `Snappy/PrefsWindow/PrefsViewController.swift` and the
   `WelcomeViewController` storyboard scene are dead (never instantiated) — safe
   to delete.
 - `WindowAction.alternateDefault` / `spectacleDefault` tables are unused.

@@ -41,9 +41,9 @@ TEAM_ID="${TEAM_ID:-P78K4VHEL3}"
 
 rm -rf "$ARCHIVE" "$EXPORT" "$ZIP"
 
-xcodebuild -project Rectangle.xcodeproj -scheme Rectangle -configuration Release \
+xcodebuild -project Snappy.xcodeproj -scheme Snappy -configuration Release \
   -archivePath "$ARCHIVE" archive \
-  CODE_SIGN_ENTITLEMENTS="$PWD/Rectangle/RectangleDirect.entitlements" \
+  CODE_SIGN_ENTITLEMENTS="$PWD/Snappy/SnappyDirect.entitlements" \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="Developer ID Application" \
   DEVELOPMENT_TEAM="$TEAM_ID" \
