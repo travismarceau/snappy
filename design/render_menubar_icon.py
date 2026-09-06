@@ -66,10 +66,6 @@ with open(os.path.join(setdir, "Contents.json"), "w") as f:
 }
 """)
 
-for stale in ("RectangleStatusTemplate.png", "RectangleStatusTemplate22.png", "RectangleStatusTemplate44.png"):
-    sp = os.path.join(setdir, stale)
-    if os.path.exists(sp):
-        os.remove(sp)
 print("wrote", setdir)
 
 # desktop preview: dark tint on a light card + the true 22px, scaled up crisply
