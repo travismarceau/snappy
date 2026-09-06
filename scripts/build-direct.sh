@@ -19,10 +19,25 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Fail on the missing prerequisite rather than 200 lines into an archive log.
+if ! security find-identity -v -p codesigning | grep -q "Developer ID Application"; then
+  echo "No \"Developer ID Application\" certificate in the keychain." >&2
+  echo "Create one in Xcode > Settings > Accounts > Manage Certificates > + ," >&2
+  echo "or via Organizer > Distribute App > Developer ID once." >&2
+  exit 1
+fi
+if ! xcrun notarytool history --keychain-profile "${NOTARY_PROFILE:-snappy-notary}" >/dev/null 2>&1; then
+  echo "No notary credentials stored under profile \"${NOTARY_PROFILE:-snappy-notary}\"." >&2
+  echo "  xcrun notarytool store-credentials ${NOTARY_PROFILE:-snappy-notary} \\" >&2
+  echo "    --apple-id <your-apple-id> --team-id ${TEAM_ID:-P78K4VHEL3} --password <app-specific-password>" >&2
+  exit 1
+fi
+
 ARCHIVE=build/Snappy-direct.xcarchive
 EXPORT=build/export-direct
 ZIP=build/Snappy.zip
 NOTARY_PROFILE="${NOTARY_PROFILE:-snappy-notary}"
+TEAM_ID="${TEAM_ID:-P78K4VHEL3}"
 
 rm -rf "$ARCHIVE" "$EXPORT" "$ZIP"
 
@@ -31,6 +46,7 @@ xcodebuild -project Rectangle.xcodeproj -scheme Rectangle -configuration Release
   CODE_SIGN_ENTITLEMENTS="$PWD/Rectangle/RectangleDirect.entitlements" \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="Developer ID Application" \
+  DEVELOPMENT_TEAM="$TEAM_ID" \
   PROVISIONING_PROFILE_SPECIFIER="" \
   OTHER_CODE_SIGN_FLAGS="--timestamp"
 
