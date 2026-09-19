@@ -1,6 +1,6 @@
 # Attribution
 
-Snappy is a derivative work of **Rectangle**, a window management app by
+Snappy is Copyright (c) 2026 Simarhol Onipaa LLC and is a derivative work of **Rectangle**, a window management app by
 Ryan Hanson, distributed under the MIT License.
 
 - Rectangle — Copyright (c) 2019–2026 Ryan Hanson — https://github.com/rxhanson/Rectangle

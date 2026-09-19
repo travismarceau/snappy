@@ -6,10 +6,10 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 ## Done in the codebase
 
 **Identity & compliance**
-- Bundle id `com.travismarceau.snappy`, display name "Snappy", URL scheme
+- Bundle id `com.simarholonipaa.snappy`, display name "Snappy", URL scheme
   `snappy://`, support dir `~/Library/Application Support/Snappy`, config file
   `SnappyConfig.json`, icon `SnappyIcon`, login helper
-  `com.travismarceau.snappy.Launcher`. Swift module is `Snappy`
+  `com.simarholonipaa.snappy.Launcher`. Swift module is `Snappy`
   internally (`PRODUCT_MODULE_NAME`).
 - `LICENSE` kept verbatim; `NOTICE.md` added; the About panel and
   `NSHumanReadableCopyright` credit Rectangle + Spectacle.
@@ -37,7 +37,7 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 
 ### Mac App Store (Release)
 1. App Store Connect: create the app record — bundle id
-   `com.travismarceau.snappy`, category Productivity.
+   `com.simarholonipaa.snappy`, category Productivity.
 2. Xcode ▸ Snappy target ▸ Signing & Capabilities: automatic signing, your
    team. First Archive creates the Mac App Store provisioning profile.
 3. Product ▸ Archive ▸ Organizer ▸ Distribute App ▸ App Store Connect. Or
@@ -125,7 +125,7 @@ non-Snappy window whose frame changed.
 
 **The sandboxed build cannot manage windows at all.** The Accessibility API is
 not reachable from inside the sandbox, independently of the TCC grant. From the
-unified log, with `kTCCServiceAccessibility com.travismarceau.snappy` set to
+unified log, with `kTCCServiceAccessibility com.simarholonipaa.snappy` set to
 `full`:
 
 ```
@@ -159,8 +159,8 @@ or installed — it looks healthy and does nothing.
 
 **Switching a build between sandboxed and unsandboxed resets every setting.**
 `CFPreferences` redirects a sandboxed app to
-`~/Library/Containers/com.travismarceau.snappy/Data/Library/Preferences/com.travismarceau.snappy.plist`;
-unsandboxed it reads `~/Library/Preferences/com.travismarceau.snappy.plist`.
+`~/Library/Containers/com.simarholonipaa.snappy/Data/Library/Preferences/com.simarholonipaa.snappy.plist`;
+unsandboxed it reads `~/Library/Preferences/com.simarholonipaa.snappy.plist`.
 Nothing is lost, but the app reads a different file, so grid bindings, layouts,
 `placementModeEnabled` and the `enterPlacementMode` shortcut all appear to
 revert — the leader key simply stops opening the overlay, because
@@ -168,8 +168,8 @@ revert — the leader key simply stops opening the overlay, because
 absent. Carry them across by hand while the app is quit:
 
 ```
-cp ~/Library/Containers/com.travismarceau.snappy/Data/Library/Preferences/com.travismarceau.snappy.plist \
-   ~/Library/Preferences/com.travismarceau.snappy.plist
+cp ~/Library/Containers/com.simarholonipaa.snappy/Data/Library/Preferences/com.simarholonipaa.snappy.plist \
+   ~/Library/Preferences/com.simarholonipaa.snappy.plist
 killall cfprefsd     # otherwise the old values stay cached
 ```
 

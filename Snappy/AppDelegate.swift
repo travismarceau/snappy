@@ -7,7 +7,7 @@ import os.log
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static let launcherAppId = "com.travismarceau.snappy.Launcher"
+    static let launcherAppId = "com.simarholonipaa.snappy.Launcher"
 
     private let accessibilityAuthorization = AccessibilityAuthorization()
     private let statusItem = SnappyStatusItem.instance
@@ -41,6 +41,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.delegate as! AppDelegate
     }
     
+    /// Runs before the storyboard is loaded and before anything touches
+    /// `Defaults`, which is exactly what the domain migration needs.
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        LegacyDefaultsMigration.run()
+    }
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         Defaults.loadFromSupportDir()
         migrateShowEighthsInMenu()

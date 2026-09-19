@@ -459,7 +459,7 @@ class ConfigImportTests: XCTestCase {
     }
 
     private func loadConfig(shortcuts: [String: Shortcut]) throws {
-        let config = Config(bundleId: "com.knollsoft.Rectangle",
+        let config = Config(bundleId: "com.simarholonipaa.snappy",
                             version: "ConfigImportTests",
                             shortcuts: shortcuts,
                             defaults: [:])

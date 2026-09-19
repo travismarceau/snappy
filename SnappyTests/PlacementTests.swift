@@ -240,3 +240,77 @@ final class WindowLayoutTests: XCTestCase {
         XCTAssertEqual(decoded.layouts, [])
     }
 }
+
+// MARK: - Bundle identifier migration
+
+/// Snappy 1.0 shipped as `com.travismarceau.snappy`. The copy that carries a
+/// 1.0 user's settings into the new domain runs once, before anything reads
+/// `Defaults`, and must never overwrite a value the user has already set here.
+final class LegacyDefaultsMigrationTests: XCTestCase {
+
+    private var suite: UserDefaults!
+    private var suiteName: String!
+
+    override func setUpWithError() throws {
+        suiteName = "SnappyMigrationTests-\(UUID().uuidString)"
+        suite = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        // The legacy domain is shared, so leave it as we found it.
+        suite.removePersistentDomain(forName: LegacyDefaultsMigration.legacyDomain)
+    }
+
+    override func tearDownWithError() throws {
+        suite.removePersistentDomain(forName: LegacyDefaultsMigration.legacyDomain)
+        suite.removePersistentDomain(forName: suiteName)
+    }
+
+    private func seedLegacy(_ values: [String: Any]) {
+        suite.setPersistentDomain(values, forName: LegacyDefaultsMigration.legacyDomain)
+    }
+
+    func testCopiesLegacyValuesIntoTheNewDomain() {
+        seedLegacy(["placementPaneTimeout": 9, "placementPaneSticky": true])
+
+        LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
+
+        XCTAssertEqual(suite.integer(forKey: "placementPaneTimeout"), 9)
+        XCTAssertTrue(suite.bool(forKey: "placementPaneSticky"))
+        XCTAssertTrue(suite.bool(forKey: LegacyDefaultsMigration.completedKey))
+    }
+
+    func testDoesNotOverwriteAValueAlreadySetInTheNewDomain() {
+        seedLegacy(["placementPaneTimeout": 9])
+        suite.set(3, forKey: "placementPaneTimeout")
+
+        LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
+
+        XCTAssertEqual(suite.integer(forKey: "placementPaneTimeout"), 3)
+    }
+
+    func testRunsOnlyOnce() {
+        seedLegacy(["placementPaneTimeout": 9])
+        LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
+
+        // The user then changes their mind in the new app; a second launch must
+        // not drag the old value back over it.
+        suite.set(3, forKey: "placementPaneTimeout")
+        LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
+
+        XCTAssertEqual(suite.integer(forKey: "placementPaneTimeout"), 3)
+    }
+
+    func testDoesNothingWhenRunningAsTheLegacyBundle() {
+        seedLegacy(["placementPaneTimeout": 9])
+
+        LegacyDefaultsMigration.run(userDefaults: suite,
+                                    bundleId: LegacyDefaultsMigration.legacyDomain)
+
+        XCTAssertNil(suite.object(forKey: "placementPaneTimeout"))
+        XCTAssertFalse(suite.bool(forKey: LegacyDefaultsMigration.completedKey))
+    }
+
+    func testMarksItselfCompleteWhenThereIsNothingToCopy() {
+        LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
+
+        XCTAssertTrue(suite.bool(forKey: LegacyDefaultsMigration.completedKey))
+    }
+}
