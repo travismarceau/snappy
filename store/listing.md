@@ -134,7 +134,7 @@ sips -g pixelWidth -g pixelHeight store/screenshots/*.png
 ## Copyright
 
 ```
-© 2026 Travis Marceau
+© 2026 Simarhol Onipaa LLC
 ```
 
 ## Category

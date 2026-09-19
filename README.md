@@ -7,7 +7,11 @@ for it.
 Snappy is derived from [Rectangle](https://github.com/rxhanson/Rectangle) by Ryan
 Hanson (MIT), which is itself based on Spectacle by Eric Czarny. The window-moving
 engine is Rectangle's; the leader-key grid, drawn placement regions, and
-multi-window layouts are Snappy's own.
+multi-window layouts are Snappy's own. This repository keeps Rectangle's full
+commit history rather than starting fresh, so `git log` shows who wrote what.
+
+Snappy makes no network connections: no updater, no analytics, no remote
+configuration.
 
 ## System requirements
 

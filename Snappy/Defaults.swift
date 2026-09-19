@@ -233,6 +233,50 @@ class Defaults {
     ]
 }
 
+/// Carries settings across the 2026 bundle-identifier change.
+///
+/// Snappy 1.0 shipped as `com.travismarceau.snappy`; the app is now
+/// `com.simarholonipaa.snappy`. macOS keys a preferences domain to the bundle
+/// identifier, so without this a 1.0 user would launch 1.1 and find every
+/// placement, layout and shortcut gone — not lost, but invisible, sitting in a
+/// plist nothing reads any more.
+///
+/// The Accessibility grant cannot be carried the same way: TCC keys it to the
+/// bundle identifier *and* the code signature, and there is no API to transfer
+/// it. Re-granting is unavoidable, which is why the release notes have to say so.
+enum LegacyDefaultsMigration {
+
+    static let legacyDomain = "com.travismarceau.snappy"
+    /// Recorded in the new domain, so the copy happens exactly once even if the
+    /// old plist is still sitting on disk years later.
+    static let completedKey = "migratedFromLegacyBundleId"
+
+    /// Copy every key the old domain holds that the new one does not.
+    ///
+    /// Must run before anything reads `Defaults`: each of those is a lazy
+    /// `static let` that caches on first access, so a single early read would
+    /// pin the pre-migration value for the life of the process.
+    static func run(userDefaults: UserDefaults = .standard,
+                    bundleId: String? = Bundle.main.bundleIdentifier) {
+        guard !userDefaults.bool(forKey: completedKey) else { return }
+        // Nothing to do when running *as* the old app — a build someone pinned,
+        // or the tests.
+        guard bundleId != legacyDomain else { return }
+
+        defer { userDefaults.set(true, forKey: completedKey) }
+
+        guard let legacy = userDefaults.persistentDomain(forName: legacyDomain), !legacy.isEmpty else {
+            return
+        }
+        var copied = 0
+        for (key, value) in legacy where userDefaults.object(forKey: key) == nil {
+            userDefaults.set(value, forKey: key)
+            copied += 1
+        }
+        Logger.log("Migrated \(copied) preference(s) from \(legacyDomain)")
+    }
+}
+
 struct CodableDefault: Codable {
     let bool: Bool?
     let int: Int?

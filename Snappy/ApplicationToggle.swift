@@ -5,7 +5,7 @@ import Cocoa
 class ApplicationToggle: NSObject {
     
     private var disabledApps = Set<String>()
-    public private(set) static var frontAppId: String? = "com.travismarceau.snappy"
+    public private(set) static var frontAppId: String? = "com.simarholonipaa.snappy"
     public private(set) static var frontAppName: String? = "Snappy"
     public private(set) static var shortcutsDisabled: Bool = false
 
