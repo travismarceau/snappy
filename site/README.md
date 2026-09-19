@@ -41,6 +41,49 @@ Until that is done, the live site is still being served from `getsnappy-site`
 and this directory is not yet authoritative. Archive that repo once the switch
 is verified, so there is no second copy to drift into.
 
+## Testing an update before shipping one
+
+The updater is the one part of a release that cannot be checked by looking at
+it, and its first real exercise would otherwise be users going 1.0 to 1.1. Run
+this against a local feed first — it needs no publishing, no notarization and no
+network.
+
+```bash
+# 1. Build Release, zip it, and generate a feed pointing at a local server.
+ditto -c -k --keepParent <Release>/Snappy.app /tmp/feed/Snappy.zip
+cp site/releases/v1.1.html /tmp/feed/Snappy.html
+generate_appcast --embed-release-notes --download-url-prefix http://127.0.0.1:8770/ /tmp/feed
+( cd /tmp/feed && python3 -m http.server 8770 > /tmp/feed/access.log 2>&1 & )
+
+# 2. Make a copy that looks like the OLD version, on its own bundle id so the
+#    test cannot touch the real app's settings or its Accessibility grant.
+ditto <Release>/Snappy.app /tmp/old/Snappy.app
+PlistBuddy -c "Set :CFBundleVersion 1" -c "Set :CFBundleShortVersionString 1.0" \
+  -c "Set :CFBundleIdentifier com.simarholonipaa.snappy.dryrun" \
+  -c "Set :SUFeedURL http://127.0.0.1:8770/appcast.xml" \
+  -c "Add :SUAutomaticallyUpdate bool true" /tmp/old/Snappy.app/Contents/Info.plist
+codesign -f -s - --deep /tmp/old/Snappy.app
+
+# 3. Launch it, wait ~25s, then quit it. Watch what the server was asked for.
+open -a /tmp/old/Snappy.app; sleep 25; pkill -f "old/Snappy.app"
+tr -d '\0' < /tmp/feed/access.log | grep -oE '"GET [^"]*"' | sort | uniq -c
+PlistBuddy -c 'Print :CFBundleShortVersionString' /tmp/old/Snappy.app/Contents/Info.plist
+```
+
+A working update asks for `appcast.xml` and then `Snappy.zip`, stages into
+`~/Library/Caches/<bundle id>/org.sparkle-project.Sparkle/Installation/`, and
+the copy reads `1.1` after it quits.
+
+**Run the negative control too, or the test proves nothing.** Corrupt the
+`sparkle:edSignature` in the feed and repeat: Sparkle still fetches and still
+downloads — the requests look identical — but nothing is staged and the copy
+stays at `1.0`. If a tampered signature installs, the public key in
+`Snappy/Info.plist` does not match the signing key and every update is
+effectively unsigned.
+
+Afterwards: kill the server, `rm -rf ~/Library/Caches/com.simarholonipaa.snappy.dryrun`,
+and `defaults delete com.simarholonipaa.snappy.dryrun`.
+
 ## Releases
 
 The notarized zip is **not** committed. `site/*.zip` is gitignored: it is about
