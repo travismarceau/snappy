@@ -35,7 +35,20 @@ is verified, so there is no second copy to drift into.
 
 ## Releases
 
-`scripts/build-direct.sh` writes the notarized zip and a regenerated
-`appcast.xml` into `build/appcast/`. Where the zip is published decides what
-`--download-url-prefix` has to be, and the appcast has to agree with it: Sparkle
-verifies the signature of whatever it finds at that URL.
+The notarized zip is **not** committed. `site/*.zip` is gitignored: it is about
+4 MB a release and git keeps every one of them for ever. It is published as a
+GitHub Release asset instead, which is also what Rectangle does.
+
+`scripts/build-direct.sh` derives the tag from `MARKETING_VERSION`, points the
+appcast at
+`https://github.com/travismarceau/snappy/releases/download/<tag>/Snappy.zip`,
+writes the signed feed to `site/appcast.xml`, and prints the `gh release`
+command to run. Commit `appcast.xml` and push so getsnappy.fyi serves it.
+
+The download button on the page uses
+`/releases/latest/download/Snappy.zip`, which GitHub resolves to the newest
+release — so the page itself never needs editing at release time.
+
+**This requires the repository to be public.** Release assets on a private
+repository are not publicly downloadable, and both the download button and every
+Sparkle update would fail for anyone who is not signed in with access.

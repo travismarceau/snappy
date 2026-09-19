@@ -41,6 +41,18 @@ if ! /usr/libexec/PlistBuddy -c "Print :SUPublicEDKey" Snappy/Info.plist 2>/dev/
   exit 1
 fi
 
+# The appcast has to name the exact URL the zip will be published at, and
+# Sparkle verifies the signature of whatever it finds there. Releases go to
+# GitHub, so the URL is derived from the version rather than hand-maintained.
+VERSION=$(xcodebuild -project Snappy.xcodeproj -target Snappy -showBuildSettings 2>/dev/null \
+  | awk '/ MARKETING_VERSION = / {print $3; exit}')
+if [[ -z "$VERSION" ]]; then
+  echo "Could not read MARKETING_VERSION from the project." >&2
+  exit 1
+fi
+TAG="v${VERSION}"
+DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/travismarceau/snappy/releases/download/${TAG}/}"
+
 ARCHIVE=build/Snappy-direct.xcarchive
 EXPORT=build/export-direct
 ZIP=build/Snappy.zip
@@ -90,17 +102,24 @@ if [[ -z "$GENERATE_APPCAST" ]]; then
 else
   mkdir -p "$APPCAST_DIR"
   cp "$ZIP" "$APPCAST_DIR/"
-  "$GENERATE_APPCAST" --download-url-prefix "${DOWNLOAD_URL_PREFIX:-https://getsnappy.fyi/}" "$APPCAST_DIR"
+  "$GENERATE_APPCAST" --download-url-prefix "$DOWNLOAD_URL_PREFIX" "$APPCAST_DIR"
   # The feed has to be served from SUFeedURL, which is getsnappy.fyi/appcast.xml,
   # and site/ is what that host deploys — so the generated feed belongs in the
   # repo, committed alongside the release it describes.
   cp "$APPCAST_DIR/appcast.xml" site/appcast.xml
   echo
   echo "Appcast written to site/appcast.xml — commit it with the release."
-  echo "Release zip: $ZIP"
-  echo "Publish the zip wherever --download-url-prefix points"
-  echo "  (currently ${DOWNLOAD_URL_PREFIX:-https://getsnappy.fyi/});"
-  echo "Sparkle verifies the signature of whatever it finds at that URL."
+  echo
+  echo "Now publish the zip at the URL the appcast names:"
+  echo "  ${DOWNLOAD_URL_PREFIX}Snappy.zip"
+  echo
+  echo "    gh release create $TAG \"$ZIP\" --title \"Snappy $VERSION\" --notes-file <notes.md>"
+  echo "    # or, if $TAG already exists:"
+  echo "    gh release upload $TAG \"$ZIP\" --clobber"
+  echo
+  echo "Then commit site/appcast.xml and push, so getsnappy.fyi serves the feed."
+  echo "Sparkle verifies the signature of whatever it finds at that URL, so the"
+  echo "zip published there must be this exact file."
 fi
 
 echo

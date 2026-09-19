@@ -34,6 +34,12 @@ build/
 *.dat
 *.dep
 
+## Release binaries. The notarized zip is published as a GitHub Release asset,
+## not committed: it is ~4 MB a release, and git keeps every one of them for
+## ever. site/appcast.xml IS committed - it is a few KB of text and the site has
+## to serve it from getsnappy.fyi.
+site/*.zip
+
 ## App Store screenshot intermediates. The composed frames in
 ## store/screenshots/ are committed; the raw captures they are built from are
 ## machine- and desktop-specific and can be regenerated.
