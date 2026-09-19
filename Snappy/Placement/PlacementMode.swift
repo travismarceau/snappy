@@ -126,9 +126,6 @@ final class PlacementModeController {
     private var _finishing = false
     private var _dragEnabled = false
     private var _dragging = false
-    /// Pane frames in CG (top-left origin) space, so the tap thread can decide
-    /// whether a click is on the grid without calling into AppKit.
-    private var _paneFramesFlipped: [CGRect] = []
 
     private var monitor: ActiveEventMonitor?
     private var overlays: [PlacementOverlayPanel] = []
@@ -180,23 +177,8 @@ final class PlacementModeController {
         stateLock.lock(); defer { stateLock.unlock() }
         return _dragEnabled
     }
-    private func setDragging(_ value: Bool) {
-        stateLock.lock(); _dragging = value; stateLock.unlock()
-    }
-    private var dragging: Bool {
-        stateLock.lock(); defer { stateLock.unlock() }
-        return _dragging
-    }
-    private func setPaneGeometry(dragEnabled: Bool, framesFlipped: [CGRect]) {
-        stateLock.lock()
-        _dragEnabled = dragEnabled
-        _paneFramesFlipped = framesFlipped
-        stateLock.unlock()
-    }
-    /// True when a CG-space point lies on one of the panes.
-    private func paneContains(flippedPoint: CGPoint) -> Bool {
-        stateLock.lock(); defer { stateLock.unlock() }
-        return _paneFramesFlipped.contains { $0.contains(flippedPoint) }
+    private func setDragEnabled(_ value: Bool) {
+        stateLock.lock(); _dragEnabled = value; stateLock.unlock()
     }
 
     // MARK: Activation
@@ -226,12 +208,14 @@ final class PlacementModeController {
             return
         }
         overlays = panels
-        setPaneGeometry(dragEnabled: dragEnabled,
-                        framesFlipped: panels.map { $0.screenFrame.screenFlipped })
+        setDragEnabled(dragEnabled)
         panels.forEach { $0.present() }
 
         let monitor = ActiveEventMonitor(
-            mask: [.keyDown, .mouseMoved, .leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown],
+            // Keys only. The panel is a real window now and takes its own mouse
+            // events, so dragging no longer depends on a tap -- which needs
+            // Accessibility and silently does nothing without it.
+            mask: [.keyDown],
             filterer: { [weak self] event in self?.shouldSwallow(event) ?? false },
             handler: { [weak self] event in self?.handleEvent(event) }
         )
@@ -261,6 +245,11 @@ final class PlacementModeController {
             ? ScreenDetection().detectScreensAtCursor()
             : ScreenDetection().detectScreens(using: targetElement)
         baseScreen = usable?.currentScreen ?? NSScreen.main
+
+        // Title the panel with the window it is about to move. A bare grid gives
+        // no clue which of several windows is the target.
+        let app = NSWorkspace.shared.frontmostApplication
+        overlays.forEach { $0.setTarget(name: app?.localizedName, icon: app?.icon) }
     }
 
     // MARK: Panes
@@ -276,23 +265,27 @@ final class PlacementModeController {
         var reusable = cachedPanels
         cachedPanels = []
 
-        var panels: [PlacementOverlayPanel] = []
-        for screen in NSScreen.screens {
-            let frame = screen.adjustedVisibleFrame()
-            guard frame.width > 1, frame.height > 1 else { continue }
-            if let index = reusable.firstIndex(where: { $0.matches(frame: frame, keymap: keymap, dragEnabled: dragEnabled) }) {
-                let panel = reusable.remove(at: index)
-                panel.prepareForReuse()
-                panels.append(panel)
-            } else {
-                panels.append(PlacementOverlayPanel(screen: screen,
-                                                    frame: frame,
-                                                    keymap: keymap,
-                                                    dragEnabled: dragEnabled))
-            }
+        // One panel, on the display being placed onto. The full-screen version
+        // needed one per display because it covered them; a small box does not.
+        let screen = Defaults.useCursorScreenDetection.enabled
+            ? (ScreenDetection().detectScreensAtCursor()?.currentScreen ?? NSScreen.main)
+            : NSScreen.main
+        guard let screen else { return [] }
+        let frame = screen.adjustedVisibleFrame()
+        guard frame.width > 1, frame.height > 1 else { return [] }
+
+        let panel: PlacementOverlayPanel
+        if let i = reusable.firstIndex(where: { $0.matches(frame: frame, keymap: keymap, dragEnabled: dragEnabled) }) {
+            panel = reusable.remove(at: i)
+            panel.prepareForReuse()
+        } else {
+            panel = PlacementOverlayPanel(screen: screen, frame: frame, keymap: keymap, dragEnabled: dragEnabled)
         }
         reusable.forEach { $0.orderOut(nil) }
-        return panels
+
+        panel.onDragChanged = { [weak self] p in self?.dragSelection = p }
+        panel.onDragCommitted = { [weak self] p in self?.commitDrag(p, on: panel) }
+        return [panel]
     }
 
     /// Hold the panes for a short while: placing several windows in a row is the
@@ -366,23 +359,6 @@ final class PlacementModeController {
             // the user can still switch or quit apps, useful in sticky mode.
             return mods == 0
 
-        case .mouseMoved:
-            // Hover feedback does not need to block anything, and swallowing
-            // motion would leave every other app's hover state stuck.
-            return false
-
-        case .leftMouseDown, .leftMouseDragged, .leftMouseUp:
-            guard isActive, dragEnabled else { return false }
-            // A drag that has begun owns every subsequent event, wherever the
-            // cursor goes. A press that lands off the grid — the menu bar, the
-            // Dock — is left alone and dismisses the session instead.
-            if dragging { return true }
-            guard let location = event.cgEvent?.location else { return false }
-            return paneContains(flippedPoint: location)
-
-        case .rightMouseDown:
-            return isActive && dragging
-
         default:
             return false
         }
@@ -393,15 +369,8 @@ final class PlacementModeController {
     /// Dispatched to the main thread by `ActiveEventMonitor`.
     private func handleEvent(_ event: NSEvent) {
         guard isActive else { return }
-        switch event.type {
-        case .keyDown:       handleKey(event)
-        case .mouseMoved:    handleMouseMoved()
-        case .leftMouseDown: handleMouseDown()
-        case .leftMouseDragged: handleMouseDragged()
-        case .leftMouseUp:   handleMouseUp()
-        case .rightMouseDown: cancelDrag()
-        default: break
-        }
+        guard event.type == .keyDown else { return }
+        handleKey(event)
     }
 
     private func handleKey(_ event: NSEvent) {
@@ -441,105 +410,24 @@ final class PlacementModeController {
 
     // MARK: Mouse
 
-    private func panel(containing point: CGPoint) -> PlacementOverlayPanel? {
-        overlays.first { $0.screenFrame.contains(point) }
-    }
-
     private func panel(for screen: NSScreen?) -> PlacementOverlayPanel? {
         guard let screen else { return nil }
         return overlays.first { $0.targetScreen == screen }
     }
 
-    private func cell(in panel: PlacementOverlayPanel, at point: CGPoint) -> GridCell {
-        let map = currentKeymap
-        let local = CGPoint(x: point.x - panel.screenFrame.minX,
-                            y: point.y - panel.screenFrame.minY)
-        let geometry = PlacementGridGeometry(
-            bounds: CGRect(origin: .zero, size: panel.screenFrame.size),
-            grid: map.grid,
-            outerMargin: map.outerMargin)
-        return geometry.cell(at: local)
-    }
-
-    private func handleMouseMoved() {
-        guard dragEnabled, dragSelection == nil else { return }
-        let location = NSEvent.mouseLocation
-        let panel = panel(containing: location)
-        let cell = panel.map { self.cell(in: $0, at: location) }
-
-        // A tap delivers motion at pointer rate. Only a change of cell is worth
-        // a redraw, and only a change of cell counts as the kind of activity
-        // that should hold the pane open — rebuilding the timeout work item a
-        // hundred times a second would cost more than the feature.
-        guard panel !== hoverPanel || cell != hoverCell else { return }
-        if panel !== hoverPanel { hoverPanel?.updateHover(nil) }
-        hoverPanel = panel
-        hoverCell = cell
-        panel?.updateHover(cell)
-        rearmTimeout()
-    }
-
-    private func handleMouseDown() {
-        guard dragEnabled else { return }
-        let location = NSEvent.mouseLocation
-        guard let panel = panel(containing: location) else {
-            // A click outside every pane is the same gesture as Escape.
-            deactivate()
-            return
-        }
-        // A drag must not race the idle timeout; the hard stop takes over as
-        // the bound on a gesture that never completes.
-        timeoutWorkItem?.cancel()
-        timeoutWorkItem = nil
-        armHardStop()
-
-        let anchor = cell(in: panel, at: location)
-        dragPanel = panel
-        dragAnchor = anchor
-        setDragging(true)
-        updateDrag(to: anchor)
-    }
-
-    private func handleMouseDragged() {
-        guard let panel = dragPanel, dragAnchor != nil else { return }
-        updateDrag(to: cell(in: panel, at: NSEvent.mouseLocation))
-    }
-
-    private func handleMouseUp() {
-        guard let panel = dragPanel, let selection = dragSelection else { return }
-        setDragging(false)
-        hardStopWorkItem?.cancel()
-        hardStopWorkItem = nil
-        // The rectangle was on screen the whole way down, so there is nothing
-        // left to confirm: place it and get out of the way. This deliberately
-        // skips `finishPlacement` — no flash to hold, and no sticky mode. A
-        // mouse release is an unambiguous "done", and your next click should
-        // reach the app the window just landed on.
-        place(selection, on: panel.targetScreen, element: targetElement, windowId: targetWindowId)
+    /// The panel reports a finished drag. Release is terminal: place and get out
+    /// of the way -- you watched the rectangle the whole way down, so there is
+    /// nothing left to confirm and no flash worth waiting through.
+    private func commitDrag(_ placement: GridPlacement, on panel: PlacementOverlayPanel) {
+        guard isActive else { return }
+        dragSelection = nil
+        place(placement, on: panel.targetScreen, element: targetElement, windowId: targetWindowId)
         endSession()
     }
 
-    private func updateDrag(to focus: GridCell) {
-        guard let anchor = dragAnchor, let panel = dragPanel else { return }
-        let placement = GridPlacement(anchor: anchor, focus: focus)
-        guard placement != dragSelection else { return }
-        dragSelection = placement
-        panel.updateHover(nil)
-        panel.updateDrag(placement)
-    }
-
     private func cancelDrag(rearmingTimeout: Bool = true) {
-        setDragging(false)
-        hardStopWorkItem?.cancel()
-        hardStopWorkItem = nil
-        dragPanel?.updateDrag(nil)
-        dragPanel = nil
-        dragAnchor = nil
         dragSelection = nil
-        // So the next movement redraws the hover even if the cursor never left
-        // the cell the drag started in.
-        hoverPanel = nil
-        hoverCell = nil
+        overlays.forEach { $0.clearDrag() }
         if rearmingTimeout { rearmTimeout() }
     }
 
@@ -682,8 +570,7 @@ final class PlacementModeController {
         guard isActive || finishing || !overlays.isEmpty || monitor != nil else { return }
         setActive(false)
         setFinishing(false)
-        setDragging(false)
-        setPaneGeometry(dragEnabled: false, framesFlipped: [])
+        setDragEnabled(false)
 
         timeoutWorkItem?.cancel(); timeoutWorkItem = nil
         revealWorkItem?.cancel(); revealWorkItem = nil
