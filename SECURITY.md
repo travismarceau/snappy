@@ -24,7 +24,7 @@ Snappy requires **macOS Accessibility Permissions** (`AXUIElement`) to manage wi
 
 If you find a vulnerability, please report it privately:
 
-* **Email:** t@travismarceau.com
+* **Email:** help@getsnappy.fyi
 
 ### Please Include:
 1. A brief description of the issue and potential impact.
