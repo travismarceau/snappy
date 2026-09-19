@@ -113,9 +113,15 @@ class Defaults {
     static let placementModeEnabled = OptionalBoolDefault(key: "placementModeEnabled")
     static let placementPaneSticky = BoolDefault(key: "placementPaneSticky")
     static let placementPaneTimeout = FloatDefault(key: "placementPaneTimeout", defaultValue: 4)
-    static let placementMapReveal = IntEnumDefault<PlacementMapReveal>(key: "placementMapReveal", defaultValue: .afterDelay)
+    static let placementMapReveal = IntEnumDefault<PlacementMapReveal>(key: "placementMapReveal", defaultValue: .always)
     static let placementMapRevealDelay = FloatDefault(key: "placementMapRevealDelay", defaultValue: 0.4)
     static let placementKeymap = JSONDefault<PlacementKeymap>(key: "placementKeymap")
+    /// Drag on the placement grid to place a one-off region. Off means the pane
+    /// never consumes a mouse click — the escape hatch when an app or an input
+    /// device disagrees with the global tap.
+    /// Tri-state so it can default to on: only an explicit `userDisabled`
+    /// turns dragging off, matching `missionControlDragging` and friends.
+    static let placementDragEnabled = OptionalBoolDefault(key: "placementDragEnabled")
     /// Which settings tab was last open. Deliberately absent from `array`
     /// below: that list is the config export manifest, and where you last
     /// looked is not configuration.
@@ -222,7 +228,8 @@ class Defaults {
         placementPaneTimeout,
         placementMapReveal,
         placementMapRevealDelay,
-        placementKeymap
+        placementKeymap,
+        placementDragEnabled
     ]
 }
 

@@ -121,8 +121,8 @@ final class PlacementGridPickerView: NSView {
         didSet { invalidateIntrinsicContentSize() }
     }
 
-    private var anchorCell: (col: Int, row: Int)?
-    private var hoverCell: (col: Int, row: Int)?
+    private var anchorCell: GridCell?
+    private var hoverCell: GridCell?
 
     override var isFlipped: Bool { true } // row 0 at the top, natural for editing
 
@@ -169,9 +169,12 @@ final class PlacementGridPickerView: NSView {
     private var cellW: CGFloat { bounds.width / CGFloat(max(grid.cols, 1)) }
     private var cellH: CGFloat { bounds.height / CGFloat(max(grid.rows, 1)) }
 
-    private func cell(at p: NSPoint) -> (col: Int, row: Int) {
-        (min(max(Int(p.x / cellW), 0), grid.cols - 1),
-         min(max(Int(p.y / cellH), 0), grid.rows - 1))
+    /// This view is flipped (row 0 at the top) while `PlacementGridGeometry`
+    /// works in Cocoa space, so the point is flipped on the way in and the one
+    /// implementation serves both the editor and the overlay.
+    private func cell(at p: NSPoint) -> GridCell {
+        PlacementGridGeometry(bounds: bounds, grid: grid)
+            .cell(at: CGPoint(x: p.x, y: bounds.height - p.y))
     }
 
     private func rect(for p: GridPlacement) -> NSRect {
@@ -208,13 +211,14 @@ final class PlacementGridPickerView: NSView {
         if let placement { onChange?(placement) }
     }
 
-    private func updateSelection(to c: (col: Int, row: Int)) {
+    private func updateSelection(to c: GridCell) {
         guard let a = anchorCell else { return }
         var p = placement ?? GridPlacement(col: 0, row: 0, colSpan: 1, rowSpan: 1)
-        p.col = min(a.col, c.col)
-        p.row = min(a.row, c.row)
-        p.colSpan = abs(a.col - c.col) + 1
-        p.rowSpan = abs(a.row - c.row) + 1
+        let block = GridPlacement(anchor: a, focus: c)
+        p.col = block.col
+        p.row = block.row
+        p.colSpan = block.colSpan
+        p.rowSpan = block.rowSpan
         placement = p
     }
 

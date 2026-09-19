@@ -1,12 +1,30 @@
 /// PlacementOverlay.swift
 ///
-/// The click-through pane shown while placement mode is active. It starts as a
-/// small HUD hint; the full key→region map only fades in if the user hesitates
-/// (or immediately / never, per `Defaults.placementMapReveal`). Pressing a bound
-/// key flashes that region on the way out.
+/// The click-through pane shown while placement mode is active.
+///
+/// The grid and the hint line are drawn the moment the pane appears — you
+/// cannot aim at a grid you cannot see, and a drag needs one immediately. The
+/// saved key→region map is a separate layer on top, revealed per
+/// `Defaults.placementMapReveal`, and drawn as outlines rather than filled
+/// blocks: overlapping placements used to stack their alpha into unreadable
+/// blobs. Only one thing on screen is ever filled — the live drag rect, or the
+/// region a keystroke just placed. Filled means happening now.
 
 import Cocoa
 import MASShortcut
+
+// MARK: - Key labels
+
+/// The "⌃⌥A" text for a key binding. Shared by the overlay's keycaps and its
+/// layout legend so they can never drift apart.
+enum PlacementKeyLabel {
+    static func text(keyCode: Int, modifierFlags: UInt) -> String {
+        guard keyCode >= 0 else { return "" }
+        let shortcut = MASShortcut(keyCode: keyCode,
+                                   modifierFlags: NSEvent.ModifierFlags(rawValue: modifierFlags))
+        return [shortcut.modifierFlagsString, shortcut.keyCodeString].compactMap { $0 }.joined()
+    }
+}
 
 // MARK: - Panel
 
@@ -14,11 +32,23 @@ final class PlacementOverlayPanel: NSPanel {
 
     private let overlayView: PlacementOverlayContentView
 
-    init(screen: NSScreen, keymap: PlacementKeymap, leaderShortcut: MASShortcut?) {
-        overlayView = PlacementOverlayContentView(frame: NSRect(origin: .zero, size: screen.visibleFrame.size),
+    /// What this panel was built for, so `PlacementModeController` can tell
+    /// whether a cached panel is still good for the next session — and, once
+    /// there is one panel per display, which screen a mouse event belongs to.
+    /// The display this pane covers. Named around the target rather than
+    /// shadowing `NSWindow.screen`, which reports where the window happens to be.
+    let targetScreen: NSScreen
+    let screenFrame: CGRect
+    let keymap: PlacementKeymap
+
+    init(screen: NSScreen, frame: CGRect, keymap: PlacementKeymap, dragEnabled: Bool) {
+        self.targetScreen = screen
+        self.screenFrame = frame
+        self.keymap = keymap
+        overlayView = PlacementOverlayContentView(frame: NSRect(origin: .zero, size: frame.size),
                                                   keymap: keymap,
-                                                  leaderShortcut: leaderShortcut)
-        super.init(contentRect: screen.visibleFrame,
+                                                  dragEnabled: dragEnabled)
+        super.init(contentRect: frame,
                    styleMask: [.borderless, .nonactivatingPanel],
                    backing: .buffered,
                    defer: false)
@@ -34,7 +64,7 @@ final class PlacementOverlayPanel: NSPanel {
         animationBehavior = .none
         collectionBehavior = [.canJoinAllSpaces, .transient, .fullScreenAuxiliary, .stationary]
 
-        setFrame(screen.visibleFrame, display: false)
+        setFrame(frame, display: false)
         contentView = overlayView
         alphaValue = 0
     }
@@ -42,22 +72,59 @@ final class PlacementOverlayPanel: NSPanel {
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
 
+    /// True when a cached panel can be reused as-is for a new session.
+    func matches(frame: CGRect, keymap: PlacementKeymap, dragEnabled: Bool) -> Bool {
+        screenFrame == frame && self.keymap == keymap && overlayView.dragEnabled == dragEnabled
+    }
+
+    /// Wipe per-session state so a cached panel opens looking new.
+    func prepareForReuse() {
+        overlayView.prepareForReuse()
+        alphaValue = 0
+    }
+
     func present() {
         orderFrontRegardless()
         NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = 0.12
+            ctx.duration = 0.06
             animator().alphaValue = 1
         }
     }
 
-    func revealMap(animated: Bool) {
-        overlayView.revealMap(animated: animated)
+    /// Fade out on the way to teardown, so the window is seen landing under the
+    /// dissolving grid rather than the grid cutting to an unchanged screen.
+    func dismiss(completion: @escaping () -> Void) {
+        NSAnimationContext.runAnimationGroup({ ctx in
+            ctx.duration = 0.1
+            animator().alphaValue = 0
+        }, completionHandler: completion)
     }
+
+    /// Outline the saved placements over the grid.
+    func revealPlacements(animated: Bool) {
+        overlayView.revealPlacements(animated: animated)
+    }
+
+    // MARK: Drag
+
+    func updateHover(_ cell: GridCell?) {
+        overlayView.updateHover(cell)
+    }
+
+    func updateDrag(_ placement: GridPlacement?) {
+        overlayView.updateDrag(placement)
+    }
+
+    func clearDrag() {
+        overlayView.updateDrag(nil)
+    }
+
+    // MARK: Flash
 
     /// Emphasise the region that was just placed, then leave it to the caller to
     /// tear the panel down.
-    func flash(_ binding: PlacementBinding) {
-        overlayView.flash(binding)
+    func flash(placement: GridPlacement) {
+        overlayView.flash(placement: placement)
     }
 
     /// The same confirmation for a layout: its chip lights up and every region
@@ -73,164 +140,256 @@ final class PlacementOverlayPanel: NSPanel {
 private final class PlacementOverlayContentView: NSView {
 
     private let dimView = NSView()
-    private let mapView: PlacementGridView
-    private let hud: PlacementHUDView
+    private let gridView: PlacementGridView
+    private let presetView: PlacementPresetView
+    let dragEnabled: Bool
 
-    init(frame frameRect: NSRect, keymap: PlacementKeymap, leaderShortcut: MASShortcut?) {
-        mapView = PlacementGridView(frame: frameRect, keymap: keymap)
-        hud = PlacementHUDView(leaderShortcut: leaderShortcut)
+    init(frame frameRect: NSRect, keymap: PlacementKeymap, dragEnabled: Bool) {
+        self.dragEnabled = dragEnabled
+        gridView = PlacementGridView(frame: frameRect, keymap: keymap, dragEnabled: dragEnabled)
+        presetView = PlacementPresetView(frame: frameRect, keymap: keymap)
         super.init(frame: frameRect)
 
         wantsLayer = true
 
         dimView.wantsLayer = true
         dimView.layer?.backgroundColor = NSColor.black.cgColor
-        dimView.alphaValue = 0
+        dimView.alphaValue = 0.16
         dimView.autoresizingMask = [.width, .height]
         dimView.frame = bounds
         addSubview(dimView)
 
-        mapView.autoresizingMask = [.width, .height]
-        mapView.frame = bounds
-        mapView.alphaValue = 0
-        addSubview(mapView)
-
-        hud.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(hud)
-        NSLayoutConstraint.activate([
-            hud.centerXAnchor.constraint(equalTo: centerXAnchor),
-            hud.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
+        for view in [gridView, presetView] as [NSView] {
+            view.autoresizingMask = [.width, .height]
+            view.frame = bounds
+            addSubview(view)
+        }
+        presetView.alphaValue = 0
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override var isFlipped: Bool { false }
 
-    func revealMap(animated: Bool) {
-        guard mapView.alphaValue < 1 else { return }
-        let apply = {
-            self.mapView.alphaValue = 1
-            self.dimView.alphaValue = 0.16
-            self.hud.alphaValue = 0
-        }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        presetView.alphaValue = 0
+        presetView.reset()
+        gridView.reset()
+    }
+
+    func revealPlacements(animated: Bool) {
+        guard presetView.alphaValue < 1 else { return }
         if animated {
             NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.2
+                ctx.duration = 0.18
                 ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                self.mapView.animator().alphaValue = 1
-                self.dimView.animator().alphaValue = 0.16
-                self.hud.animator().alphaValue = 0
+                presetView.animator().alphaValue = 1
             }
         } else {
-            apply()
+            presetView.alphaValue = 1
         }
+    }
+
+    func updateHover(_ cell: GridCell?) {
+        gridView.hoverCell = cell
+    }
+
+    func updateDrag(_ placement: GridPlacement?) {
+        gridView.dragSelection = placement
+        // The drag rect owns the screen while it is live; the saved map recedes
+        // to a whisper rather than competing with it.
+        let target: CGFloat = placement == nil ? 1 : 0.35
+        if presetView.alphaValue > 0, presetView.alphaValue != target {
+            presetView.alphaValue = target
+        }
+    }
+
+    func flash(placement: GridPlacement) {
+        presetView.flash(placement: placement)
+        revealPlacements(animated: presetView.alphaValue == 0)
+        presetView.alphaValue = 1
     }
 
     func flash(layout: WindowLayout, outcome: PlacementModeController.LayoutOutcome) {
-        mapView.flash(layout: layout, outcome: outcome)
-        if mapView.alphaValue < 1 {
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.12
-                mapView.animator().alphaValue = 1
-                hud.animator().alphaValue = 0
-            }
-        }
-    }
-
-    func flash(_ binding: PlacementBinding) {
-        mapView.flash(binding)
-        if mapView.alphaValue < 1 {
-            NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.12
-                mapView.animator().alphaValue = 1
-                hud.animator().alphaValue = 0
-            }
-        }
+        presetView.flash(layout: layout, outcome: outcome)
+        revealPlacements(animated: presetView.alphaValue == 0)
+        presetView.alphaValue = 1
     }
 }
 
-// MARK: - HUD hint
+// MARK: - Grid, hover, drag
 
-private final class PlacementHUDView: NSView {
-
-    init(leaderShortcut: MASShortcut?) {
-        super.init(frame: .zero)
-
-        let effect = NSVisualEffectView()
-        effect.material = .hudWindow
-        effect.blendingMode = .withinWindow
-        effect.state = .active
-        effect.wantsLayer = true
-        effect.layer?.cornerRadius = 14
-        effect.layer?.masksToBounds = true
-        effect.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(effect)
-
-        let icon = NSImageView()
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        if #available(macOS 11, *) {
-            icon.image = NSImage(systemSymbolName: "square.grid.3x3.fill", accessibilityDescription: nil)
-            icon.symbolConfiguration = .init(pointSize: 15, weight: .semibold)
-        }
-        icon.contentTintColor = .secondaryLabelColor
-
-        let title = NSTextField(labelWithString: NSLocalizedString("Press a key to place", tableName: "Main", value: "Press a key to place", comment: ""))
-        title.font = .systemFont(ofSize: 13, weight: .semibold)
-        title.textColor = .labelColor
-
-        let subtitle: String
-        if let leaderShortcut {
-            let combo = [leaderShortcut.modifierFlagsString, leaderShortcut.keyCodeString].compactMap { $0 }.joined()
-            subtitle = String(format: NSLocalizedString("%@ · esc to cancel", tableName: "Main", value: "%@ · esc to cancel", comment: ""), combo)
-        } else {
-            subtitle = NSLocalizedString("esc to cancel", tableName: "Main", value: "esc to cancel", comment: "")
-        }
-        let sub = NSTextField(labelWithString: subtitle)
-        sub.font = .systemFont(ofSize: 11)
-        sub.textColor = .secondaryLabelColor
-
-        let textStack = NSStackView(views: [title, sub])
-        textStack.orientation = .vertical
-        textStack.alignment = .leading
-        textStack.spacing = 1
-
-        let row = NSStackView(views: [icon, textStack])
-        row.orientation = .horizontal
-        row.alignment = .centerY
-        row.spacing = 10
-        row.translatesAutoresizingMaskIntoConstraints = false
-        effect.addSubview(row)
-
-        translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            effect.leadingAnchor.constraint(equalTo: leadingAnchor),
-            effect.trailingAnchor.constraint(equalTo: trailingAnchor),
-            effect.topAnchor.constraint(equalTo: topAnchor),
-            effect.bottomAnchor.constraint(equalTo: bottomAnchor),
-            row.leadingAnchor.constraint(equalTo: effect.leadingAnchor, constant: 18),
-            row.trailingAnchor.constraint(equalTo: effect.trailingAnchor, constant: -18),
-            row.topAnchor.constraint(equalTo: effect.topAnchor, constant: 12),
-            row.bottomAnchor.constraint(equalTo: effect.bottomAnchor, constant: -12),
-        ])
-
-        shadow = NSShadow()
-        layer?.shadowColor = NSColor.black.withAlphaComponent(0.35).cgColor
-        wantsLayer = true
-        layer?.shadowOpacity = 1
-        layer?.shadowRadius = 24
-        layer?.shadowOffset = CGSize(width: 0, height: -6)
-    }
-
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
-
-// MARK: - Map
-
+/// The always-visible layer: grid lines, the cell under the cursor, the live
+/// drag rect and the hint line.
 final class PlacementGridView: NSView {
 
     private let keymap: PlacementKeymap
-    private var flashedBindingID: UUID?
+    private let dragEnabled: Bool
+
+    var hoverCell: GridCell? {
+        didSet { if hoverCell != oldValue { needsDisplay = true } }
+    }
+    var dragSelection: GridPlacement? {
+        didSet { if dragSelection != oldValue { needsDisplay = true } }
+    }
+
+    init(frame frameRect: NSRect, keymap: PlacementKeymap, dragEnabled: Bool) {
+        self.keymap = keymap
+        self.dragEnabled = dragEnabled
+        super.init(frame: frameRect)
+        wantsLayer = true
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override var isFlipped: Bool { false } // matches GridPlacement.resolve (Cocoa bottom-left)
+
+    func reset() {
+        hoverCell = nil
+        dragSelection = nil
+        needsDisplay = true
+    }
+
+    private var geometry: PlacementGridGeometry {
+        PlacementGridGeometry(bounds: bounds, grid: keymap.grid, outerMargin: keymap.outerMargin)
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        drawGridLines()
+        drawHover()
+        drawDragSelection()
+        drawHint()
+    }
+
+    private func drawGridLines() {
+        guard keymap.grid.cols > 0, keymap.grid.rows > 0 else { return }
+        let g = geometry
+        let usable = g.usableRect
+        NSColor.white.withAlphaComponent(0.10).setStroke()
+        let line = NSBezierPath()
+        line.lineWidth = 1
+        for c in 0...keymap.grid.cols {
+            let x = usable.minX + g.cellWidth * CGFloat(c)
+            line.move(to: NSPoint(x: x, y: usable.minY))
+            line.line(to: NSPoint(x: x, y: usable.maxY))
+        }
+        for r in 0...keymap.grid.rows {
+            let y = usable.minY + g.cellHeight * CGFloat(r)
+            line.move(to: NSPoint(x: usable.minX, y: y))
+            line.line(to: NSPoint(x: usable.maxX, y: y))
+        }
+        line.stroke()
+    }
+
+    private func drawHover() {
+        guard dragEnabled, dragSelection == nil, let cell = hoverCell else { return }
+        let g = geometry
+        let usable = g.usableRect
+        let rect = NSRect(x: usable.minX + CGFloat(cell.col) * g.cellWidth,
+                          y: usable.maxY - CGFloat(cell.row + 1) * g.cellHeight,
+                          width: g.cellWidth,
+                          height: g.cellHeight)
+        NSColor.white.withAlphaComponent(0.10).setFill()
+        rect.insetBy(dx: 1, dy: 1).fill()
+    }
+
+    private func drawDragSelection() {
+        guard let placement = dragSelection else { return }
+        let rect = placement.resolve(in: bounds,
+                                     grid: keymap.grid,
+                                     outerMargin: keymap.outerMargin,
+                                     innerGap: keymap.innerGap)
+        let drawn = rect.insetBy(dx: 3, dy: 3)
+        guard drawn.width > 8, drawn.height > 8 else { return }
+
+        let accent = NSColor.controlAccentColor
+        let path = NSBezierPath(roundedRect: drawn, xRadius: 14, yRadius: 14)
+        accent.withAlphaComponent(0.38).setFill()
+        path.fill()
+        accent.setStroke()
+        path.lineWidth = 3
+        path.stroke()
+
+        drawSizeChip(for: placement, rect: rect)
+    }
+
+    /// The pane is framed to the same rect placements resolve against, so the
+    /// drag rect's size in points is literally the window's size to come.
+    private func drawSizeChip(for placement: GridPlacement, rect: NSRect) {
+        let size = "\(Int(rect.width.rounded())) × \(Int(rect.height.rounded()))"
+        let sizeFont = NSFont.systemFont(ofSize: 17, weight: .semibold)
+        let sizeAttrs: [NSAttributedString.Key: Any] = [
+            .font: sizeFont,
+            .foregroundColor: NSColor.white,
+        ]
+        let sizeSize = (size as NSString).size(withAttributes: sizeAttrs)
+        guard rect.width > sizeSize.width + 24, rect.height > 44 else { return }
+
+        let detail = placement.regionDescription(in: keymap.grid)
+        let detailFont = NSFont.systemFont(ofSize: 12)
+        let detailAttrs: [NSAttributedString.Key: Any] = [
+            .font: detailFont,
+            .foregroundColor: NSColor.white.withAlphaComponent(0.75),
+        ]
+        let detailSize = (detail as NSString).size(withAttributes: detailAttrs)
+        let showDetail = rect.height > 74 && rect.width > detailSize.width + 24
+
+        let contentH = sizeSize.height + (showDetail ? detailSize.height + 3 : 0)
+        let contentW = max(sizeSize.width, showDetail ? detailSize.width : 0)
+        let padX: CGFloat = 12, padY: CGFloat = 7
+        let chip = NSRect(x: rect.midX - contentW / 2 - padX,
+                          y: rect.midY - contentH / 2 - padY,
+                          width: contentW + padX * 2,
+                          height: contentH + padY * 2)
+        NSColor.black.withAlphaComponent(0.40).setFill()
+        NSBezierPath(roundedRect: chip, xRadius: 8, yRadius: 8).fill()
+
+        let sizeY = showDetail ? chip.maxY - padY - sizeSize.height : chip.midY - sizeSize.height / 2
+        (size as NSString).draw(at: NSPoint(x: chip.midX - sizeSize.width / 2, y: sizeY),
+                                withAttributes: sizeAttrs)
+        if showDetail {
+            (detail as NSString).draw(at: NSPoint(x: chip.midX - detailSize.width / 2, y: chip.minY + padY),
+                                      withAttributes: detailAttrs)
+        }
+    }
+
+    /// Replaces the old blurred HUD panel. A line of text costs nothing to
+    /// draw; an NSVisualEffectView was the most expensive thing in the overlay
+    /// and it only ever said what this says.
+    private func drawHint() {
+        guard dragSelection == nil else { return }
+        let text = dragEnabled
+            ? NSLocalizedString("drag to place · press a key · esc to cancel", tableName: "Main",
+                                value: "drag to place · press a key · esc to cancel", comment: "")
+            : NSLocalizedString("press a key · esc to cancel", tableName: "Main",
+                                value: "press a key · esc to cancel", comment: "")
+        let font = NSFont.systemFont(ofSize: 12, weight: .medium)
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: NSColor.white.withAlphaComponent(0.8),
+        ]
+        let size = (text as NSString).size(withAttributes: attrs)
+        let pad: CGFloat = 12
+        let chip = NSRect(x: bounds.midX - (size.width + pad * 2) / 2,
+                          y: bounds.minY + 14,
+                          width: size.width + pad * 2,
+                          height: size.height + 10)
+        NSColor.black.withAlphaComponent(0.35).setFill()
+        NSBezierPath(roundedRect: chip, xRadius: 8, yRadius: 8).fill()
+        (text as NSString).draw(at: NSPoint(x: chip.midX - size.width / 2, y: chip.minY + 5),
+                                withAttributes: attrs)
+    }
+}
+
+// MARK: - Saved placements
+
+/// The revealable layer: the saved key→region map, outlined, plus whatever a
+/// keystroke just placed.
+final class PlacementPresetView: NSView {
+
+    private let keymap: PlacementKeymap
+    private var flashedPlacement: GridPlacement?
     private var flashedLayout: WindowLayout?
     private var flashedOutcome: PlacementModeController.LayoutOutcome?
 
@@ -242,13 +401,20 @@ final class PlacementGridView: NSView {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    override var isFlipped: Bool { false } // matches GridPlacement.resolve (Cocoa bottom-left)
+    override var isFlipped: Bool { false }
 
-    func flash(_ binding: PlacementBinding) {
-        flashedBindingID = binding.id
+    func reset() {
+        flashedPlacement = nil
+        flashedLayout = nil
+        flashedOutcome = nil
+        needsDisplay = true
+    }
+
+    func flash(placement: GridPlacement) {
+        flashedPlacement = placement
         needsDisplay = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [weak self] in
-            self?.flashedBindingID = nil
+            self?.flashedPlacement = nil
             self?.needsDisplay = true
         }
     }
@@ -267,55 +433,55 @@ final class PlacementGridView: NSView {
         }
     }
 
+    private func rect(for placement: GridPlacement) -> NSRect {
+        placement.resolve(in: bounds,
+                          grid: keymap.grid,
+                          outerMargin: keymap.outerMargin,
+                          innerGap: keymap.innerGap)
+            .insetBy(dx: 3, dy: 3)
+    }
+
     override func draw(_ dirtyRect: NSRect) {
-        let bounds = self.bounds
         let accent = NSColor.controlAccentColor
 
-        drawGridLines(in: bounds)
-
         for binding in keymap.assignedBindings {
-            let rect = binding.placement
-                .resolve(in: bounds,
-                         grid: keymap.grid,
-                         outerMargin: keymap.outerMargin,
-                         innerGap: keymap.innerGap)
-                .insetBy(dx: 3, dy: 3)
-            guard rect.width > 8, rect.height > 8 else { continue }
+            let r = rect(for: binding.placement)
+            guard r.width > 8, r.height > 8 else { continue }
 
-            let flashed = binding.id == flashedBindingID
-            let path = NSBezierPath(roundedRect: rect, xRadius: 14, yRadius: 14)
-            accent.withAlphaComponent(flashed ? 0.50 : 0.16).setFill()
-            path.fill()
-            accent.withAlphaComponent(flashed ? 1.0 : 0.55).setStroke()
-            path.lineWidth = flashed ? 3 : 1.5
+            let flashed = binding.placement == flashedPlacement
+            let path = NSBezierPath(roundedRect: r, xRadius: 14, yRadius: 14)
+            // Outlines only unless this is the region a keystroke just placed:
+            // a fill means "happening now", and stacking translucent fills over
+            // overlapping placements is what made this unreadable.
+            if flashed {
+                accent.withAlphaComponent(0.50).setFill()
+                path.fill()
+            }
+            accent.withAlphaComponent(flashed ? 1.0 : 0.45).setStroke()
+            path.lineWidth = flashed ? 3 : 1
             path.stroke()
 
-            drawCap(for: binding, in: rect, emphasised: flashed)
+            drawCap(for: binding, in: r, emphasised: flashed)
         }
 
-        drawFlashedLayout(in: bounds)
-        drawLayoutLegend(in: bounds)
-        drawMissingAppsNote(in: bounds)
+        drawFlashedLayout()
+        drawLayoutLegend()
+        drawMissingAppsNote()
     }
 
     /// The regions a layout actually filled, drawn with the same emphasis a
     /// flashed placement gets - the answer to "where did my windows go". Slots
     /// that couldn't be placed are deliberately not drawn; showing them would
     /// claim a window is somewhere it isn't.
-    private func drawFlashedLayout(in bounds: NSRect) {
+    private func drawFlashedLayout() {
         guard flashedLayout != nil, let outcome = flashedOutcome else { return }
         let accent = NSColor.controlAccentColor
 
         for placement in outcome.placed {
-            let rect = placement
-                .resolve(in: bounds,
-                         grid: keymap.grid,
-                         outerMargin: keymap.outerMargin,
-                         innerGap: keymap.innerGap)
-                .insetBy(dx: 3, dy: 3)
-            guard rect.width > 8, rect.height > 8 else { continue }
+            let r = rect(for: placement)
+            guard r.width > 8, r.height > 8 else { continue }
 
-            let path = NSBezierPath(roundedRect: rect, xRadius: 14, yRadius: 14)
+            let path = NSBezierPath(roundedRect: r, xRadius: 14, yRadius: 14)
             accent.withAlphaComponent(0.50).setFill()
             path.fill()
             accent.setStroke()
@@ -327,7 +493,7 @@ final class PlacementGridView: NSView {
     /// A layout that placed only some of its windows looks broken unless it says
     /// which app wasn't there - and "not running" and "running with no window"
     /// call for different things from the reader, so they are named separately.
-    private func drawMissingAppsNote(in bounds: NSRect) {
+    private func drawMissingAppsNote() {
         guard let outcome = flashedOutcome, !outcome.isComplete else { return }
 
         var parts: [String] = []
@@ -349,7 +515,7 @@ final class PlacementGridView: NSView {
         let size = (text as NSString).size(withAttributes: [.font: font])
         let pad: CGFloat = 14
         let rect = NSRect(x: bounds.midX - (size.width + pad * 2) / 2,
-                          y: bounds.minY + 88,
+                          y: bounds.minY + 106,
                           width: size.width + pad * 2,
                           height: 34)
         NSColor.black.withAlphaComponent(0.55).setFill()
@@ -360,7 +526,7 @@ final class PlacementGridView: NSView {
 
     /// Multi-window layouts can't be drawn as a single region, so list them as
     /// key chips along the bottom.
-    private func drawLayoutLegend(in bounds: NSRect) {
+    private func drawLayoutLegend() {
         let layouts = keymap.assignedLayouts
         guard !layouts.isEmpty else { return }
 
@@ -368,9 +534,7 @@ final class PlacementGridView: NSView {
         let keyFont = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
         var chips: [(key: String, label: String, keyW: CGFloat, labelW: CGFloat)] = []
         for layout in layouts {
-            let s = MASShortcut(keyCode: layout.keyCode,
-                                modifierFlags: NSEvent.ModifierFlags(rawValue: layout.modifierFlags))
-            let key = [s.modifierFlagsString, s.keyCodeString].compactMap { $0 }.joined()
+            let key = PlacementKeyLabel.text(keyCode: layout.keyCode, modifierFlags: layout.modifierFlags)
             let label = layout.label.isEmpty ? "\(layout.slots.count) windows" : layout.label
             let kw = (key as NSString).size(withAttributes: [.font: keyFont]).width
             let lw = (label as NSString).size(withAttributes: [.font: font]).width
@@ -381,7 +545,7 @@ final class PlacementGridView: NSView {
         let widths = chips.map { $0.keyW + gap + $0.labelW + pad * 2 }
         let totalW = widths.reduce(0, +) + chipGap * CGFloat(max(chips.count - 1, 0))
         var x = bounds.midX - totalW / 2
-        let y = bounds.minY + 40
+        let y = bounds.minY + 58
         let h: CGFloat = 34
 
         for (i, chip) in chips.enumerated() {
@@ -400,31 +564,8 @@ final class PlacementGridView: NSView {
         }
     }
 
-    private func drawGridLines(in bounds: NSRect) {
-        guard keymap.grid.cols > 0, keymap.grid.rows > 0 else { return }
-        let usable = bounds.insetBy(dx: max(0, keymap.outerMargin), dy: max(0, keymap.outerMargin))
-        NSColor.white.withAlphaComponent(0.06).setStroke()
-        let line = NSBezierPath()
-        line.lineWidth = 1
-        for c in 0...keymap.grid.cols {
-            let x = usable.minX + usable.width * CGFloat(c) / CGFloat(keymap.grid.cols)
-            line.move(to: NSPoint(x: x, y: usable.minY))
-            line.line(to: NSPoint(x: x, y: usable.maxY))
-        }
-        for r in 0...keymap.grid.rows {
-            let y = usable.minY + usable.height * CGFloat(r) / CGFloat(keymap.grid.rows)
-            line.move(to: NSPoint(x: usable.minX, y: y))
-            line.line(to: NSPoint(x: usable.maxX, y: y))
-        }
-        line.stroke()
-    }
-
     private func drawCap(for binding: PlacementBinding, in rect: NSRect, emphasised: Bool) {
-        let shortcut = MASShortcut(keyCode: binding.keyCode,
-                                   modifierFlags: NSEvent.ModifierFlags(rawValue: binding.modifierFlags))
-        let capText = [shortcut.modifierFlagsString, shortcut.keyCodeString]
-            .compactMap { $0 }
-            .joined()
+        let capText = PlacementKeyLabel.text(keyCode: binding.keyCode, modifierFlags: binding.modifierFlags)
         guard !capText.isEmpty || !binding.label.isEmpty else { return }
 
         let capFontSize = max(13, min(min(rect.width, rect.height) * 0.28, 30))

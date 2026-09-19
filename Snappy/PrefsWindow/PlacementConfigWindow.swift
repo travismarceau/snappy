@@ -21,6 +21,7 @@ final class PlacementConfigViewController: NSViewController {
 
     private let enableSwitch = NSSwitch()
     private let stickySwitch = NSSwitch()
+    private let dragSwitch = NSSwitch()
     private let revealPopup = NSPopUpButton()
     private let revealDelayField = NSTextField()
     private let timeoutField = NSTextField()
@@ -164,6 +165,7 @@ final class PlacementConfigViewController: NSViewController {
     private func buildGeneralGrid() -> NSView {
         enableSwitch.target = self; enableSwitch.action = #selector(toggleEnabled)
         stickySwitch.target = self; stickySwitch.action = #selector(toggleSticky)
+        dragSwitch.target = self; dragSwitch.action = #selector(toggleDrag)
 
         let shortcutView = MASShortcutView(frame: NSRect(x: 0, y: 0, width: 150, height: 24))
         shortcutView.shortcutValidator = AppShortcutValidator(defaultsKey: PlacementModeManager.defaultsKey)
@@ -184,11 +186,13 @@ final class PlacementConfigViewController: NSViewController {
 
         let grid = formGrid([
             [rightLabel(NSLocalizedString("Placement Mode", tableName: "Main", value: "Placement Mode", comment: "")), leadingWrap(enableSwitch)],
+            [rightLabel(NSLocalizedString("Drag to place", tableName: "Main", value: "Drag to place", comment: "")),
+             captioned(dragSwitch, NSLocalizedString("drag a region on the grid", tableName: "Main", value: "drag a region on the grid", comment: ""))],
             [rightLabel(NSLocalizedString("Keep pane open", tableName: "Main", value: "Keep pane open", comment: "")),
              captioned(stickySwitch, NSLocalizedString("until Esc", tableName: "Main", value: "until Esc", comment: ""))],
             [rightLabel(NSLocalizedString("Close after", tableName: "Main", value: "Close after", comment: "")), timeoutRow],
             [rightLabel(NSLocalizedString("Shortcut", tableName: "Main", value: "Shortcut", comment: "")), shortcutView],
-            [rightLabel(NSLocalizedString("Show map", tableName: "Main", value: "Show map", comment: "")), leadingWrap(revealPopup)],
+            [rightLabel(NSLocalizedString("Show placements", tableName: "Main", value: "Show placements", comment: "")), leadingWrap(revealPopup)],
             [rightLabel(NSLocalizedString("Reveal delay", tableName: "Main", value: "Reveal delay", comment: "")), delayRow],
         ])
         generalGrid = grid
@@ -346,6 +350,7 @@ final class PlacementConfigViewController: NSViewController {
     private func syncControlsFromModel() {
         enableSwitch.state = Defaults.placementModeEnabled.userEnabled ? .on : .off
         stickySwitch.state = Defaults.placementPaneSticky.enabled ? .on : .off
+        dragSwitch.state = Defaults.placementDragEnabled.userDisabled ? .off : .on
         revealPopup.selectItem(withTag: Defaults.placementMapReveal.value.rawValue)
         revealDelayField.stringValue = String(format: "%g", Double(Defaults.placementMapRevealDelay.value))
         timeoutField.stringValue = String(format: "%g", Double(Defaults.placementPaneTimeout.value))
@@ -472,13 +477,18 @@ final class PlacementConfigViewController: NSViewController {
         if enableSwitch.state == .off { PlacementModeController.shared.deactivate() }
         applyEnabledState()
     }
+    @objc private func toggleDrag() {
+        Defaults.placementDragEnabled.enabled = dragSwitch.state == .on
+        // A pane already on screen was built knowing whether it accepts a drag.
+        PlacementModeController.shared.deactivate()
+    }
     @objc private func toggleSticky() {
         Defaults.placementPaneSticky.enabled = stickySwitch.state == .on
         updateTimeoutFieldEnabled()
     }
     @objc private func revealChanged() {
         let tag = revealPopup.selectedTag()
-        Defaults.placementMapReveal.value = PlacementMapReveal(rawValue: tag) ?? .afterDelay
+        Defaults.placementMapReveal.value = PlacementMapReveal(rawValue: tag) ?? .always
         updateRevealDelayRowVisibility()
     }
     @objc private func revealDelayChanged() {

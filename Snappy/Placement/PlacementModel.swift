@@ -16,13 +16,17 @@ let placementModifierMask: UInt = (1 << 17) | (1 << 18) | (1 << 19) | (1 << 20)
 
 // MARK: - Overlay reveal behaviour
 
-/// How much the on-screen pane shows when placement mode activates.
+/// How much of the saved key→region map the pane shows.
+///
+/// Grid lines and the hint line are never governed by this — they are drawn the
+/// moment the pane appears, because you cannot aim at a grid you cannot see.
+/// This chooses only when the *bound placements* are outlined over it.
 enum PlacementMapReveal: Int {
-    /// Draw the full key→region map right away.
+    /// Outline the bound placements right away.
     case always = 0
-    /// Show only a small hint; fade the full map in if the user hesitates.
+    /// Grid only; fade the placements in if the user hesitates.
     case afterDelay = 1
-    /// Never draw the map; the hint is all you get.
+    /// Never outline the placements; the grid is all you get.
     case never = 2
 }
 
@@ -403,5 +407,72 @@ struct PlacementKeymap: Codable, Equatable {
     /// True if `keyCode`+`mods` is already taken by a different placement or layout.
     func hasConflict(keyCode: Int, modifierFlags: UInt, excluding id: UUID) -> Bool {
         holder(ofKeyCode: keyCode, modifierFlags: modifierFlags, excluding: id) != nil
+    }
+}
+
+// MARK: - Grid geometry
+
+/// A single cell of the grid. `row` counts from the TOP, as `GridPlacement`
+/// does, so a cell drops straight into a placement without a flip.
+struct GridCell: Equatable {
+    var col: Int
+    var row: Int
+
+    init(col: Int, row: Int) {
+        self.col = col
+        self.row = row
+    }
+}
+
+/// Maps a point in a pane's coordinate space to a grid cell.
+///
+/// `bounds` is the pane's own rect in Cocoa (bottom-left origin) space. Hit
+/// testing divides the usable rect evenly and deliberately ignores `innerGap`:
+/// an even division is what the overlay paints, so the cell you click is the
+/// cell you see. The gap still applies in `GridPlacement.resolve`, where it eats
+/// into the window rather than into the target you were aiming at.
+struct PlacementGridGeometry {
+    let bounds: CGRect
+    let grid: PlacementGrid
+    let outerMargin: CGFloat
+
+    init(bounds: CGRect, grid: PlacementGrid, outerMargin: CGFloat = 0) {
+        self.bounds = bounds
+        self.grid = grid
+        self.outerMargin = max(0, outerMargin)
+    }
+
+    /// The area the grid is drawn in: `bounds` inset by the outer margin. The
+    /// inset is capped so a margin wider than the pane can't invert the rect.
+    var usableRect: CGRect {
+        let inset = min(outerMargin, min(bounds.width, bounds.height) / 2)
+        return bounds.insetBy(dx: inset, dy: inset)
+    }
+
+    var cellWidth: CGFloat { usableRect.width / CGFloat(max(grid.cols, 1)) }
+    var cellHeight: CGFloat { usableRect.height / CGFloat(max(grid.rows, 1)) }
+
+    /// The cell under `point`, clamped into the grid — a point inside the outer
+    /// margin, or off the pane entirely, belongs to the nearest edge cell. A
+    /// point exactly on a grid line belongs to the higher-indexed cell.
+    func cell(at point: CGPoint) -> GridCell {
+        let usable = usableRect
+        guard usable.width > 0, usable.height > 0 else { return GridCell(col: 0, row: 0) }
+        let col = Int(floor((point.x - usable.minX) / cellWidth))
+        // `point` is Cocoa-space (y up) while rows count from the top.
+        let row = Int(floor((usable.maxY - point.y) / cellHeight))
+        return GridCell(col: min(max(col, 0), grid.cols - 1),
+                        row: min(max(row, 0), grid.rows - 1))
+    }
+}
+
+extension GridPlacement {
+    /// The block spanning two cells, whichever way round the drag ran.
+    init(anchor: GridCell, focus: GridCell, display: PlacementDisplayTarget = .current) {
+        self.init(col: min(anchor.col, focus.col),
+                  row: min(anchor.row, focus.row),
+                  colSpan: abs(anchor.col - focus.col) + 1,
+                  rowSpan: abs(anchor.row - focus.row) + 1,
+                  display: display)
     }
 }

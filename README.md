@@ -34,15 +34,25 @@ granted and then silently does nothing. See [docs/APP_STORE.md](docs/APP_STORE.m
 
 ### Placements
 
-A placement is a region of a grid bound to a single key.
+Press the leader shortcut (⌃⌥Space by default) and a grid appears over every
+display. From there, two ways to place the frontmost window:
 
-1. Open **Settings ▸ Placements** and set your grid — 6×6 by default.
-2. Click **+**, drag a region on the grid, and press the key you want it on.
-3. Anywhere in macOS, press the leader shortcut (⌃⌥Space by default), then that
-   key. The frontmost window moves to the region.
+- **Drag a region.** Press, drag across the cells you want, and release. The
+  window lands exactly where you drew, whether or not that region was ever
+  saved. The rectangle you drag is the window's real footprint, not a preview.
+- **Press a bound key.** A placement is a region bound to a single key, so one
+  keystroke sends the window there.
 
-Press the leader key again, or Escape, to dismiss without moving anything. An
-unrecognised key reveals the full map rather than doing nothing.
+To bind a key, open **Settings ▸ Placements**, set your grid — 6×6 by default —
+then click **+**, drag a region on the grid, and press the key you want it on.
+
+Press the leader key again, press Escape, or click outside the grid to dismiss
+without moving anything. An unrecognised key shows your saved placements rather
+than doing nothing.
+
+Dragging consumes a click while the grid is up, so it has an off switch:
+**Settings ▸ Placements ▸ Drag to place**. "Show placements" on the same card
+governs whether your saved regions are outlined over the grid.
 
 ### Layouts
 

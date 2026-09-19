@@ -240,3 +240,117 @@ final class WindowLayoutTests: XCTestCase {
         XCTAssertEqual(decoded.layouts, [])
     }
 }
+
+// MARK: - Drag hit testing
+
+/// The geometry behind dragging a one-off region on the overlay: a point on the
+/// pane maps to a cell, and two cells make a block. Both the overlay and the
+/// Settings editor go through this, so a regression here would move windows to
+/// the wrong place and draw the editor wrong in the same commit.
+final class PlacementGridGeometryTests: XCTestCase {
+
+    private let bounds = CGRect(x: 0, y: 0, width: 1200, height: 600)
+    private let grid = PlacementGrid(rows: 6, cols: 6) // 200 × 100 cells
+
+    private func geometry(margin: CGFloat = 0) -> PlacementGridGeometry {
+        PlacementGridGeometry(bounds: bounds, grid: grid, outerMargin: margin)
+    }
+
+    func testCornersMapToCornerCells() {
+        let g = geometry()
+        // Cocoa space: y grows upward, rows count from the top.
+        XCTAssertEqual(g.cell(at: CGPoint(x: 1, y: 599)), GridCell(col: 0, row: 0))
+        XCTAssertEqual(g.cell(at: CGPoint(x: 1199, y: 599)), GridCell(col: 5, row: 0))
+        XCTAssertEqual(g.cell(at: CGPoint(x: 1, y: 1)), GridCell(col: 0, row: 5))
+        XCTAssertEqual(g.cell(at: CGPoint(x: 1199, y: 1)), GridCell(col: 5, row: 5))
+    }
+
+    func testCenterMapsToCenterCell() {
+        XCTAssertEqual(geometry().cell(at: CGPoint(x: 500, y: 350)), GridCell(col: 2, row: 2))
+    }
+
+    func testPointOnAGridLineBelongsToTheHigherIndexedCell() {
+        let g = geometry()
+        // x = 200 is the line between column 0 and column 1.
+        XCTAssertEqual(g.cell(at: CGPoint(x: 200, y: 550)).col, 1)
+        // y = 500 is the line between row 0 and row 1, counting from the top.
+        XCTAssertEqual(g.cell(at: CGPoint(x: 50, y: 500)).row, 1)
+    }
+
+    func testPointsOffThePaneClampToEdgeCells() {
+        let g = geometry()
+        XCTAssertEqual(g.cell(at: CGPoint(x: -500, y: 5000)), GridCell(col: 0, row: 0))
+        XCTAssertEqual(g.cell(at: CGPoint(x: 9999, y: -9999)), GridCell(col: 5, row: 5))
+    }
+
+    func testOuterMarginShrinksTheGridAndClampsInsideIt() {
+        let g = geometry(margin: 60)
+        // The usable rect is 1080 × 480, so cells are 180 × 80.
+        XCTAssertEqual(g.cellWidth, 180, accuracy: 0.001)
+        XCTAssertEqual(g.cellHeight, 80, accuracy: 0.001)
+        // A point inside the margin belongs to the nearest edge cell, not to
+        // nothing: the margin is a gutter, not a dead zone.
+        XCTAssertEqual(g.cell(at: CGPoint(x: 10, y: 590)), GridCell(col: 0, row: 0))
+        XCTAssertEqual(g.cell(at: CGPoint(x: 1190, y: 10)), GridCell(col: 5, row: 5))
+        // And the first cell inside the margin is still cell zero.
+        XCTAssertEqual(g.cell(at: CGPoint(x: 70, y: 530)), GridCell(col: 0, row: 0))
+    }
+
+    func testMarginWiderThanThePaneCannotInvertTheUsableRect() {
+        let g = PlacementGridGeometry(bounds: bounds, grid: grid, outerMargin: 5000)
+        XCTAssertGreaterThanOrEqual(g.usableRect.width, 0)
+        XCTAssertGreaterThanOrEqual(g.usableRect.height, 0)
+        XCTAssertEqual(g.cell(at: CGPoint(x: 600, y: 300)), GridCell(col: 0, row: 0))
+    }
+
+    func testDragIsTheSameBlockWhicheverWayItRan() {
+        let a = GridCell(col: 1, row: 1)
+        let b = GridCell(col: 3, row: 4)
+        let expected = GridPlacement(col: 1, row: 1, colSpan: 3, rowSpan: 4)
+
+        XCTAssertEqual(GridPlacement(anchor: a, focus: b), expected)
+        XCTAssertEqual(GridPlacement(anchor: b, focus: a), expected)
+        XCTAssertEqual(GridPlacement(anchor: GridCell(col: 3, row: 1), focus: GridCell(col: 1, row: 4)), expected)
+        XCTAssertEqual(GridPlacement(anchor: GridCell(col: 1, row: 4), focus: GridCell(col: 3, row: 1)), expected)
+    }
+
+    func testClickWithoutMovementIsASingleCell() {
+        let cell = GridCell(col: 4, row: 2)
+        let p = GridPlacement(anchor: cell, focus: cell)
+        XCTAssertEqual(p, GridPlacement(col: 4, row: 2, colSpan: 1, rowSpan: 1))
+    }
+
+    func testDragRoundTripsThroughResolveToTheHandBuiltRect() {
+        let g = geometry()
+        let anchor = g.cell(at: CGPoint(x: 50, y: 580))   // col 0, row 0
+        let focus = g.cell(at: CGPoint(x: 450, y: 80))    // col 2, row 5
+        let dragged = GridPlacement(anchor: anchor, focus: focus)
+
+        XCTAssertEqual(dragged, GridPlacement(col: 0, row: 0, colSpan: 3, rowSpan: 6))
+        XCTAssertEqual(dragged.resolve(in: bounds, grid: grid, outerMargin: 0, innerGap: 0),
+                       CGRect(x: 0, y: 0, width: 600, height: 600))
+    }
+
+    func testADragAcrossTheTopHalfResolvesHighInCocoaSpace() {
+        let g = geometry()
+        let anchor = g.cell(at: CGPoint(x: 10, y: 599))   // top-left
+        let focus = g.cell(at: CGPoint(x: 1190, y: 310))  // row 2, right edge
+        let dragged = GridPlacement(anchor: anchor, focus: focus)
+
+        XCTAssertEqual(dragged, GridPlacement(col: 0, row: 0, colSpan: 6, rowSpan: 3))
+        let rect = dragged.resolve(in: bounds, grid: grid, outerMargin: 0, innerGap: 0)
+        XCTAssertEqual(rect, CGRect(x: 0, y: 300, width: 1200, height: 300))
+    }
+
+    func testDraggedRegionOnAnOffsetScreenLandsOnThatScreen() {
+        // A pane on a second display to the right: the drag is computed in the
+        // pane's own space, then resolved into the screen's coordinates.
+        let paneBounds = CGRect(x: 0, y: 0, width: 1200, height: 600)
+        let screenFrame = CGRect(x: 1920, y: 0, width: 1200, height: 600)
+        let g = PlacementGridGeometry(bounds: paneBounds, grid: grid)
+        let dragged = GridPlacement(anchor: g.cell(at: CGPoint(x: 610, y: 590)),
+                                    focus: g.cell(at: CGPoint(x: 1190, y: 310)))
+        let rect = dragged.resolve(in: screenFrame, grid: grid, outerMargin: 0, innerGap: 0)
+        XCTAssertEqual(rect, CGRect(x: 1920 + 600, y: 300, width: 600, height: 300))
+    }
+}
