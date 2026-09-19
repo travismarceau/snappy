@@ -91,10 +91,16 @@ else
   mkdir -p "$APPCAST_DIR"
   cp "$ZIP" "$APPCAST_DIR/"
   "$GENERATE_APPCAST" --download-url-prefix "${DOWNLOAD_URL_PREFIX:-https://getsnappy.fyi/}" "$APPCAST_DIR"
+  # The feed has to be served from SUFeedURL, which is getsnappy.fyi/appcast.xml,
+  # and site/ is what that host deploys — so the generated feed belongs in the
+  # repo, committed alongside the release it describes.
+  cp "$APPCAST_DIR/appcast.xml" site/appcast.xml
   echo
-  echo "Appcast: $APPCAST_DIR/appcast.xml"
-  echo "Upload BOTH $APPCAST_DIR/appcast.xml and $ZIP to getsnappy.fyi."
-  echo "The appcast URL must match SUFeedURL in Snappy/Info.plist."
+  echo "Appcast written to site/appcast.xml — commit it with the release."
+  echo "Release zip: $ZIP"
+  echo "Publish the zip wherever --download-url-prefix points"
+  echo "  (currently ${DOWNLOAD_URL_PREFIX:-https://getsnappy.fyi/});"
+  echo "Sparkle verifies the signature of whatever it finds at that URL."
 fi
 
 echo

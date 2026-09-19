@@ -181,13 +181,14 @@ No account, no network activity, no data collection.
 
 ## Hosting the Support / Privacy page — DONE
 
-`store/site.html` is live at **https://getsnappy.fyi/** and
+`site/index.html` is live at **https://getsnappy.fyi/** and
 **https://www.getsnappy.fyi/**, both over HTTPS with valid certs.
 
 Setup, for the record:
 
-- Source: GitHub repo `travismarceau/getsnappy-site` (public), `index.html` is a
-  copy of `store/site.html`. Push to `main` to redeploy.
+- Source: `site/` in this repo — see `site/README.md`. Previously the separate
+  `travismarceau/getsnappy-site` repo, mirrored to a `store/site.html` copy that
+  drifted out of date.
 - Host: DigitalOcean App Platform static site, app `getsnappy`
   (ID `3229cad9-40e1-4641-8910-8c768902710d`), free tier, region NYC. Default
   ingress `https://getsnappy-gztct.ondigitalocean.app`.
@@ -195,5 +196,5 @@ Setup, for the record:
   `www` `CNAME` point to `getsnappy-gztct.ondigitalocean.app`. The apex's
   default `ALIAS → pixie.porkbun.com` (Porkbun parking) had to be repointed —
   that was the cause of the earlier parking page.
-- To edit the page: change `store/site.html`, copy it to the site repo's
-  `index.html`, commit and push both.
+- To edit the page: change `site/index.html` and push. There is no second copy
+  to keep in step any more.

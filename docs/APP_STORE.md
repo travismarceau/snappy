@@ -194,11 +194,14 @@ someone does that experiment.
 
 ## Support / privacy site — live
 
-`store/site.html` is deployed at **https://getsnappy.fyi/** and
+`site/index.html` is deployed at **https://getsnappy.fyi/** and
 **https://www.getsnappy.fyi/** — both HTTPS, valid certs. Stack:
 
-- GitHub repo `travismarceau/getsnappy-site` (public) → `index.html` mirrors
-  `store/site.html`.
+- The site lives in this repo under `site/`. It used to be split between
+  `travismarceau/getsnappy-site` and a `store/site.html` copy here; the copy went
+  stale. See `site/README.md`, including the steps to repoint the DigitalOcean
+  app at this repo — until those are done, the live site is still served from
+  `getsnappy-site`.
 - DigitalOcean App Platform static site, app `getsnappy`
   (`3229cad9-40e1-4641-8910-8c768902710d`), free tier, NYC. Redeploys on push
   to `main`.
