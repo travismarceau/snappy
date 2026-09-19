@@ -3,14 +3,12 @@
 <!--
 	Internet Access Policy (Little Snitch and similar tools read this).
 
-	Snappy makes no network connections. There is no updater, no analytics and
-	no remote configuration, so `Connections` is deliberately empty rather than
-	absent: an empty array is a positive declaration that nothing is expected,
-	which is worth stating for an app that asks for Accessibility access.
+	Snappy makes exactly one kind of connection: Sparkle fetching the appcast to
+	see whether a newer version exists, and then the update itself. Nothing else
+	leaves the machine — no analytics, no crash reporting, no remote config.
 
-	Rectangle, which Snappy derives from, declared an update check against
-	rectangleapp.com here. Snappy has no Sparkle updater, so that entry was
-	removed rather than repointed.
+	Rectangle, which Snappy derives from, declared this against rectangleapp.com.
+	Snappy polls its own host.
 -->
 <plist version="1.0">
 <dict>
@@ -19,6 +17,21 @@
 	<key>ApplicationDescription</key>
 	<string>Snappy is Divvy-style window placement for macOS. Free and open source.</string>
 	<key>Connections</key>
-	<array/>
+	<array>
+		<dict>
+			<key>IsIncoming</key>
+			<false/>
+			<key>Host</key>
+			<string>getsnappy.fyi</string>
+			<key>NetworkProtocol</key>
+			<string>TCP</string>
+			<key>Port</key>
+			<string>443</string>
+			<key>Purpose</key>
+			<string>Snappy checks for new versions and downloads them</string>
+			<key>DenyConsequences</key>
+			<string>If you deny this connection, Snappy keeps working but will never tell you a new version exists. You would need to check getsnappy.fyi yourself.</string>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -16,7 +16,8 @@ Security fixes are applied only to the latest stable release.
 Snappy requires **macOS Accessibility Permissions** (`AXUIElement`) to manage windows. 
 
 * **Local Only:** Snappy runs entirely locally. It never collects, logs, or transmits window layouts, keystrokes, or personal data.
-* **No Network Access:** Snappy makes no network connections of any kind. It has no updater, no analytics, and no remote configuration. The bundled `InternetAccessPolicy.plist` declares this, so tools like Little Snitch can confirm it independently.
+* **Network Access:** Exactly one connection, to `getsnappy.fyi`, made by the Sparkle updater to fetch the appcast and download a new version. No analytics, no crash reporting, no remote configuration. The bundled `InternetAccessPolicy.plist` declares it, so tools like Little Snitch can confirm the scope independently.
+* **Update Integrity:** Every update is signed with an EdDSA key whose public half ships inside the app, and Sparkle refuses anything that fails verification. Builds are also Developer ID signed and notarized.
 
 ## Reporting a Vulnerability
 

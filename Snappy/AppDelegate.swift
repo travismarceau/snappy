@@ -74,6 +74,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
         insertEnterPlacementMenuItem()
+        insertCheckForUpdatesMenuItem()
+
+        // Creating the controller is what starts Sparkle's scheduler, so it has
+        // to happen at launch rather than the first time Settings is opened.
+        _ = SnappyUpdater.shared
 
         Notification.Name.configImported.onPost(using: { _ in
             self.statusItem.refreshVisibility()
@@ -244,6 +249,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         mainStatusMenu.insertItem(item, at: 0)
         mainStatusMenu.insertItem(NSMenuItem.separator(), at: 1)
+    }
+
+    /// Snappy ships outside the App Store, so checking for updates has to be
+    /// reachable without opening Settings — the status menu is the only UI a
+    /// menu-bar app reliably has.
+    private func insertCheckForUpdatesMenuItem() {
+        guard let index = mainStatusMenu.items.firstIndex(where: { $0.action == #selector(openPreferences(_:)) })
+        else { return }
+        let item = NSMenuItem(
+            title: NSLocalizedString("Check for Updates…", tableName: "Main", value: "Check for Updates…", comment: ""),
+            action: #selector(checkForUpdates(_:)),
+            keyEquivalent: "")
+        item.target = self
+        if #available(macOS 11, *) {
+            item.image = NSImage(systemSymbolName: "arrow.down.circle", accessibilityDescription: nil)
+        }
+        mainStatusMenu.insertItem(item, at: index + 1)
+    }
+
+    @objc func checkForUpdates(_ sender: Any) {
+        SnappyUpdater.shared.checkForUpdates()
     }
 
     /// Opens the placement grid over the frontmost window, exactly as the

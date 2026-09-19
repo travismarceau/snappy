@@ -10,8 +10,9 @@ engine is Rectangle's; the leader-key grid, drawn placement regions, and
 multi-window layouts are Snappy's own. This repository keeps Rectangle's full
 commit history rather than starting fresh, so `git log` shows who wrote what.
 
-Snappy makes no network connections: no updater, no analytics, no remote
-configuration.
+Snappy talks to one host, `getsnappy.fyi`, and only to check for and download a
+new version. No analytics, no crash reporting, no remote configuration. Updates
+are EdDSA-signed and verified before they are applied.
 
 ## System requirements
 

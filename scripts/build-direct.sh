@@ -33,6 +33,14 @@ if ! xcrun notarytool history --keychain-profile "${NOTARY_PROFILE:-snappy-notar
   exit 1
 fi
 
+# An empty SUPublicEDKey ships an app that will reject every update it is ever
+# offered, including the one that would fix it. Catch it here, not in the wild.
+if ! /usr/libexec/PlistBuddy -c "Print :SUPublicEDKey" Snappy/Info.plist 2>/dev/null | grep -q .; then
+  echo "SUPublicEDKey is empty in Snappy/Info.plist." >&2
+  echo "Run scripts/sparkle-keys.sh and paste the public key in before releasing." >&2
+  exit 1
+fi
+
 ARCHIVE=build/Snappy-direct.xcarchive
 EXPORT=build/export-direct
 ZIP=build/Snappy.zip
@@ -63,6 +71,31 @@ xcrun notarytool submit "$ZIP" --keychain-profile "$NOTARY_PROFILE" --wait
 xcrun stapler staple "$APP"
 rm -f "$ZIP"; ditto -c -k --keepParent "$APP" "$ZIP"
 spctl -a -vvv --type exec "$APP" || true
+
+# Sparkle: sign the build and fold it into the appcast users actually poll.
+#
+# generate_appcast reads every archive in the directory, signs each with the
+# private EdDSA key from the keychain, and rewrites appcast.xml. It needs the
+# release notes and download URL to match what the website serves, so the
+# appcast lives beside the zip and both are uploaded together.
+APPCAST_DIR=build/appcast
+GENERATE_APPCAST=$(find ~/Library/Developer/Xcode/DerivedData \
+  -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast' \
+  -type f 2>/dev/null | head -1)
+
+if [[ -z "$GENERATE_APPCAST" ]]; then
+  echo
+  echo "Sparkle's generate_appcast wasn't found in DerivedData; skipping the appcast." >&2
+  echo "The app is still built and notarized — but no existing user will be offered it." >&2
+else
+  mkdir -p "$APPCAST_DIR"
+  cp "$ZIP" "$APPCAST_DIR/"
+  "$GENERATE_APPCAST" --download-url-prefix "${DOWNLOAD_URL_PREFIX:-https://getsnappy.fyi/}" "$APPCAST_DIR"
+  echo
+  echo "Appcast: $APPCAST_DIR/appcast.xml"
+  echo "Upload BOTH $APPCAST_DIR/appcast.xml and $ZIP to getsnappy.fyi."
+  echo "The appcast URL must match SUFeedURL in Snappy/Info.plist."
+fi
 
 echo
 echo "Done: $APP"

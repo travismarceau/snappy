@@ -39,6 +39,19 @@
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>SUFeedURL</key>
+	<string>https://getsnappy.fyi/appcast.xml</string>
+	<!-- Sparkle verifies every download against this EdDSA public key. It is
+	     generated once by `scripts/sparkle-keys.sh`, which keeps the private
+	     half in the login keychain and never writes it to disk. Until it is
+	     filled in, Sparkle refuses updates rather than accepting unsigned ones. -->
+	<key>SUPublicEDKey</key>
+	<string></string>
+	<!-- Ask on first launch rather than deciding for the user. -->
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>

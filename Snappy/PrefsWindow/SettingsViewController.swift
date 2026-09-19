@@ -144,7 +144,13 @@ class SettingsViewController: NSViewController {
     }
     
     @IBAction func checkForUpdates(_ sender: Any) {
-        // Updates are handled by the App Store.
+        SnappyUpdater.shared.checkForUpdates()
+    }
+
+    @objc func toggleCheckForUpdatesAutomatically(_ sender: NSButton) {
+        // Sparkle owns this setting; Defaults.SUEnableAutomaticChecks reads the
+        // same key, so writing it through the updater keeps one source of truth.
+        SnappyUpdater.shared.automaticallyChecksForUpdates = sender.state == .on
     }
     
     @IBAction func toggleDoubleClickTitleBar(_ sender: NSButton) {
@@ -1081,9 +1087,15 @@ class SettingsViewController: NSViewController {
                                                name: .stackBadgeChanged,
                                                object: nil)
 
-        // Sparkle-based updating is removed for the App Store build.
-        checkForUpdatesAutomaticallyCheckbox.isHidden = true
-        checkForUpdatesButton.isHidden = true
+        // The checkbox has an outlet but never had an action - it was wired to
+        // the Sparkle controller that used to exist. Connect it in code rather
+        // than editing the storyboard for one connection.
+        checkForUpdatesAutomaticallyCheckbox.target = self
+        checkForUpdatesAutomaticallyCheckbox.action = #selector(toggleCheckForUpdatesAutomatically(_:))
+        // A copy running from a read-only mount or the build directory cannot
+        // replace itself; offering the button there only produces a puzzling
+        // failure later.
+        checkForUpdatesButton.isEnabled = SnappyUpdater.shared.canCheckForUpdates
 
         // Snappy drops Rectangle's repeated-command cycling, Todo Mode, the Stage
         // Manager sizing slider, and the Extras popover — hide those rows.
@@ -1199,7 +1211,7 @@ class SettingsViewController: NSViewController {
     }
     
     func initializeToggles() {
-        checkForUpdatesAutomaticallyCheckbox.state = Defaults.SUEnableAutomaticChecks.enabled ? .on : .off
+        checkForUpdatesAutomaticallyCheckbox.state = SnappyUpdater.shared.automaticallyChecksForUpdates ? .on : .off
         
         launchOnLoginCheckbox.state = Defaults.launchOnLogin.enabled ? .on : .off
         

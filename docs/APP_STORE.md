@@ -22,7 +22,11 @@ Snappy is a keyboard-first window placement app derived from **Rectangle**
 - The Placement tab has a **Placements | Layouts** switch. **Multi-window
   layouts** (one key arranges several apps' windows at once) is a feature
   Rectangle has no equivalent for.
-- Welcome / recommended-settings modal removed. Sparkle removed entirely.
+- Welcome / recommended-settings modal removed.
+- **Sparkle is back** (2.10.0, SPM), unconditionally: the sandbox verdict below
+  closes the App Store route, so there is no build that must ship without an
+  updater. See `Snappy/Updater.swift`, `scripts/sparkle-keys.sh` and the appcast
+  step in `scripts/build-direct.sh`.
 
 **Build config**
 - **Release** = the Mac App Store build: `Snappy.app`, App Sandbox

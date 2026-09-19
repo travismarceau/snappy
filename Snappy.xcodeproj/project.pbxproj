@@ -96,11 +96,13 @@
 		983DD04028A844BE00BF1EEE /* SnapAreaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */; };
 		983DD04428B0639E00BF1EEE /* SnapAreaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DD04328B0639E00BF1EEE /* SnapAreaModel.swift */; };
 		984EDB0F29A42ED200D119D2 /* LaunchOnLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984EDB0E29A42ED200D119D2 /* LaunchOnLogin.swift */; };
+		F1AC0DE00000000000000302 /* Updater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000301 /* Updater.swift */; };
 		9851A5C3251BEBA300ECF78C /* OrientationAware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9851A5C2251BEBA300ECF78C /* OrientationAware.swift */; };
 		985B9BF522B93EEC00A2E8F0 /* ApplicationToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985B9BF422B93EEC00A2E8F0 /* ApplicationToggle.swift */; };
 		985B9BF822BB6F5100A2E8F0 /* MessageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 985B9BF622BB6F5000A2E8F0 /* MessageView.xib */; };
 		985B9BF922BB6F5100A2E8F0 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985B9BF722BB6F5000A2E8F0 /* MessageView.swift */; };
 		9877B63A29C8AC0E00F02D74 /* MASShortcut in Frameworks */ = {isa = PBXBuildFile; productRef = 9877B63929C8AC0E00F02D74 /* MASShortcut */; };
+		5B0C1A0000000000000000A3 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0C1A0000000000000000A2 /* Sparkle */; };
 		988D066122EB4C7C004EABD7 /* FirstThirdCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988D066022EB4C7C004EABD7 /* FirstThirdCalculation.swift */; };
 		988D066322EB4CA5004EABD7 /* FirstTwoThirdsCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988D066222EB4CA5004EABD7 /* FirstTwoThirdsCalculation.swift */; };
 		988D066522EB4CB6004EABD7 /* CenterThirdCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988D066422EB4CB5004EABD7 /* CenterThirdCalculation.swift */; };
@@ -333,6 +335,7 @@
 		983DD03F28A844BE00BF1EEE /* SnapAreaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapAreaViewController.swift; sourceTree = "<group>"; };
 		983DD04328B0639E00BF1EEE /* SnapAreaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapAreaModel.swift; sourceTree = "<group>"; };
 		984EDB0E29A42ED200D119D2 /* LaunchOnLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchOnLogin.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000301 /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
 		9851A5C2251BEBA300ECF78C /* OrientationAware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationAware.swift; sourceTree = "<group>"; };
 		985B9BF422B93EEC00A2E8F0 /* ApplicationToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationToggle.swift; sourceTree = "<group>"; };
 		985B9BF622BB6F5000A2E8F0 /* MessageView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageView.xib; sourceTree = "<group>"; };
@@ -460,6 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9877B63A29C8AC0E00F02D74 /* MASShortcut in Frameworks */,
+				5B0C1A0000000000000000A3 /* Sparkle in Frameworks */,
 				9821405E22B3ED3600ABFB3F /* ServiceManagement.framework in Frameworks */,
 				12D896200936C0DE9FF41FB4 /* (null) in Frameworks */,
 			);
@@ -715,6 +719,7 @@
 				9824701622AF9B7E0037B409 /* Snappy.entitlements */,
 				9821405F22B3EFB200ABFB3F /* Defaults.swift */,
 				984EDB0E29A42ED200D119D2 /* LaunchOnLogin.swift */,
+				F1AC0DE00000000000000301 /* Updater.swift */,
 				98C1008B2305F1FA006E5344 /* SubsequentExecutionMode.swift */,
 				7BE578EE2C5BF4ED0083DAE3 /* CycleSize.swift */,
 				7BE578F22EFE11010083DAE3 /* ActiveSideSplitRatios.swift */,
@@ -878,6 +883,7 @@
 			name = Snappy;
 			packageProductDependencies = (
 				9877B63929C8AC0E00F02D74 /* MASShortcut */,
+				5B0C1A0000000000000000A2 /* Sparkle */,
 			);
 			productName = Snappy;
 			productReference = 9824700922AF9B7D0037B409 /* Snappy.app */;
@@ -982,6 +988,7 @@
 			mainGroup = 9824700022AF9B7D0037B409;
 			packageReferences = (
 				9877B63829C8AC0E00F02D74 /* XCRemoteSwiftPackageReference "MASShortcut" */,
+				5B0C1A0000000000000000A1 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = 9824700A22AF9B7D0037B409 /* Products */;
 			projectDirPath = "";
@@ -1056,6 +1063,7 @@
 				94E9B08E2C3B8D97004C7F41 /* MacTilingDefaults.swift in Sources */,
 				9821403522B38A2B00ABFB3F /* UpperRightCalculation.swift in Sources */,
 				984EDB0F29A42ED200D119D2 /* LaunchOnLogin.swift in Sources */,
+				F1AC0DE00000000000000302 /* Updater.swift in Sources */,
 				9824702F22AFA2E50037B409 /* AccessibilityAuthorization.swift in Sources */,
 				988D066322EB4CA5004EABD7 /* FirstTwoThirdsCalculation.swift in Sources */,
 				D04CE30A27817A9F00BD47B3 /* MiddleRightNinthCalculation.swift in Sources */,
@@ -1622,6 +1630,14 @@
 				revision = 2f9fbb3f959b7a683c6faaf9638d22afad37a235;
 			};
 		};
+		5B0C1A0000000000000000A1 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1629,6 +1645,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9877B63829C8AC0E00F02D74 /* XCRemoteSwiftPackageReference "MASShortcut" */;
 			productName = MASShortcut;
+		};
+		5B0C1A0000000000000000A2 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B0C1A0000000000000000A1 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
