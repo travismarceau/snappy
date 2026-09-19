@@ -68,12 +68,29 @@ DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/travismarceau/sna
 # A release overwrites nothing. An existing tag means either the version was
 # never bumped, or this is a re-cut of something already published -- and since
 # the appcast names ${DOWNLOAD_URL_PREFIX}Snappy.zip, replacing that asset swaps
-# the download out from under the signature the feed told users to expect.
-if [[ -z "${ALLOW_EXISTING_TAG:-}" ]] && git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
-  echo "Tag $TAG already exists: $(git log -1 --format='%h %ad' --date=short "$TAG")." >&2
-  echo "Bump MARKETING_VERSION in the Snappy target, or re-run with" >&2
-  echo "ALLOW_EXISTING_TAG=1 if you are deliberately re-cutting that release." >&2
-  exit 1
+# the download out from under the signature the published feed told users to
+# expect.
+#
+# The remote is what matters, and checking only the local repo misses the case
+# this guard exists for: `gh release create` makes the tag server-side, so after
+# a release the tag is on origin and NOT here until someone fetches. A local-only
+# check sails straight through the second run. The local check is kept as a cheap
+# offline pre-filter -- and because this repo carries ~100 inherited tags from
+# Rectangle that were never pushed.
+if [[ -z "${ALLOW_EXISTING_TAG:-}" ]]; then
+  if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+    echo "Tag $TAG already exists on origin — that release is likely published." >&2
+    echo "Re-uploading its asset would invalidate the signature the live appcast" >&2
+    echo "advertises. Bump MARKETING_VERSION in the Snappy target, or re-run with" >&2
+    echo "ALLOW_EXISTING_TAG=1 to deliberately re-cut it." >&2
+    exit 1
+  fi
+  if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+    echo "Tag $TAG already exists locally: $(git log -1 --format='%h %ad' --date=short "$TAG")." >&2
+    echo "Bump MARKETING_VERSION in the Snappy target, or re-run with" >&2
+    echo "ALLOW_EXISTING_TAG=1 if you are deliberately re-cutting that release." >&2
+    exit 1
+  fi
 fi
 
 # Sparkle offers an update only when the feed's sparkle:version exceeds what is
@@ -105,6 +122,23 @@ fi
 # silently refuses to move a window.
 NOTES_HTML="site/releases/${TAG}.html"
 NOTES_MD="site/releases/${TAG}.md"
+
+# The two files say the same thing to different readers -- Sparkle's dialog
+# renders the HTML, the GitHub release body quotes the markdown -- and nothing
+# makes them agree. That is the shape of the bug that let store/site.html drift
+# away from the deployed site until the copy here had no download button at all.
+#
+# These checks compare the files against each other rather than demanding any
+# particular wording: a release that changes nothing about permissions should
+# not be forced to mention them. What is not allowed is one file carrying a
+# warning the other drops.
+notes_prose() {
+  # HTML minus its style block and tags, or markdown minus its syntax, reduced
+  # to comparable words.
+  sed -e '/<style>/,/<\/style>/d' -e 's/<[^>]*>//g' -e 's/[#*`_>-]//g' "$1" \
+    | tr -s '[:space:]' '\n' | grep -c . || true
+}
+
 for f in "$NOTES_HTML" "$NOTES_MD"; do
   if [[ ! -f "$f" ]]; then
     echo "Missing release notes: $f" >&2
@@ -115,7 +149,41 @@ for f in "$NOTES_HTML" "$NOTES_MD"; do
     echo "who skip it see Snappy do nothing at all, with no error." >&2
     exit 1
   fi
+  if ! grep -q "$VERSION" "$f"; then
+    echo "Release notes $f never mention version $VERSION." >&2
+    exit 1
+  fi
 done
+
+# A warning in one file and not the other means someone edited one and forgot
+# the other. Accessibility is called out by name because it is the one whose
+# absence is silent: users who miss it get an app that launches and does nothing.
+for topic in -i.accessibility -i.re-grant; do
+  pattern=${topic#-i.}
+  if grep -qi "$pattern" "$NOTES_MD" && ! grep -qi "$pattern" "$NOTES_HTML"; then
+    echo "\"$pattern\" appears in $NOTES_MD but not $NOTES_HTML." >&2
+    echo "Sparkle renders the HTML — that warning would not reach anyone updating." >&2
+    exit 1
+  fi
+  if grep -qi "$pattern" "$NOTES_HTML" && ! grep -qi "$pattern" "$NOTES_MD"; then
+    echo "\"$pattern\" appears in $NOTES_HTML but not $NOTES_MD." >&2
+    echo "The GitHub release body quotes the markdown — it would omit that warning." >&2
+    exit 1
+  fi
+done
+
+# Catch wholesale divergence: one file rewritten, the other left behind.
+MD_WORDS=$(notes_prose "$NOTES_MD")
+HTML_WORDS=$(notes_prose "$NOTES_HTML")
+if (( MD_WORDS == 0 || HTML_WORDS == 0 )); then
+  echo "Release notes are empty after stripping markup (md=$MD_WORDS html=$HTML_WORDS)." >&2
+  exit 1
+fi
+if (( MD_WORDS * 100 / HTML_WORDS < 60 || HTML_WORDS * 100 / MD_WORDS < 60 )); then
+  echo "Release notes differ a lot in length: $NOTES_MD $MD_WORDS words," >&2
+  echo "$NOTES_HTML $HTML_WORDS. One was probably edited without the other." >&2
+  exit 1
+fi
 
 ARCHIVE=build/Snappy-direct.xcarchive
 EXPORT=build/export-direct
@@ -201,6 +269,11 @@ else
   echo
   echo "Then commit site/appcast.xml and $NOTES_HTML and push, so getsnappy.fyi"
   echo "serves the feed and the notes."
+  echo
+  echo "Finally, once it is deployed and the release is published:"
+  echo "    scripts/verify-release.sh"
+  echo "A 200 from the feed URL proves nothing — the site answers every unknown"
+  echo "path with the homepage."
   echo "Sparkle verifies the signature of whatever it finds at that URL, so the"
   echo "zip published there must be this exact file."
 fi

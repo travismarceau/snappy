@@ -26,19 +26,16 @@ To move the deployment here from `getsnappy-site`:
 1. DigitalOcean ▸ Apps ▸ the getsnappy app ▸ Settings ▸ App-Level ▸ Source.
 2. Repoint it at `travismarceau/snappy`, branch `main`, **source directory `site/`**.
 3. Grant DigitalOcean access to the repo if it is still private.
-4. Redeploy, then verify. **A 200 proves nothing here**: the static site's
-   catchall document is `index.html`, so every unknown path answers 200 with the
-   homepage. `https://getsnappy.fyi/appcast.xml` returns the homepage today.
-   Check the content type instead:
+4. Redeploy, then run `scripts/verify-release.sh`. **Do not check for a 200**:
+   the static site's catchall document is `index.html`, so every unknown path
+   answers 200 with the homepage — `https://getsnappy.fyi/appcast.xml` does
+   exactly that today. The script checks content type, that the body is really
+   RSS, that the advertised build matches the project, that the notes are
+   embedded rather than linked, that the signature is present, and that the
+   download the feed promises actually resolves.
 
-   ```bash
-   curl -sI https://getsnappy.fyi/appcast.xml | grep -i content-type
-   # want: application/xml or text/xml -- text/html means the feed is missing
-   curl -s https://getsnappy.fyi/appcast.xml | head -2   # want <?xml ... <rss
-   ```
-
-   Sparkle fetching HTML fails to parse it and reports an update error, so a
-   missing feed is not a quiet no-op.
+   It takes an optional feed URL, so it also works against a local
+   `python3 -m http.server` during a dry run.
 
 Until that is done, the live site is still being served from `getsnappy-site`
 and this directory is not yet authoritative. Archive that repo once the switch
