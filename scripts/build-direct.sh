@@ -44,14 +44,78 @@ fi
 # The appcast has to name the exact URL the zip will be published at, and
 # Sparkle verifies the signature of whatever it finds there. Releases go to
 # GitHub, so the URL is derived from the version rather than hand-maintained.
-VERSION=$(xcodebuild -project Snappy.xcodeproj -target Snappy -showBuildSettings 2>/dev/null \
-  | awk '/ MARKETING_VERSION = / {print $3; exit}')
+# -configuration Release is explicit on purpose. Without it xcodebuild answers
+# for the project's default configuration, so a Debug/Release version mismatch
+# reads as whichever one happens to be default -- which is how 1.100/106 sat in
+# Debug while Release quietly still said 1.0/1.
+SETTINGS=$(xcodebuild -project Snappy.xcodeproj -target Snappy -configuration Release \
+  -showBuildSettings 2>/dev/null)
+VERSION=$(awk '/ MARKETING_VERSION = / {print $3; exit}' <<<"$SETTINGS")
 if [[ -z "$VERSION" ]]; then
   echo "Could not read MARKETING_VERSION from the project." >&2
   exit 1
 fi
+# CFBundleVersion, not the marketing string, is what Sparkle compares: the
+# sparkle:version generate_appcast writes comes from here.
+BUILD=$(awk '/ CURRENT_PROJECT_VERSION = / {print $3; exit}' <<<"$SETTINGS")
+if [[ -z "$BUILD" ]]; then
+  echo "Could not read CURRENT_PROJECT_VERSION from the project." >&2
+  exit 1
+fi
 TAG="v${VERSION}"
 DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/travismarceau/snappy/releases/download/${TAG}/}"
+
+# A release overwrites nothing. An existing tag means either the version was
+# never bumped, or this is a re-cut of something already published -- and since
+# the appcast names ${DOWNLOAD_URL_PREFIX}Snappy.zip, replacing that asset swaps
+# the download out from under the signature the feed told users to expect.
+if [[ -z "${ALLOW_EXISTING_TAG:-}" ]] && git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+  echo "Tag $TAG already exists: $(git log -1 --format='%h %ad' --date=short "$TAG")." >&2
+  echo "Bump MARKETING_VERSION in the Snappy target, or re-run with" >&2
+  echo "ALLOW_EXISTING_TAG=1 if you are deliberately re-cutting that release." >&2
+  exit 1
+fi
+
+# Sparkle offers an update only when the feed's sparkle:version exceeds what is
+# installed. Publishing a feed whose newest entry is <= the last one produces an
+# updater that never fires, and it fails silently: a feed offering nothing looks
+# exactly like being up to date.
+if [[ -f site/appcast.xml ]]; then
+  PUBLISHED=$( { sed -n 's/.*<sparkle:version>\([0-9][0-9]*\)<\/sparkle:version>.*/\1/p' site/appcast.xml
+                 sed -n 's/.*sparkle:version="\([0-9][0-9]*\)".*/\1/p' site/appcast.xml
+               } | sort -n | tail -1 )
+  if [[ -n "$PUBLISHED" ]] && (( BUILD <= PUBLISHED )); then
+    echo "CURRENT_PROJECT_VERSION is $BUILD, but site/appcast.xml already" >&2
+    echo "advertises $PUBLISHED. Sparkle compares CFBundleVersion, so this build" >&2
+    echo "would never be offered to anyone running the published one." >&2
+    echo "Bump CURRENT_PROJECT_VERSION in the Snappy target." >&2
+    exit 1
+  fi
+fi
+
+# Release notes, checked here rather than after the archive: finding out that
+# they are missing should cost a second, not a build and a notarization round
+# trip. generate_appcast embeds the HTML as the <description> Sparkle renders in
+# its update dialog, which is the only place most users will ever read it; the
+# markdown is what the GitHub release body quotes.
+#
+# Hard failure on purpose. Releases change the bundle identifier from time to
+# time, and macOS drops the Accessibility grant when they do -- an update that
+# ships without saying so leaves every user with an app that launches and then
+# silently refuses to move a window.
+NOTES_HTML="site/releases/${TAG}.html"
+NOTES_MD="site/releases/${TAG}.md"
+for f in "$NOTES_HTML" "$NOTES_MD"; do
+  if [[ ! -f "$f" ]]; then
+    echo "Missing release notes: $f" >&2
+    echo "Write them before releasing. If this version changes the bundle" >&2
+    echo "identifier or the signing identity, they MUST tell users to re-grant" >&2
+    echo "Accessibility in System Settings -- TCC keys the grant to the bundle" >&2
+    echo "id plus code signature and there is no API to transfer it, so users" >&2
+    echo "who skip it see Snappy do nothing at all, with no error." >&2
+    exit 1
+  fi
+done
 
 ARCHIVE=build/Snappy-direct.xcarchive
 EXPORT=build/export-direct
@@ -102,6 +166,19 @@ if [[ -z "$GENERATE_APPCAST" ]]; then
 else
   mkdir -p "$APPCAST_DIR"
   cp "$ZIP" "$APPCAST_DIR/"
+
+  # Release notes. generate_appcast embeds <archive-basename>.html from this
+  # directory as the <description> Sparkle renders in the update dialog, which
+  # is the only place most users will ever read them. Embedding beats linking:
+  # a sparkle:releaseNotesLink that 404s shows an empty dialog, and the notes
+  # then depend on the website being up at update time.
+  #
+  # This is a hard failure, not a warning. Releases change the bundle
+  # identifier from time to time, and macOS drops the Accessibility grant when
+  # they do -- an update that ships without saying so leaves every user with an
+  # app that launches and then silently refuses to move a window.
+  cp "$NOTES_HTML" "$APPCAST_DIR/$(basename "$ZIP" .zip).html"
+
   "$GENERATE_APPCAST" --download-url-prefix "$DOWNLOAD_URL_PREFIX" "$APPCAST_DIR"
   # The feed has to be served from SUFeedURL, which is getsnappy.fyi/appcast.xml,
   # and site/ is what that host deploys — so the generated feed belongs in the
@@ -113,11 +190,12 @@ else
   echo "Now publish the zip at the URL the appcast names:"
   echo "  ${DOWNLOAD_URL_PREFIX}Snappy.zip"
   echo
-  echo "    gh release create $TAG \"$ZIP\" --title \"Snappy $VERSION\" --notes-file <notes.md>"
-  echo "    # or, if $TAG already exists:"
+  echo "    gh release create $TAG \"$ZIP\" --title \"Snappy $VERSION\" --notes-file $NOTES_MD"
+  echo "    # re-cutting an already-published tag (ALLOW_EXISTING_TAG=1 to get here):"
   echo "    gh release upload $TAG \"$ZIP\" --clobber"
   echo
-  echo "Then commit site/appcast.xml and push, so getsnappy.fyi serves the feed."
+  echo "Then commit site/appcast.xml and $NOTES_HTML and push, so getsnappy.fyi"
+  echo "serves the feed and the notes."
   echo "Sparkle verifies the signature of whatever it finds at that URL, so the"
   echo "zip published there must be this exact file."
 fi
