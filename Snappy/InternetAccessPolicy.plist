@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+	Internet Access Policy (Little Snitch and similar tools read this).
+
+	Snappy makes no network connections. There is no updater, no analytics and
+	no remote configuration, so `Connections` is deliberately empty rather than
+	absent: an empty array is a positive declaration that nothing is expected,
+	which is worth stating for an app that asks for Accessibility access.
+
+	Rectangle, which Snappy derives from, declared an update check against
+	rectangleapp.com here. Snappy has no Sparkle updater, so that entry was
+	removed rather than repointed.
+-->
 <plist version="1.0">
 <dict>
+	<key>ApplicationName</key>
+	<string>Snappy</string>
 	<key>ApplicationDescription</key>
 	<string>Snappy is Divvy-style window placement for macOS. Free and open source.</string>
 	<key>Connections</key>
-	<array>
-		<dict>
-			<key>IsIncoming</key>
-			<false/>
-			<key>Host</key>
-			<string>rectangleapp.com</string>
-			<key>NetworkProtocol</key>
-			<string>TCP</string>
-			<key>Port</key>
-			<string>443</string>
-			<key>Purpose</key>
-			<string>Snappy checks for new versions</string>
-			<key>DenyConsequences</key>
-			<string>If you deny this connection, you will not be notified about new versions.</string>
-		</dict>
-	</array>
+	<array/>
 </dict>
 </plist>
