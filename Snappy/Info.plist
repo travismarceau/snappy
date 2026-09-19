@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>$(BUNDLE_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
@@ -13,8 +15,6 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(BUNDLE_DISPLAY_NAME)</string>
-	<key>CFBundleDisplayName</key>
 	<string>$(BUNDLE_DISPLAY_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
@@ -39,19 +39,6 @@
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>SUFeedURL</key>
-	<string>https://getsnappy.fyi/appcast.xml</string>
-	<!-- Sparkle verifies every download against this EdDSA public key. It is
-	     generated once by `scripts/sparkle-keys.sh`, which keeps the private
-	     half in the login keychain and never writes it to disk. Until it is
-	     filled in, Sparkle refuses updates rather than accepting unsigned ones. -->
-	<key>SUPublicEDKey</key>
-	<string></string>
-	<!-- Ask on first launch rather than deciding for the user. -->
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
-	<key>SUScheduledCheckInterval</key>
-	<integer>86400</integer>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
@@ -60,5 +47,22 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<!-- Sparkle. Check on a schedule rather than deciding for the user on a
+	     first run; the Settings checkbox writes the same key. -->
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://getsnappy.fyi/appcast.xml</string>
+	<!-- Sparkle verifies every download against this EdDSA public key, whose
+	     private half lives in the login keychain (service
+	     https://sparkle-project.org, account ed25519) and is never written to
+	     disk. It was generated once by scripts/sparkle-keys.sh and must not
+	     change: every copy of Snappy already installed verifies against the key
+	     baked into it, so losing the private half ends updates for those users
+	     permanently. Back up that keychain item. -->
+	<key>SUPublicEDKey</key>
+	<string>Xo8SuxXRugAs1k8o+dWS538srPXc/iC3kcN5UvXJH+s=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 </dict>
 </plist>
