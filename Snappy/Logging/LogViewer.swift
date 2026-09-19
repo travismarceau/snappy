@@ -1,10 +1,22 @@
 /// LogViewer.swift
 
 import Cocoa
+import os.log
 
 class Logger {
     
     static var logging = false
+
+    /// Everything also goes to the unified log, not only to the in-app window.
+    ///
+    /// The window is opt-in (hold Option, "View Logging…"), which means the
+    /// messages that matter most -- "the event tap could not be created", which
+    /// is what a missing Accessibility grant looks like from inside -- were
+    /// written to nowhere unless someone happened to have the window open
+    /// first. Diagnosing that from outside the app was impossible.
+    ///
+    ///   log stream --predicate 'subsystem == "com.simarholonipaa.snappy"'
+    private static let osLog = OSLog(subsystem: "com.simarholonipaa.snappy", category: "snappy")
     
     static private var logWindowController: LogWindowController?
     
@@ -18,6 +30,7 @@ class Logger {
     }
     
     static func log(_ string: String) {
+        os_log("%{public}@", log: osLog, type: .default, string)
         if logging {
             logWindowController?.append(string)
         }

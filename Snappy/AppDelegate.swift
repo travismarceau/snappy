@@ -48,6 +48,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // Say plainly, every launch, whether macOS trusts us. Without this the
+        // only symptom of a missing or stale grant is "the panel appears and
+        // nothing happens", which is indistinguishable from a bug in the panel.
+        // Recorded in defaults as well as the log: a value you can read from
+        // outside the app is the difference between diagnosing this in one
+        // command and guessing at it from symptoms.
+        let trusted = AXIsProcessTrusted()
+        UserDefaults.standard.set(trusted, forKey: "lastLaunchAccessibilityTrusted")
+        UserDefaults.standard.set(Bundle.main.bundlePath, forKey: "lastLaunchBundlePath")
+        UserDefaults.standard.set(Date(), forKey: "lastLaunchAt")
+        Logger.log("Launch: bundle=\(Bundle.main.bundleIdentifier ?? "?") path=\(Bundle.main.bundlePath) accessibilityTrusted=\(trusted)")
         Defaults.loadFromSupportDir()
         migrateShowEighthsInMenu()
 
@@ -715,6 +726,13 @@ extension AppDelegate {
                         return getUrlName(windowAction.name) == name
                     })
                     action?.postUrl()
+                case ("execute-task", "enter-placement"):
+                    // Opens the placement panel exactly as the leader shortcut
+                    // does. Anything a person can reach from the menu bar should
+                    // be reachable without a keyboard -- for scripting, for
+                    // automation, and so the panel can be exercised in a test
+                    // without synthesising a global hotkey.
+                    PlacementModeController.shared.activate()
                 case ("execute-task", "ignore-app"):
                     let bundleId = extractBundleIdParameter(fromComponents: components)
                     guard isValidParameter(bundleId: bundleId), let bundleId else { continue }

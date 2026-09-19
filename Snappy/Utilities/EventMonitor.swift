@@ -1,6 +1,7 @@
 /// EventMonitor.swift
 
 import Cocoa
+import IOKit.hid
 
 protocol EventMonitor {
     var running: Bool { get }
@@ -52,7 +53,7 @@ public class ActiveEventMonitor: EventMonitor {
     // the main thread - so the port and its thread are guarded.
     private let lock = NSLock()
     private var tap: CFMachPort?
-    private var thread: RunLoopThread?
+    private var runLoopSource: CFRunLoopSource?
     private let mask: NSEvent.EventTypeMask
     public let filterer: (NSEvent) -> Bool
     public let handler: (NSEvent) -> Void
@@ -85,19 +86,62 @@ public class ActiveEventMonitor: EventMonitor {
             Logger.log("Unable to create an event tap - accessibility may no longer be authorized")
             return
         }
-        let thread = RunLoopThread(mode: .default, qualityOfService: .userInteractive, start: true)
-        thread.runLoop?.add(tap, forMode: .default)
+
+        // A CGEventTap delivers through the CFMachPort's *callback*, which only
+        // runs if a CFRunLoopSource built from that port is on a live run loop.
+        //
+        // This used to be `runLoop.add(tap, forMode:)`. CFMachPort and NSPort
+        // are toll-free bridged, so that compiled -- and installed NSPort's
+        // message-delivery machinery instead of the port's callback. The tap was
+        // created, the WindowServer had it registered, `running` reported true,
+        // and tapCallback was never called once: every event sailed past
+        // unfiltered until the WindowServer timed the tap out. Nothing in the
+        // app said so, because from the inside a tap that sees no events is
+        // indistinguishable from a quiet keyboard.
+        guard let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0) else {
+            Logger.log("Unable to build a run loop source for the event tap")
+            CFMachPortInvalidate(tap)
+            return
+        }
+        // The main run loop, in common modes.
+        //
+        // This used to run on a dedicated RunLoopThread, and the callback was
+        // never invoked once -- tap created, tap enabled, zero deliveries. The
+        // callback itself is trivial (take a lock, read a bool, return), so
+        // there is nothing to gain from a private thread and a whole class of
+        // "is that run loop actually spinning" to lose. Common modes so the tap
+        // keeps delivering while menus are open and windows are being dragged,
+        // which is exactly when this app is used.
+        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
+        CGEvent.tapEnable(tap: tap, enable: true)
+
+        // Accessibility is not sufficient for a keyboard tap. Listening to key
+        // events is gated on Input Monitoring (TCC's kTCCServiceListenEvent),
+        // and the failure is silent in the worst way: tapCreate returns a real
+        // port, tapIsEnabled reports true, and the callback is simply never
+        // invoked. From inside the app that is indistinguishable from nobody
+        // typing. Ask for it, and record what we were told.
+        let hidAccess = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent)
+        UserDefaults.standard.set(hidAccess.rawValue, forKey: "lastInputMonitoringAccess")
+        UserDefaults.standard.set(CGEvent.tapIsEnabled(tap: tap), forKey: "lastTapIsEnabled")
+        if hidAccess != kIOHIDAccessTypeGranted {
+            Logger.log("Input Monitoring not granted (access=\(hidAccess.rawValue)) — key events will not reach the tap. Requesting…")
+            _ = IOHIDRequestAccess(kIOHIDRequestTypeListenEvent)
+        }
+        Logger.log("Event tap created; enabled=\(CGEvent.tapIsEnabled(tap: tap)) inputMonitoring=\(hidAccess.rawValue)")
+
         self.tap = tap
-        self.thread = thread
+        self.runLoopSource = source
     }
 
     public func stop() {
         lock.lock()
         defer { lock.unlock() }
         guard let tap = tap else { return }
-        thread?.runLoop?.remove(tap, forMode: .default)
-        thread?.cancel()
-        thread = nil
+        if let source = runLoopSource {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
+        }
+        runLoopSource = nil
         CGEvent.tapEnable(tap: tap, enable: false)
         // CoreGraphics holds internal references to the CFMachPort from tapCreate, so
         // releasing ours never deallocates it; without an explicit invalidate, the
@@ -121,7 +165,18 @@ public class ActiveEventMonitor: EventMonitor {
     }
 }
 
+/// Raw delivery counters, so "the tap exists" can be told apart from "the tap
+/// is delivering". Read back from defaults after a session.
+enum EventTapDiagnostics {
+    static var callbackInvocations = 0
+    static var disableNotices = 0
+}
+
 fileprivate func tapCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
+    EventTapDiagnostics.callbackInvocations += 1
+    if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+        EventTapDiagnostics.disableNotices += 1
+    }
     var filtered = false
     if let ptr = refcon {
         let eventMonitor = CUtil.bridge(ptr: ptr) as ActiveEventMonitor

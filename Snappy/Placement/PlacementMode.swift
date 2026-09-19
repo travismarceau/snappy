@@ -118,6 +118,10 @@ final class PlacementModeController {
     /// Guards the state the event-tap thread reads from `shouldSwallow` while
     /// the main thread mutates it. Everything behind it is a value type: the
     /// tap thread never touches AppKit.
+    /// Diagnostics for the event tap, read back from defaults after a session.
+    private static var tapEventsSeen = 0
+    private static var tapEventsSwallowed = 0
+
     private let stateLock = NSLock()
     private var active = false
     private var keymap = PlacementKeymap.empty
@@ -221,6 +225,23 @@ final class PlacementModeController {
         )
         monitor.start()
         self.monitor = monitor
+        // The single most common failure: no Accessibility grant means no event
+        // tap, which looks like "the panel is up but my keys go to the app
+        // behind it". Say so rather than leaving it to be inferred.
+        // Also recorded in defaults: os_log from a background-only app is
+        // awkward to read back, and this is the one fact that separates "the
+        // panel is broken" from "macOS will not give us an event tap".
+        Self.tapEventsSeen = 0
+        Self.tapEventsSwallowed = 0
+        EventTapDiagnostics.callbackInvocations = 0
+        EventTapDiagnostics.disableNotices = 0
+        UserDefaults.standard.set(monitor.running, forKey: "lastSessionEventTapRunning")
+        UserDefaults.standard.set(Date(), forKey: "lastSessionAt")
+        if !monitor.running {
+            Logger.log("Placement mode: event tap NOT running — keystrokes will reach the app behind the panel. Accessibility grant missing or stale for \(Bundle.main.bundleIdentifier ?? "?").")
+        } else {
+            Logger.log("Placement mode: event tap running, keys captured.")
+        }
 
         setActive(true)
         scheduleMapReveal()
@@ -344,6 +365,10 @@ final class PlacementModeController {
     /// Runs on the event-tap thread. Returning true consumes the event so it
     /// never reaches the focused app.
     private func shouldSwallow(_ event: NSEvent) -> Bool {
+        // Counted so a session can be asked afterwards whether the tap ever saw
+        // anything. "The tap exists" and "the tap receives events" are different
+        // claims, and only the second one matters.
+        Self.tapEventsSeen += 1
         guard isActive || finishing else { return false }
 
         switch event.type {
@@ -352,12 +377,13 @@ final class PlacementModeController {
             if Int(event.keyCode) == kVK_Escape { return true }
             let mods = event.modifierFlags.rawValue & placementModifierMask
             let code = Int(event.keyCode)
-            if currentKeymap.binding(forKeyCode: code, modifierFlags: mods) != nil { return true }
-            if currentKeymap.layout(forKeyCode: code, modifierFlags: mods) != nil { return true }
+            if currentKeymap.binding(forKeyCode: code, modifierFlags: mods) != nil { Self.tapEventsSwallowed += 1; return true }
+            if currentKeymap.layout(forKeyCode: code, modifierFlags: mods) != nil { Self.tapEventsSwallowed += 1; return true }
             // Bare keystrokes are the "any single key" the user means to capture;
             // swallow them. Unrecognised modified combos (⌘Tab, ⌘Q…) pass through so
             // the user can still switch or quit apps, useful in sticky mode.
-            return mods == 0
+            if mods == 0 { Self.tapEventsSwallowed += 1; return true }
+            return false
 
         default:
             return false
@@ -572,6 +598,10 @@ final class PlacementModeController {
         setFinishing(false)
         setDragEnabled(false)
 
+        UserDefaults.standard.set(EventTapDiagnostics.callbackInvocations, forKey: "lastSessionTapCallbacks")
+        UserDefaults.standard.set(EventTapDiagnostics.disableNotices, forKey: "lastSessionTapDisables")
+        UserDefaults.standard.set(Self.tapEventsSeen, forKey: "lastSessionTapEventsSeen")
+        UserDefaults.standard.set(Self.tapEventsSwallowed, forKey: "lastSessionTapEventsSwallowed")
         timeoutWorkItem?.cancel(); timeoutWorkItem = nil
         revealWorkItem?.cancel(); revealWorkItem = nil
         hardStopWorkItem?.cancel(); hardStopWorkItem = nil

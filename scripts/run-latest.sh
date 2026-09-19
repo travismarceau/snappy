@@ -56,9 +56,43 @@ if [[ -n "$STATUS_ONLY" ]]; then
   exit 0
 fi
 
+# Sign with Developer ID, not the automatic Apple Development identity.
+#
+# macOS keys the Accessibility grant to the code signature. An Apple Development
+# signature changes enough between builds that TCC throws the grant away, so
+# every reinstall silently un-authorised the app: the panel still appeared, the
+# event tap could not be created, and keystrokes went to whatever was behind it.
+# That reads exactly like "it worked for a second and then stopped".
+#
+# A Developer ID signature has a designated requirement built from the team and
+# bundle id rather than the individual build, so one grant survives rebuilds.
+# NEVER build this with the Release configuration's own entitlements. Those are
+# the Mac App Store ones, which turn on the App Sandbox -- and a sandboxed Snappy
+# is not a slightly worse Snappy, it is a completely inert one. The sandbox
+# denies the mach lookup of com.apple.axserver, so AXIsProcessTrusted() returns
+# true, the Accessibility checkbox looks granted, CGEventTapCreate returns a live
+# enabled tap, and then nothing happens: no window moves and the tap never
+# receives a single event. Every symptom points at permissions and none of them
+# are the problem. docs/APP_STORE.md records the same finding, which is why
+# build-direct.sh overrides this too.
+#
+# The path must be absolute: xcodebuild applies command-line build settings to
+# every target, and the MASShortcut package resolves a relative one against its
+# own checkout.
+SIGN_ARGS=(CODE_SIGN_ENTITLEMENTS="$PWD/Snappy/SnappyDirect.entitlements")
+if security find-identity -v -p codesigning 2>/dev/null | grep -q "Developer ID Application"; then
+  SIGN_ARGS+=(CODE_SIGN_STYLE=Manual
+             CODE_SIGN_IDENTITY="Developer ID Application"
+             DEVELOPMENT_TEAM="${TEAM_ID:-P78K4VHEL3}"
+             PROVISIONING_PROFILE_SPECIFIER="")
+else
+  echo "No Developer ID certificate found; falling back to the project's signing." >&2
+  echo "Expect to re-grant Accessibility after every rebuild." >&2
+fi
+
 echo "Building ${CONFIG}…"
 xcodebuild -project Snappy.xcodeproj -scheme Snappy -configuration "$CONFIG" \
-  -destination 'platform=macOS' build >/dev/null
+  -destination 'platform=macOS' "${SIGN_ARGS[@]}" build >/dev/null
 
 # Ask for build settings with the SAME flags used to build. The project sets a
 # custom SYMROOT, so `-target` alone answers ./build/Release while a
@@ -66,7 +100,7 @@ xcodebuild -project Snappy.xcodeproj -scheme Snappy -configuration "$CONFIG" \
 # still holds a v1.0 from September. Querying the wrong one installs a stale
 # app that looks plausible and is months old.
 BUILT=$(xcodebuild -project Snappy.xcodeproj -scheme Snappy -configuration "$CONFIG" \
-  -destination 'platform=macOS' -showBuildSettings 2>/dev/null \
+  -destination 'platform=macOS' "${SIGN_ARGS[@]}" -showBuildSettings 2>/dev/null \
   | awk '/ BUILT_PRODUCTS_DIR = / {print $3; exit}')/Snappy.app
 [[ -d "$BUILT" ]] || { echo "Build produced no app at $BUILT" >&2; exit 1; }
 
