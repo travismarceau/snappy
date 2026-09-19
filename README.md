@@ -16,7 +16,7 @@ are EdDSA-signed and verified before they are applied.
 
 ## System requirements
 
-macOS 10.15 or later.
+macOS 12 or later.
 
 ## Installation
 

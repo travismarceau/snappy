@@ -167,11 +167,15 @@ else
   mkdir -p "$APPCAST_DIR"
   cp "$ZIP" "$APPCAST_DIR/"
 
-  # Release notes. generate_appcast embeds <archive-basename>.html from this
-  # directory as the <description> Sparkle renders in the update dialog, which
-  # is the only place most users will ever read them. Embedding beats linking:
-  # a sparkle:releaseNotesLink that 404s shows an empty dialog, and the notes
-  # then depend on the website being up at update time.
+  # Release notes, embedded as the <description> Sparkle renders in its update
+  # dialog -- the only place most users will ever read them.
+  #
+  # --embed-release-notes is required, not optional. generate_appcast embeds a
+  # notes file automatically ONLY when it is a bare fragment; ours is a full
+  # document with <!doctype> and <style>, so without the flag it writes a
+  # sparkle:releaseNotesLink instead, pointing at a Snappy.html that is never
+  # published. Worse than a 404: the site serves index.html for unknown paths,
+  # so users would get the entire homepage rendered inside the update dialog.
   #
   # This is a hard failure, not a warning. Releases change the bundle
   # identifier from time to time, and macOS drops the Accessibility grant when
@@ -179,7 +183,8 @@ else
   # app that launches and then silently refuses to move a window.
   cp "$NOTES_HTML" "$APPCAST_DIR/$(basename "$ZIP" .zip).html"
 
-  "$GENERATE_APPCAST" --download-url-prefix "$DOWNLOAD_URL_PREFIX" "$APPCAST_DIR"
+  "$GENERATE_APPCAST" --embed-release-notes \
+    --download-url-prefix "$DOWNLOAD_URL_PREFIX" "$APPCAST_DIR"
   # The feed has to be served from SUFeedURL, which is getsnappy.fyi/appcast.xml,
   # and site/ is what that host deploys — so the generated feed belongs in the
   # repo, committed alongside the release it describes.
