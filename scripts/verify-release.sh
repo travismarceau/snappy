@@ -68,8 +68,14 @@ URL=$(sed -n 's/.*enclosure url="\([^"]*\)".*/\1/p' <<<"$BODY" | head -1)
 if [[ -z "$URL" ]]; then
   bad "no enclosure url"
 else
-  read -r CODE DLTYPE < <(curl -fsSLI --max-time 60 -o /dev/null \
+  # A ranged GET, not HEAD. GitHub release assets redirect to their object
+  # store, and a HEAD against that redirect answers 404 even when the asset is
+  # public and downloads perfectly -- which this script reported as a failed
+  # release until someone checked by hand.
+  read -r CODE DLTYPE < <(curl -fsSL --max-time 60 -r 0-0 -o /dev/null \
     -w '%{http_code} %{content_type}\n' "$URL" 2>/dev/null || echo "000 -")
+  # A range request succeeds with 206 Partial Content.
+  [[ "$CODE" == "206" ]] && CODE=200
   if [[ "$CODE" == "200" ]] && [[ "$DLTYPE" != text/html* ]]; then
     ok "download resolves ($CODE, $DLTYPE)"
   else

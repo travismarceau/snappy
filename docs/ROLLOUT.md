@@ -76,9 +76,16 @@ copyright lines and dropping the prose line above them.
 
 ```bash
 gh release create v1.1 build/Snappy.zip \
+  -R travismarceau/snappy \
   --title "Snappy 1.1" \
   --notes-file site/releases/v1.1.md
 ```
+
+**`-R` is not optional.** This repo still has an `upstream` remote pointing at
+`rxhanson/Rectangle`, and with two remotes and no default set `gh` picks that
+one — the first attempt here tried to create the release on Rectangle and only
+failed because there is no write access to it. `gh repo set-default
+travismarceau/snappy` fixes it for good; pass `-R` anyway.
 
 The tag is created server-side, which is why `build-direct.sh` checks `origin`
 rather than the local repo — re-running the build after this point must fail,
@@ -122,6 +129,11 @@ project, that the notes are embedded rather than linked, that the signature is
 present, and that the enclosure actually resolves.
 
 All eight checks must pass before the release is announced.
+
+Do not spot-check a release asset with `curl -I`. GitHub redirects asset
+downloads to its object store and a HEAD against that redirect answers 404 for
+an asset that is public and downloads perfectly — which looked exactly like a
+failed release here until it was checked with a real GET.
 
 ---
 
