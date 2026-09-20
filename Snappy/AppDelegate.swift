@@ -41,8 +41,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.delegate as! AppDelegate
     }
     
-    /// Runs before the storyboard is loaded and before anything touches
-    /// `Defaults`, which is exactly what the domain migration needs.
+    /// Runs after the main storyboard has created this delegate, but before any
+    /// launch-time controller reads `Defaults`. Keep initial-scene object
+    /// initializers free of `Defaults` access so migration remains first.
     func applicationWillFinishLaunching(_ notification: Notification) {
         LegacyDefaultsMigration.run()
     }
@@ -789,4 +790,3 @@ extension AppDelegate {
         }
     }
 }
-

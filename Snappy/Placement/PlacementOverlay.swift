@@ -90,7 +90,9 @@ final class PlacementOverlayPanel: NSPanel {
         backgroundColor = .clear
         hasShadow = true
         // The whole point of the small panel: it takes its own mouse events.
-        ignoresMouseEvents = false
+        // With dragging disabled the pane is purely informational and must not
+        // eat clicks intended for the window behind it.
+        ignoresMouseEvents = !dragEnabled
         isReleasedWhenClosed = false
         hidesOnDeactivate = false
         animationBehavior = .none

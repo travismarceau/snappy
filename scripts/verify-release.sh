@@ -55,29 +55,50 @@ grep -q 'sparkle:releaseNotesLink' <<<"$BODY" \
 grep -q '<description><!\[CDATA\[' <<<"$BODY" && ok "notes embedded as description" \
                                               || bad "no embedded <description>"
 
-# 4. Signature and minimum OS.
-grep -q 'sparkle:edSignature="' <<<"$BODY" && ok "EdDSA signature present" \
-                                           || bad "no sparkle:edSignature -- updates will be rejected"
+# 4. Signature and minimum OS. Merely finding a signature string is not enough:
+#    the release asset may have been replaced or uploaded incorrectly. The
+#    downloaded bytes are verified below with Sparkle's own tool.
+SIGNATURE=$(sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p' <<<"$BODY" | head -1)
+[[ -n "$SIGNATURE" ]] && ok "EdDSA signature present" \
+                       || bad "no sparkle:edSignature -- updates will be rejected"
 MINOS=$(sed -n 's/.*<sparkle:minimumSystemVersion>\([^<]*\)<.*/\1/p' <<<"$BODY" | head -1)
 [[ -n "$MINOS" ]] && ok "minimumSystemVersion $MINOS" \
                   || bad "no minimumSystemVersion -- older macOS would be offered a build it cannot run"
 
-# 5. The download the feed promises has to exist. Release assets on a private
-#    repo 404 here, which is the single likeliest cutover mistake.
+# 5. The download the feed promises has to exist and be the exact signed bytes.
+#    Release assets on a private repo 404 here, while a replaced or corrupt asset
+#    downloads successfully but fails Sparkle's signature check.
 URL=$(sed -n 's/.*enclosure url="\([^"]*\)".*/\1/p' <<<"$BODY" | head -1)
+EXPECTED_LENGTH=$(sed -n 's/.*enclosure[^>]* length="\([0-9][0-9]*\)".*/\1/p' <<<"$BODY" | head -1)
 if [[ -z "$URL" ]]; then
   bad "no enclosure url"
 else
-  # A ranged GET, not HEAD. GitHub release assets redirect to their object
-  # store, and a HEAD against that redirect answers 404 even when the asset is
-  # public and downloads perfectly -- which this script reported as a failed
-  # release until someone checked by hand.
-  read -r CODE DLTYPE < <(curl -fsSL --max-time 60 -r 0-0 -o /dev/null \
+  ARCHIVE=$(mktemp "${TMPDIR:-/tmp}/snappy-release.XXXXXX.zip")
+  trap 'rm -f "$ARCHIVE"' EXIT
+  read -r CODE DLTYPE < <(curl -fsSL --max-time 120 -o "$ARCHIVE" \
     -w '%{http_code} %{content_type}\n' "$URL" 2>/dev/null || echo "000 -")
-  # A range request succeeds with 206 Partial Content.
-  [[ "$CODE" == "206" ]] && CODE=200
   if [[ "$CODE" == "200" ]] && [[ "$DLTYPE" != text/html* ]]; then
     ok "download resolves ($CODE, $DLTYPE)"
+
+    ACTUAL_LENGTH=$(stat -f '%z' "$ARCHIVE" 2>/dev/null || wc -c < "$ARCHIVE" | tr -d ' ')
+    if [[ -n "$EXPECTED_LENGTH" ]] && [[ "$ACTUAL_LENGTH" == "$EXPECTED_LENGTH" ]]; then
+      ok "download length matches appcast ($ACTUAL_LENGTH bytes)"
+    else
+      bad "download length $ACTUAL_LENGTH does not match appcast ${EXPECTED_LENGTH:-unset}"
+    fi
+
+    SIGN_UPDATE=$(find ~/Library/Developer/Xcode/DerivedData \
+      -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update' \
+      -type f 2>/dev/null | head -1)
+    if [[ -z "$SIGN_UPDATE" ]]; then
+      bad "Sparkle sign_update not found -- resolve packages/build once before verification"
+    elif [[ -z "$SIGNATURE" ]]; then
+      bad "cannot verify download without an EdDSA signature"
+    elif "$SIGN_UPDATE" --verify "$ARCHIVE" "$SIGNATURE" >/dev/null 2>&1; then
+      ok "download matches the appcast EdDSA signature"
+    else
+      bad "download does not match the appcast EdDSA signature"
+    fi
   else
     bad "download $URL -> $CODE ${DLTYPE} (private repo? unpublished asset?)"
   fi

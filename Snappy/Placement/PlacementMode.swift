@@ -3,8 +3,8 @@
 /// The "leader key" runtime for Divvy-style window placement:
 ///   1. `PlacementModeManager` owns a single global shortcut (via MASShortcut,
 ///      like `TodoManager`) that toggles placement mode on.
-///   2. `PlacementModeController` shows the on-screen grid pane — one per
-///      display — and captures input with an `ActiveEventMonitor`. A key
+///   2. `PlacementModeController` shows the on-screen grid pane on the target
+///      display and captures input with an `ActiveEventMonitor`. A key
 ///      resolves through the saved `PlacementKeymap`; a mouse drag draws a
 ///      region that was never saved at all. Either way the rect goes to the
 ///      normal execution pipeline through
@@ -105,22 +105,19 @@ final class PlacementModeController {
             object: nil)
     }
 
-    /// How long a session may live with its timeout cancelled by an in-flight
-    /// drag. The session swallows mouse clicks system-wide, so it must not be
-    /// able to outlive a gesture that never ends — a mouse unplugged mid-drag,
-    /// say, or a tap that stops delivering.
+    /// How long a session may live with its ordinary timeout cancelled by an
+    /// in-flight drag. This bounds a gesture whose mouse-up never arrives.
     private static let hardStopSeconds: TimeInterval = 30
     /// How long an unused pane is kept warm. Long enough to cover placing
     /// several windows in a row, short enough that a menu-bar app is not
     /// sitting on a full-screen backing store all day.
     private static let panelCacheSeconds: TimeInterval = 60
 
-    /// Guards the state the event-tap thread reads from `shouldSwallow` while
-    /// the main thread mutates it. Everything behind it is a value type: the
-    /// tap thread never touches AppKit.
-    /// Diagnostics for the event tap, read back from defaults after a session.
-    private static var tapEventsSeen = 0
-    private static var tapEventsSwallowed = 0
+    /// Guards the state the event-tap callback reads from `shouldSwallow` while
+    /// the controller mutates it. Everything behind it is a value type.
+    /// Diagnostics for the placement tap, read back from defaults afterwards.
+    private var tapEventsSeen = 0
+    private var tapEventsSwallowed = 0
 
     private let stateLock = NSLock()
     private var active = false
@@ -128,8 +125,6 @@ final class PlacementModeController {
     /// True during the brief flash between a placement and teardown, so the
     /// event tap keeps swallowing keys even though `active` is already false.
     private var _finishing = false
-    private var _dragEnabled = false
-    private var _dragging = false
 
     private var monitor: ActiveEventMonitor?
     private var overlays: [PlacementOverlayPanel] = []
@@ -146,13 +141,7 @@ final class PlacementModeController {
     private var targetWindowId: CGWindowID?
     private var baseScreen: NSScreen?
 
-    // The in-flight drag. `dragPanel` owns the gesture: a drag that starts on
-    // one display stays on it, however far the cursor wanders.
-    private var dragPanel: PlacementOverlayPanel?
-    private var dragAnchor: GridCell?
     private var dragSelection: GridPlacement?
-    private var hoverPanel: PlacementOverlayPanel?
-    private var hoverCell: GridCell?
 
     // MARK: Locked state accessors
 
@@ -177,12 +166,21 @@ final class PlacementModeController {
     private func setFinishing(_ value: Bool) {
         stateLock.lock(); _finishing = value; stateLock.unlock()
     }
-    private var dragEnabled: Bool {
-        stateLock.lock(); defer { stateLock.unlock() }
-        return _dragEnabled
+    private func resetTapEventCounts() {
+        stateLock.lock()
+        tapEventsSeen = 0
+        tapEventsSwallowed = 0
+        stateLock.unlock()
     }
-    private func setDragEnabled(_ value: Bool) {
-        stateLock.lock(); _dragEnabled = value; stateLock.unlock()
+    private func recordTapEventSeen() {
+        stateLock.lock(); tapEventsSeen += 1; stateLock.unlock()
+    }
+    private func recordTapEventSwallowed() {
+        stateLock.lock(); tapEventsSwallowed += 1; stateLock.unlock()
+    }
+    private var tapEventCounts: (seen: Int, swallowed: Int) {
+        stateLock.lock(); defer { stateLock.unlock() }
+        return (tapEventsSeen, tapEventsSwallowed)
     }
 
     // MARK: Activation
@@ -206,13 +204,23 @@ final class PlacementModeController {
         }
         setKeymap(map)
 
-        let panels = preparePanels(keymap: map, dragEnabled: dragEnabled)
+        // Resolve the target before choosing the panel's display. In the
+        // default, window-based mode, falling back to NSScreen.main here would
+        // make a drag pull a secondary-display window onto the main display.
+        captureTarget()
+        guard let targetScreen = baseScreen ?? NSScreen.main else {
+            NSSound.beep()
+            return
+        }
+
+        let panels = preparePanels(keymap: map, dragEnabled: dragEnabled, screen: targetScreen)
         guard !panels.isEmpty else {
             NSSound.beep()
             return
         }
         overlays = panels
-        setDragEnabled(dragEnabled)
+        let app = NSWorkspace.shared.frontmostApplication
+        panels.forEach { $0.setTarget(name: app?.localizedName, icon: app?.icon) }
         // Secure Event Input blocks every keyboard event tap on the system, and
         // nothing else: the mouse is untouched. So the panel opens, dragging
         // places windows perfectly, and bound keys do nothing at all while
@@ -259,10 +267,7 @@ final class PlacementModeController {
         // Also recorded in defaults: os_log from a background-only app is
         // awkward to read back, and this is the one fact that separates "the
         // panel is broken" from "macOS will not give us an event tap".
-        Self.tapEventsSeen = 0
-        Self.tapEventsSwallowed = 0
-        EventTapDiagnostics.callbackInvocations = 0
-        EventTapDiagnostics.disableNotices = 0
+        resetTapEventCounts()
         UserDefaults.standard.set(monitor.running, forKey: "lastSessionEventTapRunning")
         UserDefaults.standard.set(Date(), forKey: "lastSessionAt")
         if !monitor.running {
@@ -274,19 +279,11 @@ final class PlacementModeController {
         setActive(true)
         scheduleMapReveal()
         rearmTimeout()
-
-        // The panes are already on screen by the time this runs. Capturing the
-        // target window is a synchronous accessibility round-trip that can block
-        // for as long as the focused app takes to answer, and there is no reason
-        // for the overlay to wait on it. Nothing can steal focus in between: the
-        // panes are non-activating and the tap swallows input.
-        DispatchQueue.main.async { [weak self] in self?.captureTarget() }
     }
 
     /// Resolve the window a keystroke or drag will move, and the display the
     /// keyboard path treats as "current".
     private func captureTarget() {
-        guard isActive else { return }
         targetElement = AccessibilityElement.getFrontWindowElement()
         targetWindowId = targetElement?.getWindowId()
 
@@ -295,19 +292,17 @@ final class PlacementModeController {
             : ScreenDetection().detectScreens(using: targetElement)
         baseScreen = usable?.currentScreen ?? NSScreen.main
 
-        // Title the panel with the window it is about to move. A bare grid gives
-        // no clue which of several windows is the target.
-        let app = NSWorkspace.shared.frontmostApplication
-        overlays.forEach { $0.setTarget(name: app?.localizedName, icon: app?.icon) }
     }
 
     // MARK: Panes
 
-    /// One pane per display, reusing a warm one wherever it still matches. The
+    /// One pane on the target display, reusing a warm one when it still matches. The
     /// frame is `adjustedVisibleFrame` — the rect placements actually resolve
     /// against — so the grid is painted exactly where the windows will land,
     /// Todo sidebar and Stage Manager strip included.
-    private func preparePanels(keymap: PlacementKeymap, dragEnabled: Bool) -> [PlacementOverlayPanel] {
+    private func preparePanels(keymap: PlacementKeymap,
+                               dragEnabled: Bool,
+                               screen: NSScreen) -> [PlacementOverlayPanel] {
         cacheReleaseWorkItem?.cancel()
         cacheReleaseWorkItem = nil
 
@@ -316,10 +311,6 @@ final class PlacementModeController {
 
         // One panel, on the display being placed onto. The full-screen version
         // needed one per display because it covered them; a small box does not.
-        let screen = Defaults.useCursorScreenDetection.enabled
-            ? (ScreenDetection().detectScreensAtCursor()?.currentScreen ?? NSScreen.main)
-            : NSScreen.main
-        guard let screen else { return [] }
         let frame = screen.adjustedVisibleFrame()
         guard frame.width > 1, frame.height > 1 else { return [] }
 
@@ -332,7 +323,16 @@ final class PlacementModeController {
         }
         reusable.forEach { $0.orderOut(nil) }
 
-        panel.onDragChanged = { [weak self] p in self?.dragSelection = p }
+        panel.onDragChanged = { [weak self] placement in
+            guard let self else { return }
+            let wasDragging = self.dragSelection != nil
+            self.dragSelection = placement
+            if placement != nil, !wasDragging {
+                self.timeoutWorkItem?.cancel()
+                self.timeoutWorkItem = nil
+                self.armHardStop()
+            }
+        }
         panel.onDragCommitted = { [weak self] p in self?.commitDrag(p, on: panel) }
         return [panel]
     }
@@ -396,21 +396,36 @@ final class PlacementModeController {
         // Counted so a session can be asked afterwards whether the tap ever saw
         // anything. "The tap exists" and "the tap receives events" are different
         // claims, and only the second one matters.
-        Self.tapEventsSeen += 1
+        recordTapEventSeen()
         guard isActive || finishing else { return false }
 
         switch event.type {
         case .keyDown:
-            guard isActive else { return true } // in the flash tail: swallow everything, act on nothing
-            if Int(event.keyCode) == kVK_Escape { return true }
+            guard isActive else {
+                recordTapEventSwallowed()
+                return true // in the flash tail: swallow everything, act on nothing
+            }
+            if Int(event.keyCode) == kVK_Escape {
+                recordTapEventSwallowed()
+                return true
+            }
             let mods = event.modifierFlags.rawValue & placementModifierMask
             let code = Int(event.keyCode)
-            if currentKeymap.binding(forKeyCode: code, modifierFlags: mods) != nil { Self.tapEventsSwallowed += 1; return true }
-            if currentKeymap.layout(forKeyCode: code, modifierFlags: mods) != nil { Self.tapEventsSwallowed += 1; return true }
+            if currentKeymap.binding(forKeyCode: code, modifierFlags: mods) != nil {
+                recordTapEventSwallowed()
+                return true
+            }
+            if currentKeymap.layout(forKeyCode: code, modifierFlags: mods) != nil {
+                recordTapEventSwallowed()
+                return true
+            }
             // Bare keystrokes are the "any single key" the user means to capture;
             // swallow them. Unrecognised modified combos (⌘Tab, ⌘Q…) pass through so
             // the user can still switch or quit apps, useful in sticky mode.
-            if mods == 0 { Self.tapEventsSwallowed += 1; return true }
+            if mods == 0 {
+                recordTapEventSwallowed()
+                return true
+            }
             return false
 
         default:
@@ -482,6 +497,8 @@ final class PlacementModeController {
     private func cancelDrag(rearmingTimeout: Bool = true) {
         dragSelection = nil
         overlays.forEach { $0.clearDrag() }
+        hardStopWorkItem?.cancel()
+        hardStopWorkItem = nil
         if rearmingTimeout { rearmTimeout() }
     }
 
@@ -618,11 +635,10 @@ final class PlacementModeController {
 
     /// A ceiling on an in-flight drag, armed only while one is running.
     ///
-    /// A drag cancels the idle timeout — it must not expire mid-gesture — and
-    /// for as long as it runs the session is swallowing clicks system-wide. So
-    /// "the mouse-up never arrives" (a mouse unplugged mid-drag, a tap that
-    /// stops delivering) has to resolve to teardown rather than to a dead
-    /// cursor. Deliberately not armed for the session as a whole: sticky mode
+    /// A drag cancels the idle timeout so it cannot expire mid-gesture. The
+    /// "mouse-up never arrives" case (a mouse unplugged mid-drag, for example)
+    /// still has to resolve to teardown rather than leave the pane indefinitely.
+    /// Deliberately not armed for the session as a whole: sticky mode
     /// keeps a pane up across many placements, and each one rearms the ordinary
     /// timeout, which is what bounds that case.
     private func armHardStop() {
@@ -643,12 +659,13 @@ final class PlacementModeController {
         guard isActive || finishing || !overlays.isEmpty || monitor != nil else { return }
         setActive(false)
         setFinishing(false)
-        setDragEnabled(false)
 
-        UserDefaults.standard.set(EventTapDiagnostics.callbackInvocations, forKey: "lastSessionTapCallbacks")
-        UserDefaults.standard.set(EventTapDiagnostics.disableNotices, forKey: "lastSessionTapDisables")
-        UserDefaults.standard.set(Self.tapEventsSeen, forKey: "lastSessionTapEventsSeen")
-        UserDefaults.standard.set(Self.tapEventsSwallowed, forKey: "lastSessionTapEventsSwallowed")
+        let tapDiagnostics = monitor?.diagnostics.snapshot ?? .zero
+        let placementTapCounts = tapEventCounts
+        UserDefaults.standard.set(tapDiagnostics.callbackInvocations, forKey: "lastSessionTapCallbacks")
+        UserDefaults.standard.set(tapDiagnostics.disableNotices, forKey: "lastSessionTapDisables")
+        UserDefaults.standard.set(placementTapCounts.seen, forKey: "lastSessionTapEventsSeen")
+        UserDefaults.standard.set(placementTapCounts.swallowed, forKey: "lastSessionTapEventsSwallowed")
         timeoutWorkItem?.cancel(); timeoutWorkItem = nil
         revealWorkItem?.cancel(); revealWorkItem = nil
         hardStopWorkItem?.cancel(); hardStopWorkItem = nil
@@ -657,11 +674,7 @@ final class PlacementModeController {
         monitor?.stop()
         monitor = nil
 
-        dragPanel = nil
-        dragAnchor = nil
         dragSelection = nil
-        hoverPanel = nil
-        hoverCell = nil
         targetElement = nil
         targetWindowId = nil
         baseScreen = nil

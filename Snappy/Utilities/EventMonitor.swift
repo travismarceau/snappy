@@ -57,6 +57,7 @@ public class ActiveEventMonitor: EventMonitor {
     private let mask: NSEvent.EventTypeMask
     public let filterer: (NSEvent) -> Bool
     public let handler: (NSEvent) -> Void
+    let diagnostics = EventTapDiagnostics()
 
     var running: Bool {
         lock.lock()
@@ -165,21 +166,41 @@ public class ActiveEventMonitor: EventMonitor {
     }
 }
 
-/// Raw delivery counters, so "the tap exists" can be told apart from "the tap
-/// is delivering". Read back from defaults after a session.
-enum EventTapDiagnostics {
-    static var callbackInvocations = 0
-    static var disableNotices = 0
+/// Per-monitor delivery counters, so one tap cannot make another look healthy.
+final class EventTapDiagnostics {
+    struct Snapshot {
+        let callbackInvocations: Int
+        let disableNotices: Int
+
+        static let zero = Snapshot(callbackInvocations: 0, disableNotices: 0)
+    }
+
+    private let lock = NSLock()
+    private var callbackInvocations = 0
+    private var disableNotices = 0
+
+    func record(_ type: CGEventType) {
+        lock.lock()
+        callbackInvocations += 1
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            disableNotices += 1
+        }
+        lock.unlock()
+    }
+
+    var snapshot: Snapshot {
+        lock.lock()
+        defer { lock.unlock() }
+        return Snapshot(callbackInvocations: callbackInvocations,
+                        disableNotices: disableNotices)
+    }
 }
 
 fileprivate func tapCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
-    EventTapDiagnostics.callbackInvocations += 1
-    if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-        EventTapDiagnostics.disableNotices += 1
-    }
     var filtered = false
     if let ptr = refcon {
         let eventMonitor = CUtil.bridge(ptr: ptr) as ActiveEventMonitor
+        eventMonitor.diagnostics.record(type)
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             eventMonitor.reEnable()
         } else {

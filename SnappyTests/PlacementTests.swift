@@ -1,6 +1,7 @@
 /// PlacementTests.swift
 
 import XCTest
+import CoreGraphics
 @testable import Snappy
 
 final class GridPlacementGeometryTests: XCTestCase {
@@ -426,5 +427,48 @@ final class LegacyDefaultsMigrationTests: XCTestCase {
         LegacyDefaultsMigration.run(userDefaults: suite, bundleId: "com.simarholonipaa.snappy")
 
         XCTAssertTrue(suite.bool(forKey: LegacyDefaultsMigration.completedKey))
+    }
+}
+
+// MARK: - Diagnostics
+
+final class DiagnosticsTests: XCTestCase {
+
+    func testEventTapCountersAreIsolatedPerMonitor() {
+        let placement = EventTapDiagnostics()
+        let snapping = EventTapDiagnostics()
+
+        placement.record(.keyDown)
+        snapping.record(.leftMouseDown)
+        snapping.record(.tapDisabledByTimeout)
+
+        XCTAssertEqual(placement.snapshot.callbackInvocations, 1)
+        XCTAssertEqual(placement.snapshot.disableNotices, 0)
+        XCTAssertEqual(snapping.snapshot.callbackInvocations, 2)
+        XCTAssertEqual(snapping.snapshot.disableNotices, 1)
+    }
+
+    func testInstallationLocationRedactsHomeDirectory() {
+        let home = "/Users/private-name"
+
+        XCTAssertEqual(
+            Diagnostics.installationLocation(
+                for: "/Users/private-name/Downloads/Snappy.app",
+                home: home),
+            "inside the user’s home directory")
+        XCTAssertEqual(
+            Diagnostics.installationLocation(
+                for: "/Users/private-name/Applications/Snappy.app",
+                home: home),
+            "~/Applications")
+    }
+
+    func testIssueTitleUsesMarketingVersionAndBuild() {
+        XCTAssertEqual(
+            Diagnostics.issueTitle(info: [
+                "CFBundleShortVersionString": "1.2",
+                "CFBundleVersion": "3",
+            ]),
+            "[1.2 build 3] ")
     }
 }

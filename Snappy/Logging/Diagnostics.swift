@@ -32,7 +32,7 @@ enum Diagnostics {
         let build = info?["CFBundleVersion"] as? String ?? "?"
         out.append("- Version: \(version) (\(build))")
         out.append("- Bundle id: \(Bundle.main.bundleIdentifier ?? "?")")
-        out.append("- Installed at: \(Bundle.main.bundlePath)")
+        out.append("- Installed at: \(installationLocation)")
         out.append("- Sandboxed: \(isSandboxed ? "yes — placement cannot work" : "no")")
 
         out.append("")
@@ -101,7 +101,7 @@ enum Diagnostics {
         copyToPasteboard()
         var components = URLComponents(string: issueURL)
         components?.queryItems = [
-            URLQueryItem(name: "title", value: "[1.\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "")] "),
+            URLQueryItem(name: "title", value: issueTitle()),
             URLQueryItem(name: "body", value: text),
         ]
         guard let url = components?.url else { return }
@@ -116,6 +116,29 @@ enum Diagnostics {
     /// without parsing our own code signature.
     static var isSandboxed: Bool {
         NSHomeDirectory().contains("/Library/Containers/")
+    }
+
+    /// Enough location detail to diagnose a translocated or uninstalled copy,
+    /// without putting a username or private directory names into a public issue.
+    static var installationLocation: String {
+        installationLocation(for: Bundle.main.bundlePath,
+                             home: FileManager.default.homeDirectoryForCurrentUser.path)
+    }
+
+    static func installationLocation(for path: String, home: String) -> String {
+        if path.hasPrefix("/Applications/") { return "/Applications" }
+
+        if path.hasPrefix(home + "/Applications/") { return "~/Applications" }
+        if path.hasPrefix(home + "/") { return "inside the user’s home directory" }
+        if path.hasPrefix("/Volumes/") { return "a mounted volume" }
+        if path.contains("/AppTranslocation/") { return "an App Translocation location" }
+        return "another system location"
+    }
+
+    static func issueTitle(info: [String: Any]? = Bundle.main.infoDictionary) -> String {
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "[\(version) build \(build)] "
     }
 
     static var inputMonitoringDescription: String {
