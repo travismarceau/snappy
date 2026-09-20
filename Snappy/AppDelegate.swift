@@ -336,7 +336,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func showAbout(_ sender: Any) {
         NSApp.activate(ignoringOtherApps: true)
         let credits = NSAttributedString(
-            string: "Divvy-style window placement built on Rectangle by Ryan Hanson (MIT License), which is itself based on Spectacle by Eric Czarny.",
+            string: "Grid-based window placement built on Rectangle by Ryan Hanson (MIT License), which is itself based on Spectacle by Eric Czarny.",
             attributes: [
                 .font: NSFont.systemFont(ofSize: 11),
                 .foregroundColor: NSColor.secondaryLabelColor,

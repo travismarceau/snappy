@@ -67,7 +67,7 @@ Snappy's window-moving engine is derived from the open-source Rectangle project 
 
 ## Keywords  *(100 char max, comma-separated, no spaces after commas)*
 
-Don't use other apps' names (Divvy, Rectangle, Magnet…) as keywords — Apple
+Don't use competing apps' names as keywords — Apple
 rejects that.
 
 ```

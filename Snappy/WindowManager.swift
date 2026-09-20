@@ -126,7 +126,7 @@ class WindowManager {
 
         let precalculatedResult: WindowCalculationResult?
         if let precomputedRect = parameters.precomputedRect {
-            // Divvy-style grid placement: the caller has already resolved the
+            // Grid-based placement: the caller has already resolved the
             // exact destination rect against the (possibly explicit) screen.
             precalculatedResult = WindowCalculationResult(rect: precomputedRect,
                                                           screen: usableScreens.currentScreen,
@@ -332,7 +332,7 @@ struct ExecutionParameters {
     let source: ExecutionSource
     /// When set, `WindowManager.execute` skips `WindowCalculationFactory` and
     /// moves the window straight to this rect (Cocoa, bottom-left origin, in the
-    /// coordinate space of the target screen). Used by Divvy-style grid placement.
+    /// coordinate space of the target screen). Used by grid-based placement.
     let precomputedRect: CGRect?
 
     init(_ action: WindowAction, updateRestoreRect: Bool = true, screen: NSScreen? = nil, windowElement: AccessibilityElement? = nil, windowId: CGWindowID? = nil, source: ExecutionSource = .keyboardShortcut, precomputedRect: CGRect? = nil) {

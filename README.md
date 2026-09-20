@@ -1,6 +1,6 @@
 # Snappy
 
-Divvy-style window placement for macOS. Press one leader key, a grid appears over
+Grid-based window placement for macOS. Press one leader key, a grid appears over
 your screen, press one more key and the front window lands in the region you drew
 for it.
 

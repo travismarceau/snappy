@@ -15,7 +15,7 @@
 	<key>ApplicationName</key>
 	<string>Snappy</string>
 	<key>ApplicationDescription</key>
-	<string>Snappy is Divvy-style window placement for macOS. Free and open source.</string>
+	<string>Snappy is grid-based window placement for macOS. Free and open source.</string>
 	<key>Connections</key>
 	<array>
 		<dict>

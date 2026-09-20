@@ -1,6 +1,6 @@
 /// PlacementMode.swift
 ///
-/// The "leader key" runtime for Divvy-style window placement:
+/// The "leader key" runtime for grid-based window placement:
 ///   1. `PlacementModeManager` owns a single global shortcut (via MASShortcut,
 ///      like `TodoManager`) that toggles placement mode on.
 ///   2. `PlacementModeController` shows the on-screen grid pane on the target

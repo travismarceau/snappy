@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Render the Snappy app icon: a monochrome take on Rectangle's snapped
-window sitting on a Divvy-style grid. White ground, one dark region, gray grid."""
+window sitting on a placement grid. White ground, one dark region, gray grid."""
 
 import os
 from PIL import Image, ImageDraw

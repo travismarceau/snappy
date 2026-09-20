@@ -1,6 +1,6 @@
 /// PlacementConfigWindow.swift
 ///
-/// The Divvy-style configuration UI: pick a grid size, then for each key draw a
+/// The grid-based configuration UI: pick a grid size, then for each key draw a
 /// rectangular region on the grid and assign a single keystroke to it. Hosted as
 /// the "Placements" tab of Snappy Settings (Main.storyboard); multi-window
 /// Layouts is its own tab, in PlacementConfigViews.swift. Programmatic AppKit

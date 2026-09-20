@@ -183,7 +183,7 @@ enum WindowAction: Int, Codable {
         NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, updateRestoreRect: false, screen: screen, windowElement: windowElement, windowId: windowId, source: .dragToSnap))
     }
 
-    /// Divvy-style grid placement: move the window straight to `rect` (Cocoa,
+    /// Grid-based placement: move the window straight to `rect` (Cocoa,
     /// bottom-left origin, in `screen`'s coordinate space), bypassing the
     /// calculation factory. Routes through the normal execution pipeline so
     /// restore rects, fixed-size handling, cross-display moves and cursor-follow

@@ -11,7 +11,7 @@ which carries both copyright lines, and applies to Snappy.
 
 This repository also retains Rectangle's complete commit history — every commit
 back to 2019, with its authors intact. It is not a GitHub fork, so nothing in
-the interface signals that; the history itself is the record. Snappy adds a Divvy-style "placement mode": a
+the interface signals that; the history itself is the record. Snappy adds a grid-based "placement mode": a
 leader-key grid overlay for moving windows to user-defined regions.
 
 Third-party components bundled or linked:

@@ -1,6 +1,6 @@
 /// PlacementModel.swift
 ///
-/// Divvy-style window placement: the screen is divided into an N×M grid and each
+/// Grid-based window placement: the screen is divided into an N×M grid and each
 /// user-defined placement is a rectangular block of cells bound to a single key.
 /// These types are pure value types with no AppKit dependency beyond CoreGraphics
 /// so the geometry can be unit tested in isolation.

@@ -1,6 +1,6 @@
 /// PlacementOverlay.swift
 ///
-/// The Divvy-style placement panel: a small floating box, not a full-screen
+/// The grid-based placement panel: a small floating box, not a full-screen
 /// wash.
 ///
 /// It was a full-screen overlay first, on the reasoning that a pane covering the
@@ -8,7 +8,7 @@
 /// window lands. True, and wrong in practice: a grid stretched over the whole
 /// display is faint wherever your wallpaper is busy, it hides the windows you
 /// are arranging, and the gesture spans the whole desk instead of an inch of
-/// mouse travel. Divvy's compact panel is the better idea and this is it.
+/// mouse travel. A compact panel keeps the whole grid within easy reach.
 ///
 /// Being small also fixes the input. A full-screen pane has to be
 /// click-through, so every click had to be intercepted by a CGEventTap -- which
@@ -117,7 +117,7 @@ final class PlacementOverlayPanel: NSPanel {
         alphaValue = 0
     }
 
-    /// Name the window being placed, the way Divvy titles its panel. Without it
+    /// Name the window being placed so the target stays clear. Without it
     /// a bare grid gives no clue which window is about to move.
     func setTarget(name: String?, icon: NSImage?) {
         panelView.setTarget(name: name, icon: icon)
