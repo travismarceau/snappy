@@ -133,7 +133,12 @@ stale Accessibility grant.
    the password field is gone. Nothing announces it. Dragging on the placement
    grid still works perfectly, because only the keyboard is affected, so it
    looks like the keys are broken rather than the system. Locking and unlocking
-   clears it. Snappy now says so on the panel when it detects it.
+   clears it; logging out or restarting always does. Snappy now says so on the
+   panel when it detects it, and records the process macOS names as the owner
+   (`lastSessionSecureInputHolder`). Treat that name as a hint rather than a
+   verdict — once the state is latched, the reported owner just follows whichever
+   app is frontmost. A terminal with "secure keyboard entry" enabled is a common
+   genuine cause.
 2. Make sure macOS is up to date, and restart if you've just updated.
 3. Re-grant Accessibility: System Settings ▸ Privacy & Security ▸ Accessibility,
    remove Snappy, then add it back.

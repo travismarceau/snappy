@@ -224,13 +224,22 @@ final class PlacementModeController {
         // for it. Locking and unlocking the Mac clears it, which is why that has
         // always been the first line of this app's troubleshooting advice.
         let secureInput = IsSecureEventInputEnabled()
+        let blocker = secureInput ? PlacementModeController.secureInputHolderName() : nil
         UserDefaults.standard.set(secureInput, forKey: "lastSessionSecureInputEnabled")
         if secureInput {
-            Logger.log("Secure Event Input is enabled — no keyboard event tap can receive keys. Bound keys will not work until it is cleared (lock and unlock the Mac).")
+            UserDefaults.standard.set(blocker ?? "unknown", forKey: "lastSessionSecureInputHolder")
+            Logger.log("Secure Event Input is enabled, held by \(blocker ?? "an unknown process") — no keyboard event tap can receive keys. Bound keys will not work until it is cleared (lock and unlock the Mac).")
         }
 
         if secureInput {
-            panels.forEach { $0.setWarning("Keys blocked by Secure Input — lock and unlock your Mac") }
+            // The reported owner is whichever app is frontmost at the time, so
+            // it names a suspect rather than a culprit: a terminal with secure
+            // keyboard entry on is a common cause, but so is a state left
+            // latched after a password prompt, in which case the pid just
+            // follows focus around. Say what is happening and give the remedy
+            // that works either way.
+            let message = "Secure Input is on — bound keys cannot work. Log out or restart to clear it."
+            panels.forEach { $0.setWarning(message) }
         }
         panels.forEach { $0.present() }
 
@@ -553,6 +562,25 @@ final class PlacementModeController {
             element.bringToFront()
         }
         return outcome
+    }
+
+    /// The app currently holding Secure Event Input, if any.
+    ///
+    /// macOS publishes the owning pid in the session dictionary but surfaces it
+    /// nowhere a user would look, so an app that enables Secure Input and never
+    /// releases it breaks every keyboard event tap on the system with no
+    /// attribution at all.
+    static func secureInputHolderName() -> String? {
+        guard let session = CGSessionCopyCurrentDictionary() as? [String: Any],
+              // NSNumber does not bridge straight to pid_t here; going through
+              // NSNumber is what actually reads the value.
+              let pid = (session["kCGSSessionSecureInputPID"] as? NSNumber)?.int32Value,
+              pid > 0
+        else { return nil }
+        if let app = NSRunningApplication(processIdentifier: pid) {
+            return app.localizedName ?? app.bundleIdentifier ?? "pid \(pid)"
+        }
+        return "pid \(pid)"
     }
 
     /// An app's name for a message, falling back to its bundle id when the app
