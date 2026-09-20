@@ -92,34 +92,33 @@ rather than the local repo — re-running the build after this point must fail,
 because replacing the asset would invalidate the signature the live appcast
 advertises.
 
-Then commit the appcast and notes so the site can serve them:
+Then commit and push the appcast and notes:
 
 ```bash
 git add site/appcast.xml site/releases/
 git commit -m "Publish the 1.1 appcast"
 git push
+./scripts/deploy-site.sh
 ```
+
+DigitalOcean normally deploys the push automatically through the native GitHub
+source in `.do/app.yaml`. The explicit script is still required for releases:
+it waits for the deployment it creates and then proves the public feed serves
+the new build. An older deployment being `ACTIVE` proves neither.
 
 ---
 
 ## 4. Cut the website over
 
-No dashboard needed — `doctl` does it, and a spec diff is far easier to review
-than a form:
+No dashboard needed — the checked-in app spec is reviewable and reproducible:
 
 ```bash
 doctl apps list --format ID,Spec.Name --no-header | grep getsnappy   # -> app id
-doctl apps spec get <app-id> > spec.yaml                             # keep this backup
-# change two lines only:
-#   repo_clone_url: …/getsnappy-site.git  ->  …/snappy.git
-#   source_dir: /                          ->  source_dir: /site
-doctl apps update <app-id> --spec spec.yaml
-doctl apps list-deployments <app-id> --format Phase --no-header | head -1  # wait for ACTIVE
+doctl apps update <app-id> --spec .do/app.yaml --update-sources --wait
 ```
 
-The clone URL is a plain `git:` block rather than a `github:` one, so it needs
-no GitHub authorisation — but it does need the repository to be public, which is
-step 2.
+The native `github:` source is intentional. Unlike a plain `git:` clone URL, it
+supports `deploy_on_push: true` and lets DigitalOcean receive push events.
 
 The spec has no `catchall_document`, on purpose — see `site/README.md`. Unknown
 paths 404, and `/Snappy.zip` redirects to the latest GitHub release so the 1.0
@@ -135,10 +134,12 @@ git history — but it does mean that one URL breaks.
 ## 5. Verify
 
 ```bash
-./scripts/verify-release.sh
+./scripts/deploy-site.sh
 ```
 
-Run the script rather than checking status codes by hand. The script tests
+Run the script rather than checking deployment status or HTTP status codes by
+hand. It waits for the deployment it creates, waits for the public feed's build
+number, then runs the full verifier. The verifier tests
 content type, that the body is RSS, that the advertised build matches the
 project, that the notes are embedded rather than linked, that the signature is
 present, and that the enclosure actually resolves.

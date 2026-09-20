@@ -17,16 +17,18 @@ page is the kind of thing that only diverges. Now there is one.
 
 ## Deploying
 
-DigitalOcean App Platform serves this as a static site, behind Cloudflare.
-`x-do-static-catchall-document` is `index.html`. The app is configured in the
-DigitalOcean dashboard, not from a spec file in the repo.
+DigitalOcean App Platform serves this as a static site, behind Cloudflare. Its
+source of truth is [`.do/app.yaml`](../.do/app.yaml): the native GitHub source
+has `deploy_on_push: true`, so pushes to `main` trigger deployments.
 
 To move the deployment here from `getsnappy-site`:
 
 1. DigitalOcean ▸ Apps ▸ the getsnappy app ▸ Settings ▸ App-Level ▸ Source.
 2. Repoint it at `travismarceau/snappy`, branch `main`, **source directory `site/`**.
 3. Grant DigitalOcean access to the repo if it is still private.
-4. Redeploy, then run `scripts/verify-release.sh`. It checks content type, that
+4. Apply `.do/app.yaml`, then run `scripts/deploy-site.sh`. It starts and waits
+   for a specific deployment, confirms the public feed advertises the committed
+   build, and runs `scripts/verify-release.sh`. The verifier checks content type, that
    the body is really RSS, that the advertised build matches the project, that
    the notes are embedded rather than linked, that the signature is present, and
    that the download the feed promises actually resolves.
@@ -42,9 +44,10 @@ To move the deployment here from `getsnappy-site`:
    because that URL was the download link for 1.0 and bookmarks outlive
    releases.
 
-Until that is done, the live site is still being served from `getsnappy-site`
-and this directory is not yet authoritative. Archive that repo once the switch
-is verified, so there is no second copy to drift into.
+Do not use an `ACTIVE` deployment as the release signal by itself. That may be
+the deployment that was active before the push. `scripts/deploy-site.sh` waits
+for the deployment it created and then checks the bytes served at the public
+feed URL.
 
 ## Testing an update before shipping one
 
@@ -111,7 +114,9 @@ GitHub Release asset instead, which is also what Rectangle does.
 appcast at
 `https://github.com/travismarceau/snappy/releases/download/<tag>/Snappy.zip`,
 writes the signed feed to `site/appcast.xml`, and prints the `gh release`
-command to run. Commit `appcast.xml` and push so getsnappy.fyi serves it.
+command to run. Commit `appcast.xml`, push it, then run
+`scripts/deploy-site.sh`. The explicit deployment is deliberate redundancy for
+the GitHub push hook: a release is not complete until the live feed verifies.
 
 The download button on the page uses
 `/releases/latest/download/Snappy.zip`, which GitHub resolves to the newest

@@ -1,0 +1,35 @@
+name: getsnappy
+region: nyc
+
+static_sites:
+  - name: site
+    github:
+      repo: travismarceau/snappy
+      branch: main
+      deploy_on_push: true
+    source_dir: /site
+    environment_slug: html
+    output_dir: /
+    index_document: index.html
+
+domains:
+  - domain: getsnappy.fyi
+    type: PRIMARY
+  - domain: www.getsnappy.fyi
+    type: ALIAS
+
+ingress:
+  rules:
+    - match:
+        path:
+          prefix: /Snappy.zip
+      redirect:
+        uri: /travismarceau/snappy/releases/latest/download/Snappy.zip
+        authority: github.com
+        scheme: https
+        redirect_code: 302
+    - match:
+        path:
+          prefix: /
+      component:
+        name: site

@@ -270,8 +270,8 @@ else
   echo "Then commit site/appcast.xml and $NOTES_HTML and push, so getsnappy.fyi"
   echo "serves the feed and the notes."
   echo
-  echo "Finally, once it is deployed and the release is published:"
-  echo "    scripts/verify-release.sh"
+  echo "Finally, after committing and pushing the appcast:"
+  echo "    scripts/deploy-site.sh"
   echo "A 200 from the feed URL proves nothing — the site answers every unknown"
   echo "path with the homepage."
   echo "Sparkle verifies the signature of whatever it finds at that URL, so the"
