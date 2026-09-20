@@ -86,6 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         addMenuIcons()
         insertEnterPlacementMenuItem()
         insertCheckForUpdatesMenuItem()
+        insertReportIssueMenuItem()
 
         // Creating the controller is what starts Sparkle's scheduler, so it has
         // to happen at launch rather than the first time Settings is opened.
@@ -281,6 +282,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func checkForUpdates(_ sender: Any) {
         SnappyUpdater.shared.checkForUpdates()
+    }
+
+    /// "Report an Issue…", next to the update item.
+    ///
+    /// Holding Option copies the report instead of opening a browser, matching
+    /// how "View Logging…" is already revealed, and giving anyone who would
+    /// rather read what they are about to send a way to do that first.
+    private func insertReportIssueMenuItem() {
+        guard let index = mainStatusMenu.items.firstIndex(where: { $0.action == #selector(checkForUpdates(_:)) })
+        else { return }
+        let item = NSMenuItem(
+            title: NSLocalizedString("Report an Issue…", tableName: "Main", value: "Report an Issue…", comment: ""),
+            action: #selector(reportIssue(_:)),
+            keyEquivalent: "")
+        item.target = self
+        if #available(macOS 11, *) {
+            item.image = NSImage(systemSymbolName: "ladybug", accessibilityDescription: nil)
+        }
+        mainStatusMenu.insertItem(item, at: index + 1)
+    }
+
+    @objc func reportIssue(_ sender: Any) {
+        if NSEvent.modifierFlags.contains(.option) {
+            Diagnostics.copyToPasteboard()
+            let alert = NSAlert()
+            alert.messageText = "Diagnostics copied".localized
+            alert.informativeText = "The report is on your clipboard. Paste it into an issue at github.com/travismarceau/snappy/issues.".localized
+            alert.addButton(withTitle: "OK".localized)
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+        } else {
+            Diagnostics.openIssue()
+        }
     }
 
     /// Opens the placement grid over the frontmost window, exactly as the
@@ -726,6 +760,11 @@ extension AppDelegate {
                         return getUrlName(windowAction.name) == name
                     })
                     action?.postUrl()
+                case ("execute-task", "copy-diagnostics"):
+                    // Support without a screen-share: "run this, paste what it
+                    // copies". Also the only way to exercise the report in a
+                    // test, since the menu needs a person.
+                    Diagnostics.copyToPasteboard()
                 case ("execute-task", "enter-placement"):
                     // Opens the placement panel exactly as the leader shortcut
                     // does. Anything a person can reach from the menu bar should

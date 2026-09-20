@@ -114,6 +114,7 @@
 		98910B3E231130AF0066EC23 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98910B3D231130AF0066EC23 /* SettingsViewController.swift */; };
 		98987AA42391890400BE72C4 /* LogViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98987AA22391890300BE72C4 /* LogViewer.storyboard */; };
 		98987AA52391890400BE72C4 /* LogViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98987AA32391890400BE72C4 /* LogViewer.swift */; };
+		F1AC0DE00000000000000402 /* Diagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC0DE00000000000000401 /* Diagnostics.swift */; };
 		989DA30E243FC0DF008C7AA4 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989DA30D243FC0DF008C7AA4 /* WelcomeViewController.swift */; };
 		98A009AB2512491300CFBF0C /* CenterHalfCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A009AA2512491300CFBF0C /* CenterHalfCalculation.swift */; };
 		98A009AD2512498000CFBF0C /* FirstFourthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A009AC2512498000CFBF0C /* FirstFourthCalculation.swift */; };
@@ -150,7 +151,6 @@
 		A0844B53B14365D0278BC124 /* TopCenterLeftSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE9E5E2C8BA2590DD0B6F59 /* TopCenterLeftSixteenthCalculation.swift */; };
 		A32D3739AA16C537F6427C4F /* TopCenterRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918F847FF15D524B6DB2E6DA /* TopCenterRightSixteenthCalculation.swift */; };
 		A73749B5FB00D2CC2DB08744 /* LowerMiddleCenterRightSixteenthCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE08B666CCCD1805CAB08BD /* LowerMiddleCenterRightSixteenthCalculation.swift */; };
-		AA040C67290B2640003181D5 /* RunLoopThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA040C66290B2640003181D5 /* RunLoopThread.swift */; };
 		AA0AC000291C1B5E00D125D2 /* CGExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0ABFFF291C1B5E00D125D2 /* CGExtension.swift */; };
 		AA0AC002291C1B9100D125D2 /* AXExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0AC001291C1B9100D125D2 /* AXExtension.swift */; };
 		AA0AC004291C48DE00D125D2 /* SequenceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0AC003291C48DE00D125D2 /* SequenceExtension.swift */; };
@@ -351,6 +351,7 @@
 		98910B3D231130AF0066EC23 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		98987AA22391890300BE72C4 /* LogViewer.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LogViewer.storyboard; sourceTree = "<group>"; };
 		98987AA32391890400BE72C4 /* LogViewer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewer.swift; sourceTree = "<group>"; };
+		F1AC0DE00000000000000401 /* Diagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics.swift; sourceTree = "<group>"; };
 		989DA30D243FC0DF008C7AA4 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		98A009AA2512491300CFBF0C /* CenterHalfCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterHalfCalculation.swift; sourceTree = "<group>"; };
 		98A009AC2512498000CFBF0C /* FirstFourthCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirstFourthCalculation.swift; sourceTree = "<group>"; };
@@ -384,7 +385,6 @@
 		9FF740222E34DE9000D22955 /* CenterThreeFourthsCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterThreeFourthsCalculation.swift; sourceTree = "<group>"; };
 		A3B5B09465C38F8B766B3C3C /* UpperMiddleRightSixteenthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpperMiddleRightSixteenthCalculation.swift; sourceTree = "<group>"; };
 		A4D034DBD7EFAC4CF5F8D67B /* TopCenterRightTwelfthCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopCenterRightTwelfthCalculation.swift; sourceTree = "<group>"; };
-		AA040C66290B2640003181D5 /* RunLoopThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunLoopThread.swift; sourceTree = "<group>"; };
 		AA0ABFFF291C1B5E00D125D2 /* CGExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGExtension.swift; sourceTree = "<group>"; };
 		AA0AC001291C1B9100D125D2 /* AXExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXExtension.swift; sourceTree = "<group>"; };
 		AA0AC003291C48DE00D125D2 /* SequenceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtension.swift; sourceTree = "<group>"; };
@@ -673,7 +673,6 @@
 				AAADE1AE28CBAB0000036331 /* WindowUtil.swift */,
 				AA4DA2FA28FDC94A00355CEB /* DispatchTimeExtension.swift */,
 				AA536C2629005DD000579AC6 /* TimeoutCache.swift */,
-				AA040C66290B2640003181D5 /* RunLoopThread.swift */,
 				AA0AC001291C1B9100D125D2 /* AXExtension.swift */,
 				AA0ABFFF291C1B5E00D125D2 /* CGExtension.swift */,
 				AA0AC003291C48DE00D125D2 /* SequenceExtension.swift */,
@@ -795,6 +794,7 @@
 			children = (
 				98987AA22391890300BE72C4 /* LogViewer.storyboard */,
 				98987AA32391890400BE72C4 /* LogViewer.swift */,
+				F1AC0DE00000000000000401 /* Diagnostics.swift */,
 			);
 			path = Logging;
 			sourceTree = "<group>";
@@ -1116,7 +1116,6 @@
 				D04CE31227817C9B00BD47B3 /* NinthsRepeated.swift in Sources */,
 				9824703F22B13FBC0037B409 /* ScreenDetection.swift in Sources */,
 				983DD04428B0639E00BF1EEE /* SnapAreaModel.swift in Sources */,
-				AA040C67290B2640003181D5 /* RunLoopThread.swift in Sources */,
 				9821402B22B388A000ABFB3F /* LowerRightCalculation.swift in Sources */,
 				D04CE30427817A6F00BD47B3 /* TopRightNinthCalculation.swift in Sources */,
 				98FD7C612687BCB6009E9DAF /* LastThreeFourthsCalculation.swift in Sources */,
@@ -1190,6 +1189,7 @@
 				AA69F8402992DCB1001A81AF /* LeftTodoCalculation.swift in Sources */,
 				9821403322B38A1B00ABFB3F /* UpperLeftCalculation.swift in Sources */,
 				98987AA52391890400BE72C4 /* LogViewer.swift in Sources */,
+				F1AC0DE00000000000000402 /* Diagnostics.swift in Sources */,
 				9824704C22B189250037B409 /* WindowMover.swift in Sources */,
 				6490B39B27BF980F0056C220 /* TopRightEighthCalculation.swift in Sources */,
 				944F25CF2CE5A144004B2FD2 /* ShortcutRecordingObserver.swift in Sources */,
