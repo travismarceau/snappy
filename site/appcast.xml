@@ -3,6 +3,62 @@
     <channel>
         <title>Snappy</title>
         <item>
+            <title>1.2.1</title>
+            <pubDate>Sat, 19 Sep 2026 21:10:37 -0700</pubDate>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>1.2.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<!-- Snappy 1.2.1 release notes. -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Snappy 1.2.1</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --ink: #16181b;
+    --mid: #63696f;
+    --surface: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e8e9eb;
+      --mid: #9aa0a6;
+      --surface: #191b1f;
+    }
+  }
+  body {
+    margin: 0;
+    padding: 16px 18px 22px;
+    font: 13px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; margin: 20px 0 6px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--mid); }
+  p { margin: 0 0 9px; }
+  ul { margin: 0 0 9px; padding-left: 19px; }
+  li { margin-bottom: 5px; }
+  .version-date { color: var(--mid); margin: 0 0 4px; }
+</style>
+
+<h1>Snappy 1.2.1</h1>
+<p class="version-date">Window placement for macOS</p>
+
+<h2>Changed</h2>
+<ul>
+  <li>
+    Product descriptions, credits, documentation, and supporting metadata now
+    describe Snappy’s grid-based placement directly, without comparisons to
+    other products.
+  </li>
+</ul>
+
+<h2>Notes</h2>
+<p>This patch does not change placement behavior, permissions, or settings.</p>
+]]></description>
+            <enclosure url="https://github.com/travismarceau/snappy/releases/download/v1.2.1/Snappy.zip" length="5007782" type="application/octet-stream" sparkle:edSignature="ma90AAzgyJzJF+RxG6BOgyr3iAl5ldgg7A4L53Io5vmphSRqSLL8fln23BGCuoECXUcBG6kTcrklLmUESkBAAw=="/>
+        </item>
+        <item>
             <title>1.2</title>
             <pubDate>Sat, 19 Sep 2026 21:10:37 -0700</pubDate>
             <sparkle:version>3</sparkle:version>
