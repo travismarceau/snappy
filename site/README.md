@@ -60,17 +60,24 @@ cp site/releases/v1.1.html /tmp/feed/Snappy.html
 generate_appcast --embed-release-notes --download-url-prefix http://127.0.0.1:8770/ /tmp/feed
 ( cd /tmp/feed && python3 -m http.server 8770 > /tmp/feed/access.log 2>&1 & )
 
-# 2. Make a copy that looks like the OLD version, on its own bundle id so the
-#    test cannot touch the real app's settings or its Accessibility grant.
+# 2. Make a copy that looks like the OLD version.
 ditto <Release>/Snappy.app /tmp/old/Snappy.app
-PlistBuddy -c "Set :CFBundleVersion 1" -c "Set :CFBundleShortVersionString 1.0" \
-  -c "Set :CFBundleIdentifier com.simarholonipaa.snappy.dryrun" \
+PlistBuddy -c "Set :CFBundleVersion <previous>" \
+  -c "Set :CFBundleShortVersionString <previous>" \
   -c "Set :SUFeedURL http://127.0.0.1:8770/appcast.xml" \
   -c "Add :SUAutomaticallyUpdate bool true" /tmp/old/Snappy.app/Contents/Info.plist
-codesign -f -s - --deep /tmp/old/Snappy.app
+# Sign it the way a release is signed. Ad-hoc (`-s -`) does NOT work, and does
+# not work silently: Sparkle refuses an update whose signing identity differs
+# from the app it is replacing, so the feed is fetched, the archive downloaded,
+# verified and staged -- and then nothing is ever installed. Keep the real
+# bundle identifier too; Sparkle checks that as well.
+codesign -f -s "Developer ID Application" --deep --options runtime /tmp/old/Snappy.app
 
-# 3. Launch it, wait ~25s, then quit it. Watch what the server was asked for.
-open -a /tmp/old/Snappy.app; sleep 25; pkill -f "old/Snappy.app"
+# 3. Launch it, wait ~30s, then quit it PROPERLY -- osascript, not pkill. A
+#    staged update is applied as the app shuts down, and a killed app never
+#    gets there, which looks exactly like a failed update.
+open -a /tmp/old/Snappy.app; sleep 30
+osascript -e 'tell application id "com.simarholonipaa.snappy" to quit'; sleep 20
 tr -d '\0' < /tmp/feed/access.log | grep -oE '"GET [^"]*"' | sort | uniq -c
 PlistBuddy -c 'Print :CFBundleShortVersionString' /tmp/old/Snappy.app/Contents/Info.plist
 ```
@@ -80,14 +87,19 @@ A working update asks for `appcast.xml` and then `Snappy.zip`, stages into
 the copy reads `1.1` after it quits.
 
 **Run the negative control too, or the test proves nothing.** Corrupt the
-`sparkle:edSignature` in the feed and repeat: Sparkle still fetches and still
-downloads — the requests look identical — but nothing is staged and the copy
-stays at `1.0`. If a tampered signature installs, the public key in
-`Snappy/Info.plist` does not match the signing key and every update is
-effectively unsigned.
+`sparkle:edSignature` in the feed and repeat: the feed is still fetched and the
+copy stays at the old version. Depending on how the signature is mangled Sparkle
+may reject it before downloading anything, so do not read "no download request"
+as a failed test — check the version, and check the feed was fetched at all. If
+a tampered signature installs, the public key in `Snappy/Info.plist` does not
+match the signing key and every update is effectively unsigned.
 
-Afterwards: kill the server, `rm -rf ~/Library/Caches/com.simarholonipaa.snappy.dryrun`,
-and `defaults delete com.simarholonipaa.snappy.dryrun`.
+Read the server log with `tr -d '\0' < access.log`. Truncating that file while
+python still holds it open leaves NUL padding, after which grep treats it as
+binary and prints nothing — which reads exactly like "no requests were made".
+
+Afterwards: kill the server and
+`rm -rf ~/Library/Caches/com.simarholonipaa.snappy/org.sparkle-project.Sparkle`.
 
 ## Releases
 
