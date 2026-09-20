@@ -104,9 +104,26 @@ git push
 
 ## 4. Cut the website over
 
-The site still deploys from `travismarceau/getsnappy-site`. In the DigitalOcean
-dashboard: Apps → the getsnappy app → Settings → App-Level → Source. Repoint at
-`travismarceau/snappy`, branch `main`, **source directory `site/`**. Redeploy.
+No dashboard needed — `doctl` does it, and a spec diff is far easier to review
+than a form:
+
+```bash
+doctl apps list --format ID,Spec.Name --no-header | grep getsnappy   # -> app id
+doctl apps spec get <app-id> > spec.yaml                             # keep this backup
+# change two lines only:
+#   repo_clone_url: …/getsnappy-site.git  ->  …/snappy.git
+#   source_dir: /                          ->  source_dir: /site
+doctl apps update <app-id> --spec spec.yaml
+doctl apps list-deployments <app-id> --format Phase --no-header | head -1  # wait for ACTIVE
+```
+
+The clone URL is a plain `git:` block rather than a `github:` one, so it needs
+no GitHub authorisation — but it does need the repository to be public, which is
+step 2.
+
+Leave `catchall_document: index.html` alone unless you mean to change it. It is
+why an unknown path answers 200 with the homepage, and therefore why step 5
+cannot be a status-code check.
 
 Note what changes for anyone with a bookmark: `getsnappy.fyi/Snappy.zip` stops
 existing. The zip is no longer committed to the site; the download button goes
