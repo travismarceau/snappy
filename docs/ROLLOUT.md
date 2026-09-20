@@ -121,9 +121,9 @@ The clone URL is a plain `git:` block rather than a `github:` one, so it needs
 no GitHub authorisation — but it does need the repository to be public, which is
 step 2.
 
-Leave `catchall_document: index.html` alone unless you mean to change it. It is
-why an unknown path answers 200 with the homepage, and therefore why step 5
-cannot be a status-code check.
+The spec has no `catchall_document`, on purpose — see `site/README.md`. Unknown
+paths 404, and `/Snappy.zip` redirects to the latest GitHub release so the 1.0
+download link keeps working.
 
 Note what changes for anyone with a bookmark: `getsnappy.fyi/Snappy.zip` stops
 existing. The zip is no longer committed to the site; the download button goes
@@ -138,9 +138,7 @@ git history — but it does mean that one URL breaks.
 ./scripts/verify-release.sh
 ```
 
-**Do not substitute a check for HTTP 200.** The static site answers every
-unknown path with `index.html`, so a missing appcast returns 200 with the
-homepage and any status-code check passes while nothing works. The script tests
+Run the script rather than checking status codes by hand. The script tests
 content type, that the body is RSS, that the advertised build matches the
 project, that the notes are embedded rather than linked, that the signature is
 present, and that the enclosure actually resolves.

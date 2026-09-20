@@ -26,16 +26,21 @@ To move the deployment here from `getsnappy-site`:
 1. DigitalOcean ▸ Apps ▸ the getsnappy app ▸ Settings ▸ App-Level ▸ Source.
 2. Repoint it at `travismarceau/snappy`, branch `main`, **source directory `site/`**.
 3. Grant DigitalOcean access to the repo if it is still private.
-4. Redeploy, then run `scripts/verify-release.sh`. **Do not check for a 200**:
-   the static site's catchall document is `index.html`, so every unknown path
-   answers 200 with the homepage — `https://getsnappy.fyi/appcast.xml` does
-   exactly that today. The script checks content type, that the body is really
-   RSS, that the advertised build matches the project, that the notes are
-   embedded rather than linked, that the signature is present, and that the
-   download the feed promises actually resolves.
+4. Redeploy, then run `scripts/verify-release.sh`. It checks content type, that
+   the body is really RSS, that the advertised build matches the project, that
+   the notes are embedded rather than linked, that the signature is present, and
+   that the download the feed promises actually resolves.
 
    It takes an optional feed URL, so it also works against a local
    `python3 -m http.server` during a dry run.
+
+   The app spec deliberately has **no `catchall_document`**. With one, every
+   unknown path answered 200 with the homepage: a missing appcast was
+   indistinguishable from a present one by status code, Sparkle got HTML and
+   reported a parse error, and a dead download link looked alive. Missing paths
+   now 404. `/Snappy.zip` is an ingress redirect to the latest GitHub release,
+   because that URL was the download link for 1.0 and bookmarks outlive
+   releases.
 
 Until that is done, the live site is still being served from `getsnappy-site`
 and this directory is not yet authoritative. Archive that repo once the switch
