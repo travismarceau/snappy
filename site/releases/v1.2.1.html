@@ -1,0 +1,49 @@
+<!-- Release notes for Snappy 1.2.1.
+     Keep this aligned with v1.2.1.md; Sparkle embeds this version in its update
+     dialog while the GitHub release uses the Markdown version. -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Snappy 1.2.1</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --ink: #16181b;
+    --mid: #63696f;
+    --surface: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e8e9eb;
+      --mid: #9aa0a6;
+      --surface: #191b1f;
+    }
+  }
+  body {
+    margin: 0;
+    padding: 16px 18px 22px;
+    font: 13px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; margin: 20px 0 6px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--mid); }
+  p { margin: 0 0 9px; }
+  ul { margin: 0 0 9px; padding-left: 19px; }
+  li { margin-bottom: 5px; }
+  .version-date { color: var(--mid); margin: 0 0 4px; }
+</style>
+
+<h1>Snappy 1.2.1</h1>
+<p class="version-date">Window placement for macOS</p>
+
+<h2>Changed</h2>
+<ul>
+  <li>
+    Product descriptions, credits, documentation, and supporting metadata now
+    describe Snappy’s grid-based placement directly, without comparisons to
+    other products.
+  </li>
+</ul>
+
+<h2>Notes</h2>
+<p>This patch does not change placement behavior, permissions, or settings.</p>
