@@ -136,6 +136,10 @@ final class PlacementOverlayPanel: NSPanel {
         }, completionHandler: completion)
     }
 
+    /// Replaces the footer hint with something that has gone wrong. Dragging
+    /// still works while this is showing; only the keys are affected.
+    func setWarning(_ text: String?) { panelView.warning = text }
+
     func revealPlacements(animated: Bool) { panelView.revealPlacements(animated: animated) }
     func updateHover(_ cell: GridCell?)   { panelView.hoverCell = cell }
     func updateDrag(_ p: GridPlacement?)  { panelView.dragSelection = p }
@@ -166,6 +170,7 @@ final class PlacementPanelView: NSView {
     var onDragChanged: ((GridPlacement?) -> Void)?
     var onDragCommitted: ((GridPlacement) -> Void)?
 
+    var warning: String? { didSet { if warning != oldValue { needsDisplay = true } } }
     var hoverCell: GridCell? { didSet { if hoverCell != oldValue { needsDisplay = true } } }
     var dragSelection: GridPlacement? { didSet { if dragSelection != oldValue { needsDisplay = true } } }
 
@@ -181,6 +186,7 @@ final class PlacementPanelView: NSView {
     override var isFlipped: Bool { false }
 
     func reset() {
+        warning = nil
         hoverCell = nil
         dragSelection = nil
         dragAnchor = nil
@@ -397,6 +403,15 @@ final class PlacementPanelView: NSView {
 
     private func drawFooter() {
         let text: String
+        if let warning {
+            let f = NSFont.systemFont(ofSize: 11, weight: .semibold)
+            let a: [NSAttributedString.Key: Any] = [.font: f, .foregroundColor: NSColor.systemOrange]
+            let sz = (warning as NSString).size(withAttributes: a)
+            (warning as NSString).draw(at: NSPoint(x: max(4, bounds.midX - sz.width / 2),
+                                                   y: gridInsets.bottom / 2 - sz.height / 2 + 2),
+                                       withAttributes: a)
+            return
+        }
         if let placement = dragSelection {
             text = placement.regionDescription(in: keymap.grid)
         } else if dragEnabled {

@@ -126,6 +126,14 @@ stale Accessibility grant.
 
 1. Lock and unlock your Mac. This resolves a surprising number of cases,
    especially after a system update.
+
+   The usual reason is **Secure Input**. A password field — or a lock screen
+   that did not tidy up after itself — can leave macOS in a state where no
+   application may observe the keyboard, and it often stays that way long after
+   the password field is gone. Nothing announces it. Dragging on the placement
+   grid still works perfectly, because only the keyboard is affected, so it
+   looks like the keys are broken rather than the system. Locking and unlocking
+   clears it. Snappy now says so on the panel when it detects it.
 2. Make sure macOS is up to date, and restart if you've just updated.
 3. Re-grant Accessibility: System Settings ▸ Privacy & Security ▸ Accessibility,
    remove Snappy, then add it back.

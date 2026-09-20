@@ -213,6 +213,25 @@ final class PlacementModeController {
         }
         overlays = panels
         setDragEnabled(dragEnabled)
+        // Secure Event Input blocks every keyboard event tap on the system, and
+        // nothing else: the mouse is untouched. So the panel opens, dragging
+        // places windows perfectly, and bound keys do nothing at all while
+        // typing straight through to the app behind -- with every permission
+        // correctly granted and nothing anywhere to say why.
+        //
+        // It is usually left stuck by a password field or a lock screen, and the
+        // owner is often reported as loginwindow rather than whichever app asked
+        // for it. Locking and unlocking the Mac clears it, which is why that has
+        // always been the first line of this app's troubleshooting advice.
+        let secureInput = IsSecureEventInputEnabled()
+        UserDefaults.standard.set(secureInput, forKey: "lastSessionSecureInputEnabled")
+        if secureInput {
+            Logger.log("Secure Event Input is enabled — no keyboard event tap can receive keys. Bound keys will not work until it is cleared (lock and unlock the Mac).")
+        }
+
+        if secureInput {
+            panels.forEach { $0.setWarning("Keys blocked by Secure Input — lock and unlock your Mac") }
+        }
         panels.forEach { $0.present() }
 
         let monitor = ActiveEventMonitor(
