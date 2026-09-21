@@ -75,11 +75,18 @@ copyright lines and dropping the prose line above them.
 ## 3. Publish the release
 
 ```bash
-gh release create v1.1 build/Snappy.zip \
+gh release create v1.X build/Snappy.zip build/Snappy.dmg \
   -R travismarceau/snappy \
-  --title "Snappy 1.1" \
-  --notes-file site/releases/v1.1.md
+  --title "Snappy 1.X" \
+  --notes-file site/releases/v1.X.md
 ```
+
+**Attach both files.** `Snappy.zip` is what Sparkle downloads and what the
+appcast signs; `Snappy.dmg` is what the website's download button points at,
+through `/releases/latest/download/Snappy.dmg`. Forget the DMG and the site's
+button 404s the moment this release becomes "latest" — which happened with
+1.2.1, whose release initially carried only the zip. Both are notarized and
+stapled by `build-direct.sh`.
 
 **`-R` is not optional.** This repo still has an `upstream` remote pointing at
 `rxhanson/Rectangle`, and with two remotes and no default set `gh` picks that

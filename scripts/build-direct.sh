@@ -216,6 +216,32 @@ xcrun stapler staple "$APP"
 rm -f "$ZIP"; ditto -c -k --keepParent "$APP" "$ZIP"
 spctl -a -vvv --type exec "$APP" || true
 
+# A disk image for people, alongside the zip for Sparkle.
+#
+# The zip stays the update artifact: that path is verified end to end and there
+# is no reason to change what already-installed copies consume. The DMG is for
+# the website download, where a zip has two problems. Unarchivers that drop
+# extended attributes strip the stapled notarization ticket, and the app then
+# needs to phone Apple on first launch or, offline, refuses to open as
+# "damaged". And a zip leaves someone holding an app in ~/Downloads with no
+# indication it belongs in Applications, which is how a copy ends up running
+# from the Downloads folder for ever.
+DMG=build/Snappy.dmg
+DMG_STAGE=build/dmg-stage
+rm -rf "$DMG_STAGE" "$DMG"; mkdir -p "$DMG_STAGE"
+ditto "$APP" "$DMG_STAGE/Snappy.app"
+ln -s /Applications "$DMG_STAGE/Applications"
+hdiutil create -volname "Snappy" -srcfolder "$DMG_STAGE" -ov -format UDZO -quiet "$DMG"
+rm -rf "$DMG_STAGE"
+
+# The disk image is signed and notarized in its own right. The app inside is
+# already stapled, so this is about the container someone double-clicks.
+codesign --sign "Developer ID Application" --timestamp "$DMG"
+echo "Submitting the disk image to the notary service…"
+xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
+xcrun stapler staple "$DMG"
+spctl -a -vvv --type install "$DMG" || true
+
 # Sparkle: sign the build and fold it into the appcast users actually poll.
 #
 # generate_appcast reads every archive in the directory, signs each with the
@@ -280,4 +306,9 @@ fi
 
 echo
 echo "Done: $APP"
-echo "      $ZIP  (notarized + stapled — distribute this)"
+echo "      $ZIP  (notarized + stapled — Sparkle's update artifact)"
+echo "      $DMG  (notarized + stapled — the website download)"
+echo
+echo "Attach BOTH to the release:"
+echo "    gh release create $TAG \"$ZIP\" \"$DMG\" -R travismarceau/snappy \\"
+echo "      --title \"Snappy $VERSION\" --notes-file $NOTES_MD"

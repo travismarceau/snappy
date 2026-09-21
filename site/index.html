@@ -184,11 +184,12 @@
     </div>
 
     <div class="get">
-      <a class="btn" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.zip">Download Snappy</a>
+      <a class="btn" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg">Download Snappy</a>
       <span class="meta">macOS 12+ · signed &amp; notarized · auto-updates</span>
     </div>
-    <p class="rule">Unzip, drag <strong>Snappy</strong> to your Applications folder, and grant
-      Accessibility permission on first launch.</p>
+    <p class="rule">Open the disk image, drag <strong>Snappy</strong> to Applications, and launch it.
+      macOS will ask for one permission on first run — <a href="#prompts">here is what it is asking
+      and why</a>.</p>
   </header>
 
   <section aria-labelledby="use-h">
@@ -216,6 +217,46 @@
       </svg>
       <figcaption>Two regions on a 4×4 grid — a key for the left half, a key for the top-right quarter.</figcaption>
     </figure>
+  </section>
+
+  <section id="prompts" aria-labelledby="prompts-h">
+    <p class="eyebrow">First launch</p>
+    <h2 id="prompts-h">The prompts, and what they mean</h2>
+
+    <p class="rule">macOS asks a few things the first time you run Snappy. None of them mean
+      something is wrong, but two of them are worded strongly enough to give anyone pause, so
+      here is exactly what is being asked.</p>
+
+    <dl class="reqs">
+      <dt>“Snappy is an app downloaded from the Internet. Are you sure you want to open it?”</dt>
+      <dd>Every app downloaded outside the App Store gets this once. The same dialog says
+        <em>“Apple checked it for malicious software and none was detected”</em> — that line is
+        the notarization result, and it is the strongest assurance a non-App-Store app can carry.
+        The <strong>Move to Trash</strong> button beside it is standard, not a recommendation.</dd>
+
+      <dt>“Snappy would like to control this computer using accessibility features.”</dt>
+      <dd>This is the one Snappy genuinely cannot work without, and the wording is macOS's, not
+        ours. The Accessibility API is how any application moves or resizes a window that belongs
+        to another application, so every window manager on the Mac asks for it. It lets Snappy
+        read the position and size of windows and set new ones. It does
+        not give Snappy your keystrokes, your screen contents, or your files. Without it the app
+        opens, the grid appears, and no window ever moves.</dd>
+
+      <dt>“Snappy would like to receive keystrokes from any application.”</dt>
+      <dd>Only if you use the placement grid's keyboard shortcuts. Snappy watches for the single
+        key you press while the grid is open, so it can act on it instead of letting it type into
+        whatever is behind. It is not recording anything: nothing is stored, and nothing leaves
+        your Mac. Prefer not to grant it? Turn off the bound keys and drag on the grid instead —
+        dragging needs no keyboard access at all.</dd>
+
+      <dt>“Snappy added a login item”</dt>
+      <dd>Only if you turn on launch at login. You can remove it in System Settings ▸ General ▸
+        Login Items at any time.</dd>
+    </dl>
+
+    <p class="rule"><strong>If macOS says Snappy “is damaged and can't be opened”,</strong> that is
+      not a virus warning — it means the download lost its signature, usually from being unpacked
+      by a tool that strips file metadata. Delete it and download the disk image again.</p>
   </section>
 
   <section aria-labelledby="req-h">
