@@ -108,8 +108,26 @@ final class PlacementOverlayPanel: NSPanel {
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
 
-    func matches(frame: CGRect, keymap: PlacementKeymap, dragEnabled: Bool) -> Bool {
-        targetFrame == frame && self.keymap == keymap && panelView.dragEnabled == dragEnabled
+    /// True when this pane can be reused as-is for `screen`. The display is part
+    /// of the test, not just the frame: a pane carries the screen it places
+    /// onto, so one reused on the wrong display would send windows there, and
+    /// mirrored displays report the same frame.
+    func matches(screen: NSScreen, frame: CGRect, keymap: PlacementKeymap, dragEnabled: Bool) -> Bool {
+        targets(screen) && targetFrame == frame && self.keymap == keymap && panelView.dragEnabled == dragEnabled
+    }
+
+    /// Displays are compared by `CGDirectDisplayID`, not `NSScreen` identity:
+    /// AppKit may hand back a fresh `NSScreen` object for the same physical
+    /// display, and identity would then miss a pane that is in fact correct.
+    func targets(_ screen: NSScreen) -> Bool {
+        if let mine = Self.displayID(of: targetScreen), let theirs = Self.displayID(of: screen) {
+            return mine == theirs
+        }
+        return targetScreen == screen
+    }
+
+    static func displayID(of screen: NSScreen) -> CGDirectDisplayID? {
+        screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
     }
 
     func prepareForReuse() {

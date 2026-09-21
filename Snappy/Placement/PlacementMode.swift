@@ -204,16 +204,17 @@ final class PlacementModeController {
         }
         setKeymap(map)
 
-        // Resolve the target before choosing the panel's display. In the
-        // default, window-based mode, falling back to NSScreen.main here would
-        // make a drag pull a secondary-display window onto the main display.
+        // Resolve the target before opening the panes. `baseScreen` is the
+        // display keyboard placements land on; in the default, window-based
+        // mode, falling back to NSScreen.main here would send a keyed placement
+        // for a secondary-display window to the main display instead.
         captureTarget()
-        guard let targetScreen = baseScreen ?? NSScreen.main else {
+        guard (baseScreen ?? NSScreen.main) != nil else {
             NSSound.beep()
             return
         }
 
-        let panels = preparePanels(keymap: map, dragEnabled: dragEnabled, screen: targetScreen)
+        let panels = preparePanels(keymap: map, dragEnabled: dragEnabled, screens: NSScreen.screens)
         guard !panels.isEmpty else {
             NSSound.beep()
             return
@@ -296,45 +297,60 @@ final class PlacementModeController {
 
     // MARK: Panes
 
-    /// One pane on the target display, reusing a warm one when it still matches. The
-    /// frame is `adjustedVisibleFrame` — the rect placements actually resolve
-    /// against — so the grid is painted exactly where the windows will land,
-    /// Todo sidebar and Stage Manager strip included.
+    /// One pane per connected display, each reusing a warm one when it still
+    /// matches. The frame is `adjustedVisibleFrame` — the rect placements
+    /// actually resolve against — so each grid is painted exactly where windows
+    /// will land on its display, Todo sidebar and Stage Manager strip included.
+    ///
+    /// Every display gets a pane because a drag places onto the display it was
+    /// drawn on: `commitDrag` uses the pane's own `targetScreen`. With a single
+    /// pane on the target display, dragging a window to another monitor was
+    /// impossible. Keyboard placements still resolve against `baseScreen`.
     private func preparePanels(keymap: PlacementKeymap,
                                dragEnabled: Bool,
-                               screen: NSScreen) -> [PlacementOverlayPanel] {
+                               screens: [NSScreen]) -> [PlacementOverlayPanel] {
         cacheReleaseWorkItem?.cancel()
         cacheReleaseWorkItem = nil
 
         var reusable = cachedPanels
         cachedPanels = []
 
-        // One panel, on the display being placed onto. The full-screen version
-        // needed one per display because it covered them; a small box does not.
-        let frame = screen.adjustedVisibleFrame()
-        guard frame.width > 1, frame.height > 1 else { return [] }
+        var panels: [PlacementOverlayPanel] = []
+        for screen in screens {
+            let frame = screen.adjustedVisibleFrame()
+            guard frame.width > 1, frame.height > 1 else { continue }
 
-        let panel: PlacementOverlayPanel
-        if let i = reusable.firstIndex(where: { $0.matches(frame: frame, keymap: keymap, dragEnabled: dragEnabled) }) {
-            panel = reusable.remove(at: i)
-            panel.prepareForReuse()
-        } else {
-            panel = PlacementOverlayPanel(screen: screen, frame: frame, keymap: keymap, dragEnabled: dragEnabled)
-        }
-        reusable.forEach { $0.orderOut(nil) }
-
-        panel.onDragChanged = { [weak self] placement in
-            guard let self else { return }
-            let wasDragging = self.dragSelection != nil
-            self.dragSelection = placement
-            if placement != nil, !wasDragging {
-                self.timeoutWorkItem?.cancel()
-                self.timeoutWorkItem = nil
-                self.armHardStop()
+            let panel: PlacementOverlayPanel
+            if let i = reusable.firstIndex(where: {
+                $0.matches(screen: screen, frame: frame, keymap: keymap, dragEnabled: dragEnabled)
+            }) {
+                panel = reusable.remove(at: i)
+                panel.prepareForReuse()
+            } else {
+                panel = PlacementOverlayPanel(screen: screen, frame: frame, keymap: keymap, dragEnabled: dragEnabled)
             }
+
+            panel.onDragChanged = { [weak self] placement in
+                guard let self else { return }
+                let wasDragging = self.dragSelection != nil
+                self.dragSelection = placement
+                if placement != nil, !wasDragging {
+                    self.timeoutWorkItem?.cancel()
+                    self.timeoutWorkItem = nil
+                    self.armHardStop()
+                }
+            }
+            // `weak panel`: the closure is stored on the panel itself, so a
+            // strong capture would keep every pane alive forever.
+            panel.onDragCommitted = { [weak self, weak panel] p in
+                guard let self, let panel else { return }
+                self.commitDrag(p, on: panel)
+            }
+            panels.append(panel)
         }
-        panel.onDragCommitted = { [weak self] p in self?.commitDrag(p, on: panel) }
-        return [panel]
+        // Panes for displays that have since disconnected, or whose grid changed.
+        reusable.forEach { $0.orderOut(nil) }
+        return panels
     }
 
     /// Hold the panes for a short while: placing several windows in a row is the
@@ -481,7 +497,7 @@ final class PlacementModeController {
 
     private func panel(for screen: NSScreen?) -> PlacementOverlayPanel? {
         guard let screen else { return nil }
-        return overlays.first { $0.targetScreen == screen }
+        return overlays.first { $0.targets(screen) }
     }
 
     /// The panel reports a finished drag. Release is terminal: place and get out
