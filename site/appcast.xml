@@ -3,6 +3,78 @@
     <channel>
         <title>Snappy</title>
         <item>
+            <title>1.2.2</title>
+            <pubDate>Sat, 19 Sep 2026 21:10:37 -0700</pubDate>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>1.2.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<!-- Snappy 1.2.1 release notes. -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Snappy 1.2.1</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --ink: #16181b;
+    --mid: #63696f;
+    --surface: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e8e9eb;
+      --mid: #9aa0a6;
+      --surface: #191b1f;
+    }
+  }
+  body {
+    margin: 0;
+    padding: 16px 18px 22px;
+    font: 13px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; margin: 20px 0 6px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--mid); }
+  p { margin: 0 0 9px; }
+  ul { margin: 0 0 9px; padding-left: 19px; }
+  li { margin-bottom: 5px; }
+  .version-date { color: var(--mid); margin: 0 0 4px; }
+</style>
+
+<h1>Snappy 1.2.2</h1>
+<p class="version-date">Window placement for macOS</p>
+
+<h2>New</h2>
+<ul>
+  <li>
+    <strong>Drag to place on any display.</strong> The placement grid now opens
+    on every connected display at once. Draw a region on whichever screen you
+    want the window on and it moves there — across displays as well as within
+    one. Previously the grid appeared only on the display holding the window, so
+    a drag could never move a window to another screen. Keyboard placements are
+    unchanged: they still act on the display the window is already on.
+  </li>
+</ul>
+
+<h2>Fixed</h2>
+<ul>
+  <li>
+    <strong>Memory that was never released.</strong> Each time the placement
+    grid had to be built afresh, the previous one was kept in memory rather than
+    freed, so Snappy’s footprint grew slowly for as long as it stayed running. It
+    is now released as intended. If Snappy has been running for a long time, this
+    update restarts it and reclaims that memory.
+  </li>
+</ul>
+
+<h2>Notes</h2>
+<ul>
+  <li>No change to permissions or your settings.</li>
+</ul>
+]]></description>
+            <enclosure url="https://github.com/travismarceau/snappy/releases/download/v1.2.2/Snappy.zip" length="5010715" type="application/octet-stream" sparkle:edSignature="5DH3p2Ho6MXzKhL/0IeVrHUk/GAcCJuiOCJjtTjpqb+ycmYhil55hd28zFFQbrji0xigUClXlUB0tq6i65UoBg=="/>
+        </item>
+        <item>
             <title>1.2.1</title>
             <pubDate>Sat, 19 Sep 2026 21:10:37 -0700</pubDate>
             <sparkle:version>4</sparkle:version>
@@ -169,143 +241,6 @@
 </ul>
 ]]></description>
             <enclosure url="https://github.com/travismarceau/snappy/releases/download/v1.2/Snappy.zip" length="5007792" type="application/octet-stream" sparkle:edSignature="Z8eysccyd9XTbLVQrezB/pPaRm6a9reSnd6BU6OhTPdX9oRFadL0upsva6U6w53qscGmUtxdwseec1nqT7mrAA=="/>
-        </item>
-        <item>
-            <title>1.1</title>
-            <pubDate>Sat, 19 Sep 2026 21:10:37 -0700</pubDate>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>1.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<!-- Release notes for Snappy 1.1.
-     Committed here so the site can serve them, and copied into the appcast by
-     scripts/build-direct.sh so Sparkle embeds them in the update dialog. The
-     Accessibility section is not optional: the bundle-identifier change in this
-     release drops the TCC grant, and a user who skips it gets an app that
-     launches and then does nothing. -->
-<!doctype html>
-<meta charset="utf-8">
-<title>Snappy 1.1</title>
-<style>
-  :root {
-    color-scheme: light dark;
-    --ink: #16181b;
-    --mid: #63696f;
-    --surface: #ffffff;
-    --hair: #dcdfdf;
-    --alert-bg: #fff6e8;
-    --alert-edge: #e0a341;
-    --alert-ink: #6b4708;
-    --code-bg: #f1f3f3;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --ink: #e8e9eb;
-      --mid: #9aa0a6;
-      --surface: #191b1f;
-      --hair: #2a2d32;
-      --alert-bg: #2a2110;
-      --alert-edge: #b5822f;
-      --alert-ink: #f0d08a;
-      --code-bg: #23262b;
-    }
-  }
-  body {
-    margin: 0;
-    padding: 16px 18px 22px;
-    font: 13px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-    color: var(--ink);
-    background: var(--surface);
-  }
-  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: -0.01em; }
-  h2 { font-size: 13px; margin: 20px 0 6px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--mid); }
-  p { margin: 0 0 9px; }
-  ul { margin: 0 0 9px; padding-left: 19px; }
-  li { margin-bottom: 5px; }
-  .version-date { color: var(--mid); margin: 0 0 4px; }
-  .alert {
-    border: 1px solid var(--alert-edge);
-    border-left-width: 3px;
-    background: var(--alert-bg);
-    color: var(--alert-ink);
-    border-radius: 6px;
-    padding: 11px 13px;
-    margin: 14px 0 4px;
-  }
-  .alert h2 { margin-top: 0; color: inherit; }
-  .alert p:last-child, ul:last-child { margin-bottom: 0; }
-  .path { background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 12px; white-space: nowrap; }
-  hr { border: 0; border-top: 1px solid var(--hair); margin: 18px 0; }
-</style>
-
-<h1>Snappy 1.1</h1>
-<p class="version-date">Window placement for macOS</p>
-
-<div class="alert">
-  <h2>You must re-grant Accessibility after this update</h2>
-  <p>
-    Snappy's application identity changed in this release. macOS ties the
-    Accessibility permission to that identity and to the app's code signature,
-    and provides no way to carry a grant from the old identity to the new one —
-    so the permission you granted before does not apply to this build.
-  </p>
-  <p>
-    <strong>Until you re-grant it, Snappy will start normally and then do
-    nothing.</strong> The leader key opens no grid and no window moves. There is
-    no error, because as far as Snappy can tell it simply has not been allowed
-    to move windows yet.
-  </p>
-  <p>To fix it, after updating:</p>
-  <ul>
-    <li>Open <span class="path">System Settings ▸ Privacy &amp; Security ▸ Accessibility</span>.</li>
-    <li>If an older Snappy entry is listed, select it and remove it with <strong>−</strong>. A stale entry will not grant the new build anything.</li>
-    <li>Add the new Snappy with <strong>+</strong> if it is not listed, then make sure its switch is on.</li>
-    <li>Quit Snappy and open it again.</li>
-  </ul>
-  <p>
-    Your settings are not affected. Placements, layouts, snap areas and keyboard
-    shortcuts are carried across automatically the first time this version runs.
-    Accessibility is the one thing that cannot be.
-  </p>
-</div>
-
-<hr>
-
-<h2>New</h2>
-<ul>
-  <li>
-    <strong>Automatic updates.</strong> Snappy now checks
-    <span class="path">getsnappy.fyi</span> for new versions and can install them
-    itself. Every update is EdDSA-signed and the signature is verified before
-    anything is applied. This is the last release you have to download by hand.
-  </li>
-  <li>
-    <strong>Place a window by dragging on the grid.</strong> Bring up the
-    placement grid, drag across the cells you want and release — the window lands
-    exactly where you drew, whether or not that region was ever saved. Turn it
-    off under <span class="path">Settings ▸ Placements ▸ Drag to place</span> if
-    you would rather the grid never consume a click.
-  </li>
-</ul>
-
-<h2>Changed</h2>
-<ul>
-  <li>
-    Snappy is now published by Simarhol Onipaa LLC, which is what changed the
-    application identity and made the Accessibility re-grant above necessary.
-  </li>
-  <li>
-    Contact for support is <span class="path">help@getsnappy.fyi</span>, matching
-    the website.
-  </li>
-  <li>
-    <strong>Snappy now requires macOS 12.</strong> Earlier releases ran on 10.15.
-    If you are on macOS 10.15 or 11, Snappy 1.0 keeps working and this update
-    will not be offered to you — the updater checks the requirement before
-    proposing anything, so there is no way to install a build that cannot run.
-  </li>
-</ul>
-]]></description>
-            <enclosure url="https://github.com/travismarceau/snappy/releases/download/v1.1/Snappy.zip" length="4994549" type="application/octet-stream" sparkle:edSignature="7k3p8Kfmied1iEyYoJQSdrECUMNmTrsgiHmFnRbAm5PTir1qJtrBkBzrHUxlVKacXnEqL0dyI26ftapE4R+bCw=="/>
         </item>
     </channel>
 </rss>
