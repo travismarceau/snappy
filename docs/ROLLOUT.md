@@ -74,7 +74,7 @@ Expect `2`, `12.0`, and
 **Do this before publishing the release.** Release assets on a private
 repository are not publicly downloadable, and three things point at one:
 
-- the site's download button → `/releases/latest/download/Snappy.zip`
+- the site's download button → `/releases/latest/download/Snappy.dmg.zip`
 - the appcast enclosure → `/releases/download/v1.1/Snappy.zip`
 - every future Sparkle update
 
@@ -87,18 +87,19 @@ copyright lines and dropping the prose line above them.
 ## 3. Publish the release
 
 ```bash
-gh release create v1.X build/Snappy.zip build/Snappy.dmg \
+gh release create v1.X build/Snappy.zip build/Snappy.dmg.zip \
   -R travismarceau/snappy \
   --title "Snappy 1.X" \
   --notes-file site/releases/v1.X.md
 ```
 
 **Attach both files.** `Snappy.zip` is what Sparkle downloads and what the
-appcast signs; `Snappy.dmg` is what the website's download button points at,
-through `/releases/latest/download/Snappy.dmg`. Forget the DMG and the site's
+appcast signs; `Snappy.dmg.zip` is what the website's download button points at,
+through `/releases/latest/download/Snappy.dmg.zip`. The outer ZIP preserves
+the disk image's custom Finder icon when downloaded. Forget it and the site's
 button 404s the moment this release becomes "latest" — which happened with
-1.2.1, whose release initially carried only the zip. Both are notarized and
-stapled by `build-direct.sh`.
+1.2.1, whose release initially carried only the Sparkle zip. The app and disk
+image are notarized and stapled by `build-direct.sh` before the DMG is zipped.
 
 **`-R` is not optional.** This repo still has an `upstream` remote pointing at
 `rxhanson/Rectangle`, and with two remotes and no default set `gh` picks that

@@ -36,9 +36,12 @@ jobs:
     - name: Resign App
       run: codesign --force --deep -s "$CODE_SIGN_IDENTITY" "$BUILD_DIR/$APP_NAME"
     - name: Make DMG
-      run: hdiutil create -srcdir "$BUILD_DIR" -volname "$DMG_NAME" "$DMG_FILE_NAME"
+      run: |
+        scripts/package-dmg.sh "$BUILD_DIR/$APP_NAME" "$DMG_FILE_NAME"
+        swift scripts/set-dmg-icon.swift "$BUILD_DIR/$APP_NAME" "$DMG_FILE_NAME"
+        ditto -c -k --rsrc --sequesterRsrc "$DMG_FILE_NAME" "$DMG_FILE_NAME.zip"
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
         name: Build
-        path: ${{ env.DMG_FILE_NAME }}
+        path: ${{ env.DMG_FILE_NAME }}.zip

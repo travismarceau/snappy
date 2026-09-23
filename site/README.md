@@ -119,8 +119,9 @@ command to run. Commit `appcast.xml`, push it, then run
 the GitHub push hook: a release is not complete until the live feed verifies.
 
 The download button on the page uses
-`/releases/latest/download/Snappy.zip`, which GitHub resolves to the newest
-release — so the page itself never needs editing at release time.
+`/releases/latest/download/Snappy.dmg.zip`, which GitHub resolves to the newest
+release. The ZIP keeps the disk image's custom Finder icon intact during the
+download, while `Snappy.zip` remains Sparkle's update artifact.
 
 **This requires the repository to be public.** Release assets on a private
 repository are not publicly downloadable, and both the download button and every

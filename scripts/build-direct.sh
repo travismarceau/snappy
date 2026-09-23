@@ -244,12 +244,7 @@ spctl -a -vvv --type exec "$APP" || true
 # indication it belongs in Applications, which is how a copy ends up running
 # from the Downloads folder for ever.
 DMG=build/Snappy.dmg
-DMG_STAGE=build/dmg-stage
-rm -rf "$DMG_STAGE" "$DMG"; mkdir -p "$DMG_STAGE"
-ditto "$APP" "$DMG_STAGE/Snappy.app"
-ln -s /Applications "$DMG_STAGE/Applications"
-hdiutil create -volname "Snappy" -srcfolder "$DMG_STAGE" -ov -format UDZO -quiet "$DMG"
-rm -rf "$DMG_STAGE"
+scripts/package-dmg.sh "$APP" "$DMG"
 
 # The disk image is signed and notarized in its own right. The app inside is
 # already stapled, so this is about the container someone double-clicks.
@@ -258,6 +253,15 @@ echo "Submitting the disk image to the notary service…"
 xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
 xcrun stapler staple "$DMG"
 spctl -a -vvv --type install "$DMG" || true
+
+# Finder stores a DMG file's custom icon in macOS metadata. A raw GitHub
+# Release asset loses that metadata in transit, so archive the stapled image
+# with ditto and let the site serve this ZIP. Its DMG unpacks with the icon.
+DMG_ZIP=build/Snappy.dmg.zip
+swift scripts/set-dmg-icon.swift "$APP" "$DMG"
+codesign --verify "$DMG"
+rm -f "$DMG_ZIP"
+ditto -c -k --rsrc --sequesterRsrc "$DMG" "$DMG_ZIP"
 
 # Sparkle: sign the build and fold it into the appcast users actually poll.
 #
@@ -324,8 +328,8 @@ fi
 echo
 echo "Done: $APP"
 echo "      $ZIP  (notarized + stapled — Sparkle's update artifact)"
-echo "      $DMG  (notarized + stapled — the website download)"
+echo "      $DMG_ZIP  (branded, notarized + stapled DMG — website download)"
 echo
 echo "Attach BOTH to the release:"
-echo "    gh release create $TAG \"$ZIP\" \"$DMG\" -R travismarceau/snappy \\"
+echo "    gh release create $TAG \"$ZIP\" \"$DMG_ZIP\" -R travismarceau/snappy \\"
 echo "      --title \"Snappy $VERSION\" --notes-file $NOTES_MD"
