@@ -16,7 +16,7 @@ class Logger {
     /// first. Diagnosing that from outside the app was impossible.
     ///
     ///   log stream --predicate 'subsystem == "com.simarholonipaa.snappy"'
-    private static let osLog = OSLog(subsystem: "com.simarholonipaa.snappy", category: "snappy")
+    private static let osLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.simarholonipaa.snappy", category: "snappy")
     
     static private var logWindowController: LogWindowController?
     

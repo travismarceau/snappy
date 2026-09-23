@@ -10,6 +10,18 @@ yet produced, `origin` carrying one tag (`v1.0`).
 
 ---
 
+## Development builds
+
+`scripts/run-dev.sh` builds and runs the app you are working on. It never
+touches `/Applications`: in Debug the app is "Snappy Dev"
+(`com.simarholonipaa.snappy.dev`, URL scheme `snappy-dev`, no updater), so it
+has its own preferences, its own Accessibility grant and its own place in the
+permissions list. The installed release keeps running beside it and keeps
+updating itself through Sparkle.
+
+The script refuses to run a build carrying the released identifier, which is
+what a `--release` build would produce.
+
 ## 0. Before anything
 
 **Back up the Sparkle private key.** It lives in the login keychain as service

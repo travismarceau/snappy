@@ -27,7 +27,9 @@
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>snappy</string>
+				<!-- snappy in Release, snappy-dev in Debug, so a development
+				     build can never claim the installed app's URLs. -->
+				<string>$(SNAPPY_URL_SCHEME)</string>
 			</array>
 		</dict>
 	</array>

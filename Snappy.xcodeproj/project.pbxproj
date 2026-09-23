@@ -1296,7 +1296,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simarholonipaa.snappy.Launcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simarholonipaa.snappy.dev.Launcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -1466,7 +1466,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = SnappyIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_OTHER_FLAGS = "--enable-icon-stack-fallback-generation=disabled";
-				BUNDLE_DISPLAY_NAME = Snappy;
+				BUNDLE_DISPLAY_NAME = "Snappy Dev";
+				SNAPPY_URL_SCHEME = "snappy-dev";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Snappy/Snappy.entitlements;
 				CODE_SIGN_IDENTITY = "-";
@@ -1484,7 +1485,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simarholonipaa.snappy;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simarholonipaa.snappy.dev;
 				PRODUCT_MODULE_NAME = Snappy;
 				PRODUCT_NAME = Snappy;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1502,6 +1503,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_OTHER_FLAGS = "--enable-icon-stack-fallback-generation=disabled";
 				BUNDLE_DISPLAY_NAME = Snappy;
+				SNAPPY_URL_SCHEME = snappy;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Snappy/SnappyRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

@@ -10,7 +10,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             terminate()
             return
         }
-        let mainAppIdentifier = "com.simarholonipaa.snappy"
+        // The helper's own identifier is the app's with ".Launcher" appended,
+        // so a development helper launches the development app.
+        let mainAppIdentifier = (Bundle.main.bundleIdentifier ?? "com.simarholonipaa.snappy.Launcher")
+            .replacingOccurrences(of: ".Launcher", with: "")
         let running = NSWorkspace.shared.runningApplications
         let isRunning = !running.filter({$0.bundleIdentifier == mainAppIdentifier}).isEmpty
         

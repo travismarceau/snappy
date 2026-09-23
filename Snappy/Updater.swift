@@ -24,10 +24,17 @@ final class SnappyUpdater: NSObject {
 
     static let shared = SnappyUpdater()
 
+    /// A development build must never update itself. Its identifier ends in
+    /// `.dev`, it is not what the appcast describes, and letting Sparkle replace
+    /// it with the released app would quietly destroy the thing being worked on.
+    static var isEnabled: Bool {
+        !(Bundle.main.bundleIdentifier ?? "").hasSuffix(".dev")
+    }
+
     private let controller: SPUStandardUpdaterController
 
     private override init() {
-        controller = SPUStandardUpdaterController(startingUpdater: true,
+        controller = SPUStandardUpdaterController(startingUpdater: Self.isEnabled,
                                                   updaterDelegate: nil,
                                                   userDriverDelegate: nil)
         super.init()
@@ -43,6 +50,7 @@ final class SnappyUpdater: NSObject {
 
     /// The menu item and the Settings button both land here.
     func checkForUpdates() {
+        guard Self.isEnabled else { return }
         controller.checkForUpdates(nil)
     }
 
@@ -50,6 +58,6 @@ final class SnappyUpdater: NSObject {
     /// read-only mount, or one still in the Xcode build directory, cannot, and
     /// offering the button there only produces a confusing failure.
     var canCheckForUpdates: Bool {
-        controller.updater.canCheckForUpdates
+        Self.isEnabled && controller.updater.canCheckForUpdates
     }
 }

@@ -29,7 +29,7 @@ extension Defaults {
             codableDefaults[exportableDefault.key] = exportableDefault.toCodable()
         }
                 
-        let config = Config(bundleId: "com.simarholonipaa.snappy",
+        let config = Config(bundleId: Bundle.main.bundleIdentifier ?? "com.simarholonipaa.snappy",
                             version: version,
                             shortcuts: shortcuts,
                             defaults: codableDefaults)

@@ -7,7 +7,9 @@ import os.log
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static let launcherAppId = "com.simarholonipaa.snappy.Launcher"
+    /// Derived, not hard-coded: a development build has its own identifier and
+    /// must talk to its own login helper, never the installed release's.
+    static let launcherAppId = (Bundle.main.bundleIdentifier ?? "com.simarholonipaa.snappy") + ".Launcher"
 
     private let accessibilityAuthorization = AccessibilityAuthorization()
     private let statusItem = SnappyStatusItem.instance
@@ -86,12 +88,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mainStatusMenu.autoenablesItems = false
         addMenuIcons()
         insertEnterPlacementMenuItem()
-        insertCheckForUpdatesMenuItem()
+        // A development build has no updater: it is not what the appcast
+        // describes, and letting Sparkle replace it with the released app would
+        // quietly destroy the build being worked on.
+        if SnappyUpdater.isEnabled { insertCheckForUpdatesMenuItem() }
         insertReportIssueMenuItem()
 
         // Creating the controller is what starts Sparkle's scheduler, so it has
         // to happen at launch rather than the first time Settings is opened.
-        _ = SnappyUpdater.shared
+        if SnappyUpdater.isEnabled { _ = SnappyUpdater.shared }
 
         Notification.Name.configImported.onPost(using: { _ in
             self.statusItem.refreshVisibility()
