@@ -61,6 +61,17 @@ report() {
 
 if [[ -n "$STATUS_ONLY" ]]; then report; exit 0; fi
 
+# Refuse before building, not after. A Release build carries the installed app's
+# identifier, so it would share its preferences, its Accessibility grant and its
+# URL scheme. To check a release build, use scripts/build-direct.sh, which
+# produces the real signed artifacts without installing them.
+if [[ "$CONFIG" == "Release" ]]; then
+  echo "Refusing: a Release build has the installed app's identifier and would" >&2
+  echo "share its preferences, permissions and URL scheme. Use Debug for" >&2
+  echo "development, or scripts/build-direct.sh to produce release artifacts." >&2
+  exit 1
+fi
+
 # Sign with Developer ID rather than ad-hoc. macOS keys the Accessibility grant
 # to the code signature, and an ad-hoc signature changes every build, so the dev
 # app would need re-authorising after each one.

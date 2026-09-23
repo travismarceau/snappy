@@ -15,7 +15,10 @@ class Logger {
     /// written to nowhere unless someone happened to have the window open
     /// first. Diagnosing that from outside the app was impossible.
     ///
+    /// The subsystem is the running bundle's identifier, so a development build
+    /// logs separately from the installed release:
     ///   log stream --predicate 'subsystem == "com.simarholonipaa.snappy"'
+    ///   log stream --predicate 'subsystem == "com.simarholonipaa.snappy.dev"'
     private static let osLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.simarholonipaa.snappy", category: "snappy")
     
     static private var logWindowController: LogWindowController?
