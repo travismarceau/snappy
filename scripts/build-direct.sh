@@ -207,6 +207,23 @@ xcodebuild -exportArchive -archivePath "$ARCHIVE" \
   -exportPath "$EXPORT"
 
 APP="$EXPORT/Snappy.app"
+
+# The exported app must be the released identity. A wrong identifier here is not
+# a cosmetic mistake: it is a different app to macOS, so it would not update
+# anyone, would not match their Accessibility grant, and would not answer
+# snappy:// — and the appcast would happily describe it anyway.
+EXPECTED_ID=com.simarholonipaa.snappy
+ACTUAL_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist")
+if [[ "$ACTUAL_ID" != "$EXPECTED_ID" ]]; then
+  echo "Exported app is $ACTUAL_ID, expected $EXPECTED_ID." >&2
+  echo "This build would not reach existing users. Check the Release" >&2
+  echo "configuration's PRODUCT_BUNDLE_IDENTIFIER." >&2
+  exit 1
+fi
+if [[ ! -d "$APP/Contents/Frameworks/Sparkle.framework" ]]; then
+  echo "Exported app has no Sparkle framework — it could never update." >&2
+  exit 1
+fi
 ditto -c -k --keepParent "$APP" "$ZIP"
 
 echo "Submitting to the notary service…"

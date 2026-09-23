@@ -24,11 +24,22 @@ final class SnappyUpdater: NSObject {
 
     static let shared = SnappyUpdater()
 
-    /// A development build must never update itself. Its identifier ends in
-    /// `.dev`, it is not what the appcast describes, and letting Sparkle replace
-    /// it with the released app would quietly destroy the thing being worked on.
+    /// A development build must never update itself: it is not what the appcast
+    /// describes, and letting Sparkle replace it with the released app would
+    /// quietly destroy the thing being worked on.
+    ///
+    /// Gated on the DEBUG compilation condition rather than on the bundle
+    /// identifier. Inferring it from a `.dev` suffix meant a release that was
+    /// ever misnamed would ship with no updater at all, silently and
+    /// irreversibly — those users could never be sent a fix, because the
+    /// mechanism for sending it is what went missing. DEBUG is set by the
+    /// configuration, so a Release build cannot be the one that loses it.
     static var isEnabled: Bool {
-        !(Bundle.main.bundleIdentifier ?? "").hasSuffix(".dev")
+        #if DEBUG
+        return false
+        #else
+        return true
+        #endif
     }
 
     private let controller: SPUStandardUpdaterController
