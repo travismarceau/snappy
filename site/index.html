@@ -1,317 +1,145 @@
-<title>Snappy</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<style>
-  :root{
-    --ground:#f4f6f6;
-    --grid:#e6e9e9;
-    --surface:#ffffff;
-    --ink:#16181b;
-    --mid:#63696f;
-    --faint:#8b9198;
-    --hair:#dcdfdf;
-    --accent:#2a55cf;
-    --accent-ink:#ffffff;
-    --kcap-face:#ffffff;
-    --kcap-edge:#c9cdcd;
-    --kcap-shadow:rgba(20,24,28,.18);
-    --radius:10px;
-    --measure:39rem;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --ground:#121316;
-      --grid:#1e2024;
-      --surface:#191b1f;
-      --ink:#e8e9eb;
-      --mid:#9aa0a6;
-      --faint:#767c83;
-      --hair:#2a2d32;
-      --accent:#7aa4ff;
-      --accent-ink:#0f1114;
-      --kcap-face:#23262b;
-      --kcap-edge:#3a3e44;
-      --kcap-shadow:rgba(0,0,0,.5);
-    }
-  }
-  :root[data-theme="dark"]{
-    --ground:#121316;
-    --grid:#1e2024;
-    --surface:#191b1f;
-    --ink:#e8e9eb;
-    --mid:#9aa0a6;
-    --faint:#767c83;
-    --hair:#2a2d32;
-    --accent:#7aa4ff;
-    --accent-ink:#0f1114;
-    --kcap-face:#23262b;
-    --kcap-edge:#3a3e44;
-    --kcap-shadow:rgba(0,0,0,.5);
-  }
-
-  *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0;
-    font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-    color:var(--ink);
-    background-color:var(--ground);
-    background-image:
-      linear-gradient(var(--grid) 1px,transparent 1px),
-      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-    background-size:30px 30px;
-    background-position:-1px -1px;
-    line-height:1.6;
-    font-size:16px;
-    letter-spacing:-0.005em;
-  }
-  .wrap{max-width:var(--measure);margin:0 auto;padding:clamp(2rem,6vw,4.5rem) 1.4rem 5rem}
-
-  a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
-  a:hover{text-decoration-thickness:2px}
-  a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
-
-  h1,h2,h3{font-weight:700;line-height:1.2;text-wrap:balance;letter-spacing:-0.02em;margin:0}
-  h1{font-size:clamp(2.1rem,7vw,2.9rem)}
-  h2{font-size:1.35rem;margin:0 0 .9rem}
-  h3{font-size:1rem;font-weight:600;margin:0 0 .3rem}
-  p{margin:0 0 1rem;max-width:var(--measure)}
-  strong{font-weight:600}
-
-  .eyebrow{
-    font-family:"IBM Plex Mono",ui-monospace,monospace;
-    font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--faint);margin:0 0 .8rem
-  }
-
-  /* ---- header ---- */
-  header{
-    display:flex;flex-direction:column;gap:1.4rem;
-    padding-bottom:2.2rem;margin-bottom:2.6rem;border-bottom:1px solid var(--hair)
-  }
-  .mark{display:flex;align-items:center;gap:.85rem}
-  .mark svg{width:44px;height:44px;flex:none;display:block}
-  .tile{fill:var(--surface);stroke:var(--hair)}
-  .win{fill:var(--ink)}
-  .quad{fill:var(--faint);opacity:.5}
-  .cell-line{stroke:var(--hair);stroke-width:1}
-  .mark .name{font-size:1.5rem;font-weight:700;letter-spacing:-0.03em}
-  .lede{font-size:1.12rem;color:var(--ink);max-width:34rem}
-  .shortcut{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;color:var(--mid);font-size:.95rem}
-
-  kbd{
-    font-family:"IBM Plex Mono",ui-monospace,monospace;
-    font-size:.82rem;font-weight:500;
-    display:inline-flex;align-items:center;justify-content:center;
-    min-width:1.9rem;height:1.9rem;padding:0 .55rem;
-    color:var(--ink);
-    background:var(--kcap-face);
-    border:1px solid var(--kcap-edge);
-    border-radius:7px;
-    box-shadow:0 2px 0 var(--kcap-shadow), inset 0 1px 0 rgba(255,255,255,.06);
-  }
-  .then{color:var(--faint);font-size:.85rem}
-
-  /* ---- diagram ---- */
-  figure{margin:0;padding:0}
-  .diagram{
-    width:100%;max-width:420px;display:block;
-    border:1px solid var(--hair);border-radius:var(--radius);
-    background:var(--surface)
-  }
-  .diagram .cell-line{stroke:var(--hair);stroke-width:1}
-  .diagram .win{fill:var(--ink)}
-  .diagram .quad{fill:var(--faint);opacity:.5}
-  figcaption{font-size:.82rem;color:var(--faint);margin-top:.6rem}
-
-  /* ---- sections ---- */
-  section{padding:2.4rem 0;border-top:1px solid var(--hair)}
-  section:first-of-type{border-top:none;padding-top:0}
-
-  ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:1.15rem}
-  ol.steps li{counter-increment:s;display:grid;grid-template-columns:1.9rem 1fr;gap:.9rem;align-items:start}
-  ol.steps li::before{
-    content:counter(s);
-    font-family:"IBM Plex Mono",monospace;font-size:.8rem;font-weight:500;
-    width:1.9rem;height:1.9rem;display:flex;align-items:center;justify-content:center;
-    color:var(--mid);border:1px solid var(--hair);border-radius:50%;
-  }
-  ol.steps li p{margin:0}
-
-  dl{margin:0;display:grid;grid-template-columns:1fr;gap:1.1rem}
-  dl>div{display:grid;gap:.15rem}
-  dt{font-weight:600;font-size:.95rem}
-  dd{margin:0;color:var(--mid);font-size:.95rem}
-
-  .get{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:.2rem}
-  .btn{display:inline-block;background:var(--accent);color:var(--accent-ink);text-decoration:none;
-       font-weight:600;font-size:1rem;padding:.7rem 1.35rem;border-radius:var(--radius)}
-  .btn:hover{filter:brightness(1.08)}
-  .meta{color:var(--faint);font-size:.86rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
-  .rule{color:var(--mid);font-size:.95rem}
-  .rule + .rule{margin-top:.7rem}
-
-  address{font-style:normal}
-  .updated{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--faint);letter-spacing:.04em}
-
-  footer{margin-top:3rem;padding-top:1.6rem;border-top:1px solid var(--hair);color:var(--faint);font-size:.82rem;display:flex;flex-wrap:wrap;gap:.4rem 1rem}
-
-  :target{scroll-margin-top:1.5rem}
-  @media (prefers-reduced-motion:no-preference){
-    kbd{transition:transform .06s ease, box-shadow .06s ease}
-    kbd:hover{transform:translateY(1px);box-shadow:0 1px 0 var(--kcap-shadow), inset 0 1px 0 rgba(255,255,255,.06)}
-  }
-</style>
-
-<div class="wrap">
-  <header>
-    <div class="mark">
-      <svg viewBox="0 0 40 40" aria-hidden="true">
-        <rect class="tile" x="1.5" y="1.5" width="37" height="37" rx="8"/>
-        <rect class="win" x="7" y="7" width="12.5" height="26" rx="2.5"/>
-        <rect class="quad" x="20.5" y="7" width="12.5" height="12.5" rx="2.5"/>
-        <line class="cell-line" x1="20.5" y1="7" x2="20.5" y2="33"/>
-        <line class="cell-line" x1="7" y1="20" x2="33" y2="20"/>
-      </svg>
-      <span class="name">Snappy</span>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9e8e3">
+  <meta name="description" content="Snappy is a Mac window manager with a grid you control. One shortcut, one key, and every window is exactly where you want it.">
+  <title>Snappy — Make space. Move faster.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23f4f3ef'/%3E%3Crect x='10' y='10' width='22' height='44' rx='3' fill='%231d1d1d'/%3E%3Crect x='34' y='10' width='20' height='20' rx='3' fill='%23989896'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./scroll.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="Snappy home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">snappy.</span></a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#details">Details</a>
+        <a class="nav-download" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip">Get Snappy ↗</a>
+      </nav>
     </div>
-    <p class="lede">A menu-bar app that moves macOS windows with the keyboard. One shortcut opens a grid over your screen; one more key snaps the window to a region you drew.</p>
-    <div class="shortcut">
-      <kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd>
-      <span class="then">then</span>
-      <kbd>F</kbd>
-      <span class="then">— front window fills the screen</span>
-    </div>
-
-    <div class="get">
-      <a class="btn" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip">Download Snappy</a>
-      <span class="meta">macOS 12+ · signed &amp; notarized · auto-updates</span>
-    </div>
-    <p class="rule">Unzip the download if needed, open the disk image, drag <strong>Snappy</strong> to Applications, and launch it.
-      macOS will ask for one permission on first run — <a href="#prompts">here is what it is asking
-      and why</a>.</p>
   </header>
 
-  <section aria-labelledby="use-h">
-    <p class="eyebrow">Using Snappy</p>
-    <h2 id="use-h">One shortcut, then one key</h2>
-    <ol class="steps">
-      <li><p>Grant Accessibility permission the first time (see Requirements) so Snappy can move windows.</p></li>
-      <li><p>Press <kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd>. A grid appears over the active display.</p></li>
-      <li><p>Press the key you bound to a region — the front window jumps there and the grid closes. Pause instead and the full key map fades in.</p></li>
-      <li><p>Bind your own regions in <strong>Settings ▸ Placement</strong>: drag a rectangle on the grid, press a key. Under <strong>Layouts</strong>, bind one key to several apps at once.</p></li>
-    </ol>
-    <figure style="margin-top:1.8rem">
-      <svg class="diagram" viewBox="0 0 260 168" role="img" aria-label="A screen divided into a grid: the left half is one window region, the top-right quarter is another.">
-        <rect class="tile" x="1" y="1" width="258" height="166" rx="10"/>
-        <g class="cell-line">
-          <line x1="65"  y1="14" x2="65"  y2="154"/>
-          <line x1="130" y1="14" x2="130" y2="154"/>
-          <line x1="195" y1="14" x2="195" y2="154"/>
-          <line x1="14"  y1="49"  x2="246" y2="49"/>
-          <line x1="14"  y1="84"  x2="246" y2="84"/>
-          <line x1="14"  y1="119" x2="246" y2="119"/>
-        </g>
-        <rect class="win"  x="16"  y="16" width="112" height="136" rx="4"/>
-        <rect class="quad" x="132" y="16" width="112" height="66"  rx="4"/>
-      </svg>
-      <figcaption>Two regions on a 4×4 grid — a key for the left half, a key for the top-right quarter.</figcaption>
-    </figure>
-  </section>
-
-  <section id="prompts" aria-labelledby="prompts-h">
-    <p class="eyebrow">First launch</p>
-    <h2 id="prompts-h">The prompts, and what they mean</h2>
-
-    <p class="rule">macOS asks a few things the first time you run Snappy. None of them mean
-      something is wrong, but two of them are worded strongly enough to give anyone pause, so
-      here is exactly what is being asked.</p>
-
-    <dl class="reqs">
-      <dt>“Snappy is an app downloaded from the Internet. Are you sure you want to open it?”</dt>
-      <dd>Every app downloaded outside the App Store gets this once. The same dialog says
-        <em>“Apple checked it for malicious software and none was detected”</em> — that line is
-        the notarization result, and it is the strongest assurance a non-App-Store app can carry.
-        The <strong>Move to Trash</strong> button beside it is standard, not a recommendation.</dd>
-
-      <dt>“Snappy would like to control this computer using accessibility features.”</dt>
-      <dd>This is the one Snappy genuinely cannot work without, and the wording is macOS's, not
-        ours. The Accessibility API is how any application moves or resizes a window that belongs
-        to another application, so every window manager on the Mac asks for it. It lets Snappy
-        read the position and size of windows and set new ones. It does
-        not give Snappy your keystrokes, your screen contents, or your files. Without it the app
-        opens, the grid appears, and no window ever moves.</dd>
-
-      <dt>“Snappy would like to receive keystrokes from any application.”</dt>
-      <dd>Only if you use the placement grid's keyboard shortcuts. Snappy watches for the single
-        key you press while the grid is open, so it can act on it instead of letting it type into
-        whatever is behind. It is not recording anything: nothing is stored, and nothing leaves
-        your Mac. Prefer not to grant it? Turn off the bound keys and drag on the grid instead —
-        dragging needs no keyboard access at all.</dd>
-
-      <dt>“Snappy added a login item”</dt>
-      <dd>Only if you turn on launch at login. You can remove it in System Settings ▸ General ▸
-        Login Items at any time.</dd>
-    </dl>
-
-    <p class="rule"><strong>If macOS says Snappy “is damaged and can't be opened”,</strong> that is
-      not a virus warning — it means the download lost its signature, usually from being unpacked
-      by a tool that strips file metadata. Delete it and download the disk image again.</p>
-  </section>
-
-  <section aria-labelledby="req-h">
-    <p class="eyebrow">Requirements</p>
-    <h2 id="req-h">What Snappy needs</h2>
-    <dl>
-      <div>
-        <dt>macOS 12 or later</dt>
-        <dd>Apple silicon and Intel.</dd>
+  <main id="top">
+    <section class="hero page-grid" aria-labelledby="hero-title">
+      <div class="shell hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">The window manager with a plan</p>
+          <h1 id="hero-title"><span>Make</span><span class="outline">space.</span><span>Move.</span></h1>
+          <p class="hero-lede">Your windows, exactly where they belong. One shortcut opens a grid. One key puts everything in place.</p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip"><span>Download for Mac</span><span class="button-arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how-it-works">See it in action ↓</a>
+          </div>
+          <p class="hero-note">macOS 12+ · Apple silicon &amp; Intel · signed and notarized · free</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="mosaic">
+            <span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span>
+            <span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span>
+            <span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span>
+            <span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span><span class="mosaic-cell"></span>
+          </div>
+          <div class="mosaic-arc"></div>
+          <div class="art-caption">A better place for every window</div>
+        </div>
       </div>
-      <div>
-        <dt>Accessibility permission</dt>
-        <dd>System Settings ▸ Privacy &amp; Security ▸ Accessibility ▸ turn on <strong>Snappy</strong>. This is the macOS API for resizing and moving windows; Snappy uses it for nothing else.</dd>
+    </section>
+    <div class="ticker"><div class="shell ticker-inner"><span>01 / Open the grid</span><span aria-hidden="true">→</span><span>02 / Pick your place</span><span>03 / Get back to work</span></div></div>
+
+    <section class="intro page-grid" aria-labelledby="intro-title">
+      <div class="shell intro-grid">
+        <div><span class="section-num">01 — The idea</span><h2 id="intro-title">Less arranging.<br>More doing.</h2></div>
+        <div class="intro-copy">
+          <p>Snappy turns window management into muscle memory. Draw the spaces you want, give them keys, then move the front window without breaking your flow.</p>
+          <div class="keyline" aria-label="Press Control, Option, Space, then H"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd><span class="then">then</span><kbd>H</kbd><span class="then">left half</span></div>
+        </div>
       </div>
-      <div>
-        <dt>No account required</dt>
-        <dd>Snappy works locally without an account. It connects to getsnappy.fyi and GitHub only to check for and download signed software updates.</dd>
+    </section>
+
+    <section class="story" id="how-it-works" aria-labelledby="story-title">
+      <div class="shell">
+        <div class="story-head"><div><p class="eyebrow">Watch the windows move</p><h2 id="story-title">A shortcut.<br>A place. Done.</h2></div><p class="story-head-note">Scroll to see it work ↓</p></div>
+        <div class="story-layout">
+          <div class="story-steps">
+            <article class="story-step is-active" data-step="0"><span class="story-index">00 / The desktop</span><h3>Start where you are.</h3><p>Browser, notes, editor. The usual overlap. Snappy stays out of sight in your menu bar until you call it.</p></article>
+            <article class="story-step" data-step="1"><span class="story-index">01 / Call Snappy</span><h3>Bring up the grid.</h3><p>Press your shortcut. A grid appears over the active display, ready for a placement key, a layout key, or a drag.</p><div class="step-command"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd></div></article>
+            <article class="story-step" data-step="2"><span class="story-index">02 / Choose a layout</span><h3>Pick a place.</h3><p>Press the key you bound to a layout. One key can give several app windows their own regions at once.</p><div class="step-command"><kbd>L</kbd><span>workspace layout</span></div></article>
+            <article class="story-step" data-step="3"><span class="story-index">03 / Keep going</span><h3>Back to what matters.</h3><p>The windows land in their places and the grid disappears. For a single window, use a placement key or draw a region on the grid.</p></article>
+          </div>
+          <div class="story-visual" role="img" aria-label="Illustration of a desktop: Snappy's grid appears, a layout is selected, and windows move into place">
+            <div class="desktop-wrap">
+              <div class="desktop" id="desktop-demo" data-state="0" aria-hidden="true">
+                <div class="menu-bar"><span class="menu-left"><span class="apple">●</span><strong>Snappy</strong><span>File</span><span>Edit</span><span>View</span></span><span class="menu-right"><span class="signal"></span><span>◖◖◖</span><span>9:41</span></span></div>
+                <div class="window notes"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="window-title">NOTES</span></div><div class="notes-body"><b>THE PLAN.</b><span>01 &nbsp; Find some space</span><span>02 &nbsp; Put things there</span><span>03 &nbsp; Get going</span></div></div>
+                <div class="window browser"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="window-title">BROWSER</span></div><div class="browser-body"><span class="browser-tag">Your workspace / 01</span><strong>Good work<br>needs room.</strong><span class="body-line"></span><span class="body-line short"></span><span class="body-line tiny"></span></div></div>
+                <div class="window code"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="window-title">EDITOR</span></div><div class="code-body"><span>01 &nbsp; <em>workspace</em> {</span><span>02 &nbsp; &nbsp; windows: [browser, notes],</span><span>03 &nbsp; &nbsp; position: <em>"exactly right"</em>,</span><span>04 &nbsp; &nbsp; focus: true</span><span>05 &nbsp; }</span></div></div>
+                <div class="story-shade"></div>
+                <div class="placement-panel"><div class="panel-head"><b>snappy.</b><span>Layout / active display</span><span>×</span></div><div class="panel-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><div class="panel-selection"><strong>L</strong></div><div class="panel-secondary top"></div><div class="panel-secondary bottom"></div></div></div>
+              </div>
+              <div class="visual-caption"><span>Fig. 01 / The placement flow</span><span>Illustration · scroll controlled</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="story-tail"><p>It takes longer to read this than to do it.</p><a class="text-link" href="#features">More ways to move ↓</a></div>
       </div>
-    </dl>
-  </section>
+    </section>
 
-  <section id="support" aria-labelledby="sup-h">
-    <p class="eyebrow">Support</p>
-    <h2 id="sup-h">Getting help</h2>
-    <p>Questions, bugs, or a placement that won't stick — email and include your macOS version and what you expected to happen.</p>
-    <address><a href="mailto:help@getsnappy.fyi">help@getsnappy.fyi</a></address>
-    <p class="rule" style="margin-top:1.2rem"><strong>Windows won't move?</strong> Re-check the Accessibility toggle. After an app update macOS sometimes drops it — remove Snappy from the list with <kbd>–</kbd> and add it back.</p>
-    <p class="rule"><strong>The grid key does nothing?</strong> That key isn't bound yet. Open Settings ▸ Placement and assign it, or press <kbd>Esc</kbd> to close the grid.</p>
-  </section>
+    <section class="features page-grid" id="features" aria-labelledby="features-title">
+      <div class="shell"><div class="features-head"><div><p class="eyebrow">Made for the way you work</p><h2 class="section-heading" id="features-title">Your space.<br>Your rules.</h2></div><p>Small moves and whole workspaces, with the same simple grid.</p></div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-label"><span>01 / Placements</span><span>↗</span></div><div class="feature-graphic grid" aria-hidden="true"></div><h3>Draw your own regions.</h3><p>Make a half, a sliver, or any shape the grid allows. Assign a key and put a window there instantly.</p></article>
+          <article class="feature-card"><div class="feature-label"><span>02 / Layouts</span><span>↗</span></div><div class="feature-graphic stack" aria-hidden="true"><span></span><span></span><span></span></div><h3>Move the whole set.</h3><p>Bind one key to several app windows. Your familiar arrangement returns in a moment.</p></article>
+          <article class="feature-card"><div class="feature-label"><span>03 / Snap areas</span><span>↗</span></div><div class="feature-graphic edges" aria-hidden="true"></div><h3>Drag to an edge.</h3><p>Prefer the mouse? Drag a window to an edge or corner and see exactly where it will land.</p></article>
+        </div>
+      </div>
+    </section>
 
-  <section id="privacy" aria-labelledby="priv-h">
-    <p class="eyebrow">Privacy Policy</p>
-    <h2 id="priv-h">Snappy collects nothing</h2>
-    <p>Snappy does not collect, transmit, or sell any personal data. It has no analytics, crash reporting, or accounts. Its only network activity is checking getsnappy.fyi for signed software updates and downloading an update from GitHub when one is available.</p>
+    <section class="details" id="details" aria-labelledby="details-title">
+      <div class="shell"><div class="details-head"><div><p class="eyebrow">The essentials</p><h2 id="details-title">Simple to start.</h2></div><p>No account, no setup maze. Download it, grant the permission macOS asks for, and give your windows a place to go.</p></div>
+        <div class="spec-list">
+          <div class="spec-row"><span class="spec-label">01 / Download</span><p><a href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip">Get the latest release</a>. Unzip it if needed, open the disk image, and drag Snappy to Applications.</p></div>
+          <div class="spec-row"><span class="spec-label">02 / Allow</span><p>On first run, macOS asks for Accessibility permission. Snappy needs it to move and resize other apps' windows. <a href="#first-launch">See what each prompt means.</a></p></div>
+          <div class="spec-row"><span class="spec-label">03 / Place</span><p>Press <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>Space</kbd>, then a bound key. Or drag on the grid. Create your own regions and keys in Settings → Placement.</p></div>
+          <div class="spec-row"><span class="spec-label">System</span><p>macOS 12 or later, on Apple silicon or Intel. Signed, notarized, and updated automatically.</p></div>
+          <div class="spec-row"><span class="spec-label">Privacy</span><p>Snappy works locally, without an account or analytics. Its network activity is limited to checking for and downloading signed updates.</p></div>
+        </div>
+      </div>
+    </section>
 
-    <h3>Information handled on your Mac</h3>
-    <p class="rule"><strong>Window and screen geometry.</strong> To place a window, Snappy reads the position and size of the frontmost window and the dimensions of your displays through the macOS Accessibility API, then writes a new frame. This happens locally, in the moment, and is never stored or sent anywhere.</p>
-    <p class="rule"><strong>App identifiers in layouts.</strong> If you build a multi-window layout, the bundle identifiers of the apps you choose (for example <span class="updated">com.apple.Terminal</span>) are saved in your configuration so the layout can find those windows again. They stay on your Mac.</p>
-    <p class="rule"><strong>Your preferences.</strong> Grid size, margins, key bindings, and layouts are stored locally in your user Library (<span class="updated">~/Library/Application&nbsp;Support/Snappy</span> and the app's preferences). You can export them to a JSON file yourself; Snappy never uploads them.</p>
+    <section class="info-section" id="first-launch" aria-labelledby="first-launch-title">
+      <div class="shell info-grid"><div><p class="eyebrow">First launch &amp; support</p><h2 id="first-launch-title">Know what you're allowing.</h2><p>macOS can word its first-run prompts strongly. Here is why they appear and what Snappy actually uses.</p><a class="text-link" href="mailto:help@getsnappy.fyi">Need help? Email us ↗</a></div>
+        <div class="accordion">
+          <details><summary>“Are you sure you want to open it?”</summary><p>Every app downloaded outside the App Store gets this prompt once. Snappy is signed and notarized by Apple. The dialog's “Apple checked it for malicious software” line is the notarization result; “Move to Trash” is a standard button, not a recommendation.</p></details>
+          <details><summary>Accessibility permission</summary><p>This is required. It lets Snappy read a window's position and size and move or resize it using the macOS Accessibility API. It does not grant access to your screen contents or files. Without this permission, the grid can appear, but windows cannot move.</p><p>Go to System Settings → Privacy &amp; Security → Accessibility and enable Snappy. If windows stop moving after an update, remove Snappy from that list and add it again.</p></details>
+          <details><summary>“Receive keystrokes from any application”</summary><p>This prompt appears if you use the placement grid's bound keys. Snappy listens for the single key you press while the grid is open so it can act on that key instead of typing it into the app behind the panel. It does not record keystrokes or send them anywhere. You can turn off bound keys and drag on the grid instead.</p></details>
+          <details><summary>“Snappy added a login item”</summary><p>This only happens if you choose to launch Snappy at login. You can remove it at any time in System Settings → General → Login Items.</p></details>
+          <details><summary>“Snappy is damaged and can't be opened”</summary><p>This usually means a tool unpacked the download and stripped its signature metadata. Delete that copy and download the disk image again.</p></details>
+          <details><summary>The grid key does nothing</summary><p>That key may not be bound yet. Open Settings → Placement and assign it, or press Escape to close the grid. If keyboard input is unresponsive after a system event, locking and unlocking your Mac can clear macOS Secure Input.</p></details>
+        </div>
+      </div>
+    </section>
 
-    <h3>Permissions</h3>
-    <p class="rule"><strong>Accessibility</strong> — required, and used solely to move and resize windows on your own Mac.</p>
-    <p class="rule"><strong>Launch at login</strong> — optional, off by default.</p>
+    <section class="privacy" id="privacy" aria-labelledby="privacy-title">
+      <div class="shell privacy-layout"><div><p class="eyebrow">Privacy policy</p><h2 id="privacy-title">Snappy collects nothing.</h2><p class="privacy-lead">No analytics, crash reporting, accounts, or personal data collection. Your workspace stays yours.</p><p class="updated">Last updated 19 September 2026</p></div>
+        <div class="accordion">
+          <details><summary>Network activity</summary><p>Snappy checks getsnappy.fyi for signed software updates and downloads updates from GitHub when one is available. It does not otherwise transmit personal information.</p></details>
+          <details><summary>Information handled on your Mac</summary><p>To place a window, Snappy reads the position and size of the frontmost window and your display dimensions through the macOS Accessibility API, then writes a new frame. This happens locally, in the moment, and is never stored or sent anywhere.</p><p>If you create a multi-window layout, the bundle identifiers of the apps you select are saved locally so Snappy can find those windows again. Grid size, margins, key bindings, and layouts are stored in your user Library and app preferences. You can export them to a JSON file yourself; Snappy never uploads them.</p></details>
+          <details><summary>Permissions</summary><p>Accessibility is required solely to move and resize windows on your Mac. Launch at login is optional and off by default. If you use bound placement keys, macOS may ask for keyboard input access while the grid is open.</p></details>
+          <details><summary>Children, changes &amp; contact</summary><p>Snappy is a utility with no user content or data collection. It is rated 4+, is not directed at children specifically, and collects nothing from anyone. If this policy changes, the updated version will be posted here. Questions can be sent to <a href="mailto:help@getsnappy.fyi">help@getsnappy.fyi</a>.</p></details>
+        </div>
+      </div>
+    </section>
 
-    <h3>Children</h3>
-    <p class="rule">Snappy is a utility with no user content and no data collection, and is rated 4+. It is not directed at children specifically, and collects nothing from anyone.</p>
+    <section class="final-cta" aria-labelledby="final-title"><div class="shell"><p class="eyebrow">Ready when you are</p><h2 id="final-title">Put everything<br>in its place.</h2><a class="button" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip"><span>Download Snappy</span><span class="button-arrow" aria-hidden="true">↗</span></a><p class="meta">Free for macOS 12+ · signed and notarized · no account</p></div></section>
+  </main>
 
-    <h3>Changes &amp; contact</h3>
-    <p class="rule">If this policy ever changes, the updated version will be posted here. Questions: <a href="mailto:help@getsnappy.fyi">help@getsnappy.fyi</a>.</p>
-    <p class="updated">Last updated 19 September 2026</p>
-  </section>
-
-  <footer>
-    <span>Snappy</span>
-    <span>© 2026 Simarhol Onipaa LLC</span>
-    <span>Window-move engine derived from <a href="https://github.com/rxhanson/Rectangle">Rectangle</a> (MIT)</span>
-  </footer>
-</div>
+  <footer class="site-footer"><div class="shell footer-inner"><a class="footer-brand" href="#top">snappy.</a><div class="footer-links"><a href="#how-it-works">How it works</a><a href="#first-launch">Support</a><a href="#privacy">Privacy</a><a href="https://github.com/travismarceau/snappy">GitHub ↗</a></div><p class="footer-meta">© 2026 Simarhol Onipaa LLC<br>Window-move engine derived from <a href="https://github.com/rxhanson/Rectangle">Rectangle</a> (MIT)</p></div></footer>
+</body>
+</html>
