@@ -40,7 +40,7 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .mark-pixel{opacity:0}
 .nav{display:flex;align-items:center;gap:clamp(18px,2.6vw,36px);font-size:15px;color:var(--soft);transition:gap .5s var(--ease),font-size .5s var(--ease)}
 .nav a{transition:color .2s}.nav a:hover{color:var(--ink)}
-.nav .nav-download{display:inline-flex;align-items:center;height:34px;padding:0 14px;color:var(--ink);border:1px solid var(--grid);border-radius:8px;transition:height .5s var(--ease),border-radius .5s var(--ease),background .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease)}
+.nav .nav-download{display:inline-flex;align-items:center;height:34px;padding:0 14px;color:var(--ink);border:1px solid var(--grid);border-radius:8px;transition:padding .5s var(--ease),border-color .35s var(--ease),color .35s var(--ease)}
 .nav .nav-download:hover{border-color:var(--ink)}
 
 .site-header.is-compact{background:rgba(243,242,239,.84);border-bottom-color:var(--rule)}
@@ -50,8 +50,8 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .is-compact .brand-marks{width:10px;height:10px}
 .is-compact .mark-full{opacity:0}.is-compact .mark-pixel{opacity:1}
 .is-compact .nav{gap:clamp(16px,2.2vw,28px);font-size:14.2px}
-.is-compact .nav .nav-download{height:var(--bar);border-radius:0;background:var(--ink);border-color:var(--ink);color:#f7f6f3}
-.is-compact .nav .nav-download:hover{background:#3a3a39}
+.is-compact .nav .nav-download{padding:0;border-color:transparent;color:var(--soft)}
+.is-compact .nav .nav-download:hover{color:var(--ink);border-color:transparent}
 
 /* Hero */
 main{padding-top:72px}
