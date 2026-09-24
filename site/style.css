@@ -214,7 +214,7 @@ main{padding-top:72px}
 }
 @media(max-width:480px){
   .nav a:not(.nav-download){display:none}
-  .story-visual{top:36px}.visual-caption{font-size:8px;margin-top:12px}
+  .story-visual{top:36px}.visual-caption{font-size:8px;margin-top:28px}
   .story-step,.story-step:last-child{min-height:65vh}
   .menu-right span:nth-child(2){display:none}.window-bar{height:17px}.dot{width:5px;height:5px}
   .desktop[data-state="3"] .window.browser,.desktop[data-state="3"] .window.notes{top:24px}
