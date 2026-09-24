@@ -171,6 +171,11 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .code-body em{font-weight:500}
 .visual-caption{font-weight:500;letter-spacing:.08em;color:#8b8a86}.visual-caption span:first-child{color:var(--ink)}
 
+/* Hold the finished layout: the walkthrough stays pinned until the last step's
+   text reaches the top of the desktop. The page script sets --story-tail exactly;
+   25vh is the no-JS approximation. Desktop layout only. */
+@media(min-width:761px){.story-steps:after{content:'';display:block;height:var(--story-tail,25vh)}}
+
 @media(max-width:1050px){
   .story-layout{grid-template-columns:minmax(240px,.65fr) minmax(0,1fr);gap:30px}
 }

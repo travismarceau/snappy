@@ -225,5 +225,29 @@
       <p class="footer-meta">© 2026 Simarhol Onipaa LLC · Window-move engine derived from <a href="https://github.com/rxhanson/Rectangle">Rectangle</a> (MIT)</p>
     </div>
   </footer>
+  <script>
+    // Size the tail after the last step so the desktop releases only when that
+    // step's text has scrolled up to the desktop's top edge.
+    (() => {
+      const steps = document.querySelector('.story-steps');
+      const visual = document.querySelector('.story-visual');
+      const desk = document.getElementById('desktop-demo');
+      const last = document.querySelector('.story-step:last-child .step-num');
+      if (!steps || !visual || !desk || !last) return;
+      const size = () => {
+        const after = getComputedStyle(steps, '::after');
+        if (after.content === 'none' || innerWidth <= 760) return;
+        const current = parseFloat(after.height) || 0;
+        const y = el => el.getBoundingClientRect().top + scrollY;
+        const base = y(steps) + steps.offsetHeight - current;
+        const deskOffset = y(desk) - y(visual);
+        const tail = Math.max(0, Math.round(y(last) - deskOffset + visual.offsetHeight - base));
+        steps.style.setProperty('--story-tail', tail + 'px');
+      };
+      addEventListener('load', size);
+      addEventListener('resize', size);
+      document.fonts && document.fonts.ready.then(size);
+    })();
+  </script>
 </body>
 </html>
