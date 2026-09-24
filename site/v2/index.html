@@ -26,14 +26,17 @@
   <header class="site-header">
     <div class="shell header-inner">
       <a class="brand" href="#top" aria-label="Snappy home">
-        <svg class="brand-mark" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="4" height="10" fill="#1c1c1c"/><rect x="5" y="0" width="5" height="4" fill="#9a9a97"/><rect x="5.5" y="5.5" width="4" height="4" fill="none" stroke="#b9b8b3"/></svg>
-        <span>Snappy</span>
+        <span class="brand-marks" aria-hidden="true">
+          <svg class="mark-full" viewBox="0 0 24 24"><rect x="3" y="3" width="8.5" height="18" rx="1.5" fill="#1c1c1c"/><rect x="12.5" y="3" width="8.5" height="8.5" rx="1.5" fill="#9a9a97"/><rect x="12.5" y="12.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="#c4c3bf"/></svg>
+          <svg class="mark-pixel" viewBox="0 0 10 10" shape-rendering="crispEdges"><rect x="0" y="0" width="4" height="10" fill="#1c1c1c"/><rect x="5" y="0" width="5" height="4" fill="#9a9a97"/><rect x="5.5" y="5.5" width="4" height="4" fill="none" stroke="#b9b8b3"/></svg>
+        </span>
+        <span class="swap"><span class="t-full">Snappy</span><span class="t-pixel" aria-hidden="true">Snappy</span></span>
       </a>
       <nav class="nav" aria-label="Main navigation">
-        <a href="#how-it-works">How it works</a>
-        <a href="#features">Features</a>
-        <a href="#first-launch">Support</a>
-        <a class="nav-download" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip">Download</a>
+        <a href="#how-it-works" style="--i:1"><span class="swap"><span class="t-full">How it works</span><span class="t-pixel" aria-hidden="true">How it works</span></span></a>
+        <a href="#features" style="--i:2"><span class="swap"><span class="t-full">Features</span><span class="t-pixel" aria-hidden="true">Features</span></span></a>
+        <a href="#first-launch" style="--i:3"><span class="swap"><span class="t-full">Support</span><span class="t-pixel" aria-hidden="true">Support</span></span></a>
+        <a class="nav-download" href="https://github.com/travismarceau/snappy/releases/latest/download/Snappy.dmg.zip" style="--i:4"><span class="swap"><span class="t-full">Download</span><span class="t-pixel" aria-hidden="true">Download</span></span></a>
       </nav>
     </div>
   </header>
@@ -226,6 +229,42 @@
     </div>
   </footer>
   <script>
+    // Header: full at the top of the page, compresses to the pixel bar once scrolled.
+    // Each label's width is measured in both faces so it can animate between them.
+    (() => {
+      const header = document.querySelector('.site-header');
+      if (!header) return;
+      const swaps = [...header.querySelectorAll('.swap')];
+      // Re-measuring (fonts arriving, resize) applies instantly; only the
+      // compact toggle itself animates.
+      const measure = () => {
+        header.classList.add('is-resizing');
+        swaps.forEach(el => {
+          el.style.setProperty('--w-full', el.querySelector('.t-full').offsetWidth + 'px');
+          el.style.setProperty('--w-pixel', el.querySelector('.t-pixel').offsetWidth + 'px');
+        });
+        header.offsetWidth;
+        header.classList.remove('is-resizing');
+      };
+      let compact = null;
+      const update = () => {
+        const next = scrollY > 24;
+        if (next === compact) return;
+        compact = next;
+        header.classList.toggle('is-compact', next);
+      };
+      measure();
+      header.classList.add('is-measured');
+      update();
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', measure);
+      addEventListener('load', measure);
+      if (document.fonts) {
+        Promise.all(['16px Silkscreen', '500 15px "Schibsted Grotesk"', '600 17px "Schibsted Grotesk"']
+          .map(f => document.fonts.load(f))).then(measure, measure);
+      }
+    })();
+
     // Size the tail after the last step so the desktop releases only when that
     // step's text has scrolled up to the desktop's top edge.
     (() => {
