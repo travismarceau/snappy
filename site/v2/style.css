@@ -29,8 +29,8 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .section-note{margin:22px 0 0;max-width:40ch;color:var(--soft)}
 
 /* Header: the full header at the top of the page; once scrolled it compresses into a
-   slim bar like the Mac menu bar. At 14.2px, Schibsted's capitals are 10px tall,
-   matching the 10px mark and sitting level with it. */
+   slim bar like the Mac menu bar. The 14px mark and the 14.2px text (10px capitals)
+   share a centre line in the 36px bar. */
 .site-header{--bar:36px;--ease:cubic-bezier(.22,1,.36,1);position:fixed;inset:0 0 auto;z-index:50;border-bottom:1px solid transparent;transition:background .45s var(--ease),border-color .45s var(--ease)}
 .site-header:before{content:'';position:absolute;inset:0;z-index:-1;opacity:0;-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);transition:opacity .45s var(--ease)}
 .header-inner{height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px;transition:height .5s var(--ease)}
@@ -47,7 +47,7 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .is-compact:before{opacity:1}
 .is-compact .header-inner{height:var(--bar)}
 .is-compact .brand{gap:8px;font-size:14.2px}
-.is-compact .brand-marks{width:10px;height:10px}
+.is-compact .brand-marks{width:14px;height:14px}
 .is-compact .mark-full{opacity:0}.is-compact .mark-pixel{opacity:1}
 .is-compact .nav{gap:clamp(16px,2.2vw,28px);font-size:14.2px}
 .is-compact .nav .nav-download{padding:0;border-color:transparent;color:var(--soft)}
