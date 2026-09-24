@@ -117,7 +117,7 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
    Desktop walkthrough — copied verbatim from ../style.css. Its original tokens
    are scoped here so the animation renders exactly as in v1.
    --------------------------------------------------------------------------- */
-.story-visual{--paper:#e9e8e3;--white:#f8f7f3;--ink:#1c1c1c;--soft:#494949;--muted:#686864;--line:#bcbcb6;--gray:#aaa9a4;--display:'Archivo Black',Impact,'Arial Black',sans-serif;--body:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;font-family:var(--body);font-size:16px;line-height:1.5;color:var(--ink)}
+.story-visual{--paper:#e9e8e3;--white:#f8f7f3;--ink:#1c1c1c;--soft:#494949;--muted:#686864;--line:#bcbcb6;--gray:#aaa9a4;--display:'Schibsted Grotesk',system-ui,sans-serif;--body:'Schibsted Grotesk',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;font-family:var(--body);font-size:16px;line-height:1.5;color:var(--ink)}
 .story-visual{position:sticky;top:clamp(90px,11vh,140px);height:min(72vh,650px);min-height:440px;display:flex;align-items:center;justify-content:center}
 .desktop-wrap{width:100%;max-width:925px;position:relative}
 .desktop{position:relative;width:100%;aspect-ratio:1.46;border:10px solid var(--ink);border-radius:10px 10px 5px 5px;background:#aaa9a4;overflow:hidden;box-shadow:14px 14px 0 #d5d4ce,15px 15px 0 var(--ink);isolation:isolate}
@@ -157,6 +157,19 @@ kbd{font-family:var(--code);font-size:12px;font-weight:500;min-width:30px;height
 .desktop[data-state="3"] .window.code{left:65%;top:calc(49% + 33px);width:33%;height:calc(51% - 43px)}
 .desktop[data-state="3"] .window{box-shadow:0 0 0 1px rgba(28,28,28,.1)}
 .visual-caption{display:flex;justify-content:space-between;gap:12px;margin-top:21px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}.visual-caption span:last-child{color:var(--muted)}
+
+/* Walkthrough type, retuned to the page. Geometry and motion above are untouched;
+   these only swap the heavy all-caps display face for the page's grotesk. */
+.browser-body strong{font-weight:500;text-transform:none;letter-spacing:-.035em;line-height:1.02}
+.notes-body{font-family:var(--body)}.notes-body b{font-weight:500;letter-spacing:-.03em}
+.panel-head b{font-family:var(--display);font-weight:600;letter-spacing:-.01em;text-transform:none}
+.panel-head{font-weight:500}
+.menu-bar{font-family:var(--body);font-weight:500;font-size:clamp(7px,.72vw,11px)}
+.menu-bar strong{font-weight:600}
+.window-title{font-family:var(--body);font-weight:500;letter-spacing:0;color:#6b6a66;font-size:clamp(6px,.62vw,9px)}
+.browser-body .browser-tag{font-weight:500}
+.code-body em{font-weight:500}
+.visual-caption{font-weight:500;letter-spacing:.08em;color:#8b8a86}.visual-caption span:first-child{color:var(--ink)}
 
 @media(max-width:1050px){
   .story-layout{grid-template-columns:minmax(240px,.65fr) minmax(0,1fr);gap:30px}
