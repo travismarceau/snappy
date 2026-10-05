@@ -130,7 +130,8 @@ class WindowManager {
             // exact destination rect against the (possibly explicit) screen.
             precalculatedResult = WindowCalculationResult(rect: precomputedRect,
                                                           screen: usableScreens.currentScreen,
-                                                          resultingAction: action)
+                                                          resultingAction: action,
+                                                          resultingScreenFrame: parameters.precomputedScreenFrame)
         } else {
             precalculatedResult = WindowCalculationFactory.calculationsByAction[action]?.calculate(calculationParams)
         }
@@ -334,8 +335,11 @@ struct ExecutionParameters {
     /// moves the window straight to this rect (Cocoa, bottom-left origin, in the
     /// coordinate space of the target screen). Used by grid-based placement.
     let precomputedRect: CGRect?
+    /// The bounds used to resolve `precomputedRect`. Keeps size-constrained
+    /// placements on the selected monitor even when combined display mode is on.
+    let precomputedScreenFrame: CGRect?
 
-    init(_ action: WindowAction, updateRestoreRect: Bool = true, screen: NSScreen? = nil, windowElement: AccessibilityElement? = nil, windowId: CGWindowID? = nil, source: ExecutionSource = .keyboardShortcut, precomputedRect: CGRect? = nil) {
+    init(_ action: WindowAction, updateRestoreRect: Bool = true, screen: NSScreen? = nil, windowElement: AccessibilityElement? = nil, windowId: CGWindowID? = nil, source: ExecutionSource = .keyboardShortcut, precomputedRect: CGRect? = nil, precomputedScreenFrame: CGRect? = nil) {
         self.action = action
         self.updateRestoreRect = updateRestoreRect
         self.screen = screen
@@ -343,6 +347,7 @@ struct ExecutionParameters {
         self.windowId = windowId
         self.source = source
         self.precomputedRect = precomputedRect
+        self.precomputedScreenFrame = precomputedScreenFrame
     }
 }
 

@@ -381,12 +381,13 @@ enum DockUtil {
 
 extension NSScreen {
 
-    func adjustedVisibleFrame(_ ignoreTodo: Bool = false, _ ignoreStage: Bool = false) -> CGRect {
+    func adjustedVisibleFrame(_ ignoreTodo: Bool = false, _ ignoreStage: Bool = false,
+                              ignoreCombinedDisplays: Bool = false) -> CGRect {
         let screens = NSScreen.screens
         let dockSnapshot = DockUtil.snapshot(for: screens)
         var newFrame: CGRect
 
-        if !NSScreen.screensHaveSeparateSpaces && Defaults.combinedDisplayMode.userEnabled {
+        if !ignoreCombinedDisplays && !NSScreen.screensHaveSeparateSpaces && Defaults.combinedDisplayMode.userEnabled {
             let combinedScreenFrame = dockSnapshot.screenFrames.reduce(CGRect.null) { $0.union($1) }
             let combinedVisibleFrame = screens.reduce(CGRect.null) {
                 $0.union(DockUtil.correctedVisibleFrame(for: $1, snapshot: dockSnapshot))

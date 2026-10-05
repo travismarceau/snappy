@@ -4480,6 +4480,36 @@ final class CrossDisplayResizeTests: XCTestCase {
         XCTAssertEqual(completedFrames, [target])
     }
 
+    func testPrecomputedPlacementAlignsConstrainedWindowToItsExplicitDisplayFrame() {
+        let savedAlignment = Defaults.moveFixedSizeToEdge.toCodable()
+        defer { Defaults.moveFixedSizeToEdge.load(from: savedAlignment) }
+        Defaults.moveFixedSizeToEdge.load(from: CodableDefault(int: EdgeAlignment.edgesAndCorners.rawValue))
+
+        // Model a combined desktop whose left display owns this selector. The
+        // selected zone touches that display's right edge, inside the desktop.
+        let screen = TestScreen(frame: CGRect(x: 0, y: 0, width: 2400, height: 1000))
+        let displayFrame = CGRect(x: 0, y: 0, width: 1200, height: 1000)
+        let placement = CGRect(x: 600, y: 0, width: 600, height: 1000)
+        let window = ClampingWindow(target: placement.screenFlipped)
+        let manager = TestWindowManager(screenDetection: TestScreenDetection(source: screen))
+        var completedFrame: CGRect?
+        manager.didFinish = { result, frame in
+            XCTAssertEqual(result.visibleFrameOfScreen, displayFrame)
+            completedFrame = frame
+        }
+
+        manager.execute(ExecutionParameters(.specified, screen: screen, windowElement: window,
+                                            precomputedRect: placement, precomputedScreenFrame: displayFrame))
+
+        // The fake accepts only 200 of the requested 600 points of width. It
+        // must remain against the selected display's right edge; using the
+        // desktop frame would center it within the zone at x = 800 instead.
+        let expected = CGRect(x: 1000, y: 0, width: 200, height: 1000).screenFlipped
+        XCTAssertEqual(window.resizeAttempts, 1)
+        XCTAssertEqual(window.frame, expected)
+        XCTAssertEqual(completedFrame, expected)
+    }
+
     private final class TestScreen: NSScreen {
         private let testFrame: CGRect
 

@@ -97,7 +97,7 @@ final class PlacementModeController {
 
     static let shared = PlacementModeController()
 
-    private init() {
+    init() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenParametersChanged),
@@ -306,9 +306,9 @@ final class PlacementModeController {
     /// drawn on: `commitDrag` uses the pane's own `targetScreen`. With a single
     /// pane on the target display, dragging a window to another monitor was
     /// impossible. Keyboard placements still resolve against `baseScreen`.
-    private func preparePanels(keymap: PlacementKeymap,
-                               dragEnabled: Bool,
-                               screens: [NSScreen]) -> [PlacementOverlayPanel] {
+    func preparePanels(keymap: PlacementKeymap,
+                       dragEnabled: Bool,
+                       screens: [NSScreen] = NSScreen.screens) -> [PlacementOverlayPanel] {
         cacheReleaseWorkItem?.cancel()
         cacheReleaseWorkItem = nil
 
@@ -317,7 +317,7 @@ final class PlacementModeController {
 
         var panels: [PlacementOverlayPanel] = []
         for screen in screens {
-            let frame = screen.adjustedVisibleFrame()
+            let frame = screen.adjustedVisibleFrame(ignoreCombinedDisplays: true)
             guard frame.width > 1, frame.height > 1 else { continue }
 
             let panel: PlacementOverlayPanel
@@ -506,7 +506,12 @@ final class PlacementModeController {
     private func commitDrag(_ placement: GridPlacement, on panel: PlacementOverlayPanel) {
         guard isActive else { return }
         dragSelection = nil
-        place(placement, on: panel.targetScreen, element: targetElement, windowId: targetWindowId)
+        WindowAction.specified.postPlacement(
+            rect: panel.destinationRect(for: placement),
+            screen: panel.targetScreen,
+            windowElement: targetElement,
+            windowId: targetWindowId,
+            screenFrame: panel.targetFrame)
         endSession()
     }
 

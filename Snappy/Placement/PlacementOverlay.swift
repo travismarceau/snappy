@@ -43,6 +43,7 @@ final class PlacementOverlayPanel: NSPanel {
     let keymap: PlacementKeymap
 
     private let panelView: PlacementPanelView
+    private(set) var dragPreview: PlacementPreviewPanel?
 
     /// Fired as a drag moves, and once when it is released.
     var onDragChanged: ((GridPlacement?) -> Void)?
@@ -101,8 +102,14 @@ final class PlacementOverlayPanel: NSPanel {
         contentView = panelView
         alphaValue = 0
 
-        panelView.onDragChanged = { [weak self] p in self?.onDragChanged?(p) }
-        panelView.onDragCommitted = { [weak self] p in self?.onDragCommitted?(p) }
+        panelView.onDragChanged = { [weak self] placement in
+            self?.updateDrag(placement)
+            self?.onDragChanged?(placement)
+        }
+        panelView.onDragCommitted = { [weak self] placement in
+            self?.dragPreview?.orderOut(nil)
+            self?.onDragCommitted?(placement)
+        }
     }
 
     override var canBecomeKey: Bool { false }
@@ -131,6 +138,7 @@ final class PlacementOverlayPanel: NSPanel {
     }
 
     func prepareForReuse() {
+        dragPreview?.orderOut(nil)
         panelView.reset()
         alphaValue = 0
     }
@@ -150,6 +158,7 @@ final class PlacementOverlayPanel: NSPanel {
     }
 
     func dismiss(completion: @escaping () -> Void) {
+        clearDrag()
         NSAnimationContext.runAnimationGroup({ ctx in
             ctx.duration = 0.1
             animator().alphaValue = 0
@@ -162,11 +171,71 @@ final class PlacementOverlayPanel: NSPanel {
 
     func revealPlacements(animated: Bool) { panelView.revealPlacements(animated: animated) }
     func updateHover(_ cell: GridCell?)   { panelView.hoverCell = cell }
-    func updateDrag(_ p: GridPlacement?)  { panelView.dragSelection = p }
-    func clearDrag()                      { panelView.dragSelection = nil }
+    func updateDrag(_ placement: GridPlacement?) {
+        panelView.dragSelection = placement
+        guard let placement else {
+            dragPreview?.orderOut(nil)
+            return
+        }
+        let preview = dragPreview ?? PlacementPreviewPanel()
+        dragPreview = preview
+        preview.setFrame(destinationRect(for: placement), display: true)
+        preview.contentView?.needsDisplay = true
+        preview.orderFrontRegardless()
+    }
+
+    func clearDrag() {
+        panelView.cancelDrag()
+        dragPreview?.orderOut(nil)
+    }
+
+    /// Both the live preview and mouse-up use this exact screen-space rect.
+    func destinationRect(for placement: GridPlacement) -> CGRect {
+        placement.resolve(in: targetFrame, grid: keymap.grid,
+                          outerMargin: keymap.outerMargin, innerGap: keymap.innerGap)
+    }
+
     func flash(placement: GridPlacement)  { panelView.flash(placement: placement) }
     func flash(layout: WindowLayout, outcome: PlacementModeController.LayoutOutcome) {
         panelView.flash(layout: layout, outcome: outcome)
+    }
+}
+
+// MARK: - Destination preview
+
+/// A faint window footprint below the selector. It never takes focus or mouse
+/// events, even when the selected region extends under another app's window.
+final class PlacementPreviewPanel: NSPanel {
+
+    init() {
+        super.init(contentRect: .zero,
+                   styleMask: [.borderless, .nonactivatingPanel],
+                   backing: .buffered, defer: false)
+        level = NSWindow.Level(rawValue: NSWindow.Level.modalPanel.rawValue - 1)
+        isOpaque = false
+        backgroundColor = .clear
+        hasShadow = false
+        ignoresMouseEvents = true
+        isReleasedWhenClosed = false
+        hidesOnDeactivate = false
+        animationBehavior = .none
+        collectionBehavior = [.canJoinAllSpaces, .transient, .fullScreenAuxiliary, .stationary]
+        contentView = PlacementPreviewView(frame: .zero)
+    }
+
+    override var canBecomeKey: Bool { false }
+    override var canBecomeMain: Bool { false }
+}
+
+private final class PlacementPreviewView: NSView {
+    override func draw(_ dirtyRect: NSRect) {
+        let outline = NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1),
+                                   xRadius: 8, yRadius: 8)
+        NSColor.controlAccentColor.withAlphaComponent(0.14).setFill()
+        outline.fill()
+        NSColor.controlAccentColor.withAlphaComponent(0.5).setStroke()
+        outline.lineWidth = 2
+        outline.stroke()
     }
 }
 
@@ -207,14 +276,18 @@ final class PlacementPanelView: NSView {
 
     func reset() {
         warning = nil
-        hoverCell = nil
-        dragSelection = nil
-        dragAnchor = nil
+        cancelDrag()
         placementsRevealed = false
         flashedPlacement = nil
         flashedLayout = nil
         flashedOutcome = nil
         needsDisplay = true
+    }
+
+    func cancelDrag() {
+        hoverCell = nil
+        dragSelection = nil
+        dragAnchor = nil
     }
 
     func setTarget(name: String?, icon: NSImage?) {

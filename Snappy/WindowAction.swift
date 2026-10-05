@@ -188,8 +188,8 @@ enum WindowAction: Int, Codable {
     /// calculation factory. Routes through the normal execution pipeline so
     /// restore rects, fixed-size handling, cross-display moves and cursor-follow
     /// all still apply.
-    func postPlacement(rect: CGRect, screen: NSScreen, windowElement: AccessibilityElement?, windowId: CGWindowID?) {
-        NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, updateRestoreRect: true, screen: screen, windowElement: windowElement, windowId: windowId, source: .keyboardShortcut, precomputedRect: rect))
+    func postPlacement(rect: CGRect, screen: NSScreen, windowElement: AccessibilityElement?, windowId: CGWindowID?, screenFrame: CGRect? = nil) {
+        NotificationCenter.default.post(name: notificationName, object: ExecutionParameters(self, updateRestoreRect: true, screen: screen, windowElement: windowElement, windowId: windowId, source: .keyboardShortcut, precomputedRect: rect, precomputedScreenFrame: screenFrame))
     }
     
     func postUrl() {

@@ -1,6 +1,7 @@
 /// PlacementTests.swift
 
 import XCTest
+import Cocoa
 import CoreGraphics
 @testable import Snappy
 
@@ -353,6 +354,195 @@ final class PlacementGridGeometryTests: XCTestCase {
                                     focus: g.cell(at: CGPoint(x: 1190, y: 310)))
         let rect = dragged.resolve(in: screenFrame, grid: grid, outerMargin: 0, innerGap: 0)
         XCTAssertEqual(rect, CGRect(x: 1920 + 600, y: 300, width: 600, height: 300))
+    }
+}
+
+// MARK: - Multi-display placement and live destination preview
+
+final class PlacementOverlayPanelTests: XCTestCase {
+
+    private let targetFrame = CGRect(x: -1600, y: -300, width: 1200, height: 600)
+    private let map = PlacementKeymap(grid: PlacementGrid(rows: 6, cols: 6),
+                                      outerMargin: 10, innerGap: 8)
+
+    func testPanelFactoryIncludesEveryDisplayEvenWhenFramesMatch() {
+        let primary = TestScreen(id: 1, frame: CGRect(x: 0, y: 0, width: 1600, height: 1000))
+        let left = TestScreen(id: 2, frame: targetFrame)
+        let mirrored = TestScreen(id: 3, frame: primary.frame)
+        let screens = [primary, left, mirrored]
+        let controller = PlacementModeController()
+
+        let panels = controller.preparePanels(keymap: map, dragEnabled: true, screens: screens)
+        defer { panels.forEach { $0.orderOut(nil) } }
+
+        XCTAssertEqual(panels.count, screens.count)
+        for (panel, screen) in zip(panels, screens) {
+            XCTAssertTrue(panel.targetScreen === screen)
+            XCTAssertEqual(panel.targetFrame, screen.adjustedVisibleFrame(ignoreCombinedDisplays: true))
+            XCTAssertTrue(panel.matches(screen: screen, frame: screen.adjustedVisibleFrame(ignoreCombinedDisplays: true),
+                                        keymap: map, dragEnabled: true))
+            XCTAssertNil(panel.dragPreview, "Preparing placement selectors should not allocate previews")
+        }
+        XCTAssertTrue(controller.preparePanels(keymap: map, dragEnabled: true, screens: []).isEmpty)
+    }
+
+    func testPanelMatchingUsesDisplayIdentityAndPlacementConfiguration() {
+        let screen = TestScreen(id: 1, frame: targetFrame)
+        let panel = PlacementOverlayPanel(screen: screen, frame: targetFrame,
+                                          keymap: map, dragEnabled: true)
+        let sameDisplay = TestScreen(id: 1, frame: targetFrame)
+        let otherDisplay = TestScreen(id: 2, frame: targetFrame)
+
+        XCTAssertTrue(panel.matches(screen: sameDisplay, frame: targetFrame,
+                                    keymap: map, dragEnabled: true))
+        XCTAssertFalse(panel.matches(screen: otherDisplay, frame: targetFrame,
+                                     keymap: map, dragEnabled: true))
+        XCTAssertFalse(panel.matches(screen: screen, frame: targetFrame.offsetBy(dx: 1, dy: 0),
+                                     keymap: map, dragEnabled: true))
+        XCTAssertFalse(panel.matches(screen: screen, frame: targetFrame,
+                                     keymap: PlacementKeymap(), dragEnabled: true))
+        XCTAssertFalse(panel.matches(screen: screen, frame: targetFrame,
+                                     keymap: map, dragEnabled: false))
+    }
+
+    func testDragPreviewsExactDestinationAndHidesOnRelease() throws {
+        let panel = makePanel()
+        defer { panel.clearDrag(); panel.orderOut(nil) }
+        let view = try XCTUnwrap(panel.contentView as? PlacementPanelView)
+        var committed: [GridPlacement] = []
+        panel.onDragCommitted = { committed.append($0) }
+
+        XCTAssertNil(panel.dragPreview)
+        view.mouseDown(with: try event(.leftMouseDown, cell: GridCell(col: 0, row: 0), in: panel))
+        let preview = try XCTUnwrap(panel.dragPreview)
+        XCTAssertTrue(preview.isVisible)
+        XCTAssertEqual(preview.frame, CGRect(x: -1590, y: 200, width: 190, height: 90))
+        XCTAssertTrue(preview.ignoresMouseEvents)
+        XCTAssertFalse(preview.canBecomeKey)
+        XCTAssertFalse(preview.canBecomeMain)
+        XCTAssertTrue(preview.styleMask.contains(.nonactivatingPanel))
+        XCTAssertFalse(preview.styleMask.contains(.titled))
+        XCTAssertLessThan(preview.level.rawValue, panel.level.rawValue)
+
+        view.mouseDragged(with: try event(.leftMouseDragged, cell: GridCell(col: 2, row: 2), in: panel))
+        let selected = GridPlacement(col: 0, row: 0, colSpan: 3, rowSpan: 3)
+        let destination = CGRect(x: -1590, y: 4, width: 586, height: 286)
+        XCTAssertTrue(panel.dragPreview === preview)
+        XCTAssertEqual(view.dragSelection, selected)
+        XCTAssertEqual(panel.destinationRect(for: selected), destination)
+        XCTAssertEqual(preview.frame, destination,
+                       "The full-size preview must honor the destination display, margins, and gaps")
+
+        view.mouseUp(with: try event(.leftMouseUp, cell: GridCell(col: 2, row: 2), in: panel))
+        XCTAssertEqual(committed, [selected])
+        XCTAssertFalse(preview.isVisible)
+    }
+
+    func testClearingDragCancelsAnchorSoLaterEventsCannotCommitIt() throws {
+        let panel = makePanel()
+        defer { panel.clearDrag(); panel.orderOut(nil) }
+        let view = try XCTUnwrap(panel.contentView as? PlacementPanelView)
+        var committed: [GridPlacement] = []
+        panel.onDragCommitted = { committed.append($0) }
+        view.mouseDown(with: try event(.leftMouseDown, cell: GridCell(col: 0, row: 0), in: panel))
+        let preview = try XCTUnwrap(panel.dragPreview)
+
+        panel.clearDrag()
+        XCTAssertNil(view.dragSelection)
+        XCTAssertFalse(preview.isVisible)
+
+        view.mouseDragged(with: try event(.leftMouseDragged, cell: GridCell(col: 5, row: 5), in: panel))
+        view.mouseUp(with: try event(.leftMouseUp, cell: GridCell(col: 5, row: 5), in: panel))
+        XCTAssertNil(view.dragSelection)
+        XCTAssertTrue(committed.isEmpty)
+        XCTAssertFalse(preview.isVisible)
+    }
+
+    func testReuseAndDismissHidePreviewAndCancelInFlightDrag() throws {
+        let panel = makePanel()
+        defer { panel.clearDrag(); panel.orderOut(nil) }
+        let view = try XCTUnwrap(panel.contentView as? PlacementPanelView)
+        var commitCount = 0
+        panel.onDragCommitted = { _ in commitCount += 1 }
+        let down = try event(.leftMouseDown, cell: GridCell(col: 0, row: 0), in: panel)
+        let drag = try event(.leftMouseDragged, cell: GridCell(col: 5, row: 5), in: panel)
+        let up = try event(.leftMouseUp, cell: GridCell(col: 5, row: 5), in: panel)
+
+        view.mouseDown(with: down)
+        let preview = try XCTUnwrap(panel.dragPreview)
+        panel.prepareForReuse()
+        XCTAssertFalse(preview.isVisible)
+        XCTAssertNil(view.dragSelection)
+        view.mouseDragged(with: drag)
+        view.mouseUp(with: up)
+        XCTAssertEqual(commitCount, 0)
+
+        view.mouseDown(with: down)
+        XCTAssertTrue(panel.dragPreview?.isVisible == true)
+        let dismissed = expectation(description: "Placement selector dismissed")
+        panel.dismiss { dismissed.fulfill() }
+        XCTAssertFalse(panel.dragPreview?.isVisible == true)
+        XCTAssertNil(view.dragSelection)
+        view.mouseDragged(with: drag)
+        view.mouseUp(with: up)
+        XCTAssertEqual(commitCount, 0)
+        wait(for: [dismissed], timeout: 1)
+    }
+
+    func testDisabledDraggingNeverCreatesPreviewOrCommits() throws {
+        let panel = makePanel(dragEnabled: false)
+        let view = try XCTUnwrap(panel.contentView as? PlacementPanelView)
+        var commitCount = 0
+        panel.onDragCommitted = { _ in commitCount += 1 }
+
+        view.mouseDown(with: try event(.leftMouseDown, cell: GridCell(col: 0, row: 0), in: panel))
+        view.mouseDragged(with: try event(.leftMouseDragged, cell: GridCell(col: 5, row: 5), in: panel))
+        view.mouseUp(with: try event(.leftMouseUp, cell: GridCell(col: 5, row: 5), in: panel))
+
+        XCTAssertTrue(panel.ignoresMouseEvents)
+        XCTAssertNil(view.dragSelection)
+        XCTAssertNil(panel.dragPreview)
+        XCTAssertEqual(commitCount, 0)
+    }
+
+    private func makePanel(dragEnabled: Bool = true) -> PlacementOverlayPanel {
+        PlacementOverlayPanel(screen: TestScreen(id: 2, frame: targetFrame), frame: targetFrame,
+                              keymap: map, dragEnabled: dragEnabled)
+    }
+
+    private func event(_ type: NSEvent.EventType, cell: GridCell,
+                       in panel: PlacementOverlayPanel) throws -> NSEvent {
+        let view = try XCTUnwrap(panel.contentView)
+        // The selector has 12-point padding, a 30-point header, and a 20-point footer.
+        let grid = CGRect(x: 12, y: 32, width: view.bounds.width - 24, height: view.bounds.height - 74)
+        let point = CGPoint(x: grid.minX + (CGFloat(cell.col) + 0.5) * grid.width / 6,
+                            y: grid.maxY - (CGFloat(cell.row) + 0.5) * grid.height / 6)
+        return try XCTUnwrap(NSEvent.mouseEvent(
+            with: type, location: view.convert(point, to: nil), modifierFlags: [], timestamp: 0,
+            windowNumber: panel.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 0))
+    }
+
+    private final class TestScreen: NSScreen {
+        private let displayID: CGDirectDisplayID
+        private let testFrame: CGRect
+
+        init(id: CGDirectDisplayID, frame: CGRect) {
+            displayID = id
+            testFrame = frame
+            super.init()
+        }
+
+        override var frame: NSRect { testFrame }
+        override var visibleFrame: NSRect { testFrame }
+        override var safeAreaInsets: NSEdgeInsets { NSEdgeInsetsZero }
+        override var hash: Int { ObjectIdentifier(self).hashValue }
+        override var deviceDescription: [NSDeviceDescriptionKey: Any] {
+            [NSDeviceDescriptionKey("NSScreenNumber"): displayID]
+        }
+
+        override func isEqual(_ object: Any?) -> Bool {
+            (object as AnyObject?) === self
+        }
     }
 }
 
